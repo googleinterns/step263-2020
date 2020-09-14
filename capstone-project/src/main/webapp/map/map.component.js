@@ -18,8 +18,6 @@ angular.module('map').component('mapComponent', {
             long: 83.3697
         }];
 
-        $scope.gMap = null;
-
         let googleMapOption = {
             zoom: 4,
             center: new google.maps.LatLng(25, 80)
