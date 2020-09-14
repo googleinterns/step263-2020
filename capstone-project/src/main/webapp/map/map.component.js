@@ -27,7 +27,6 @@ angular.module('map').component('mapComponent', {
         
         //Iterate over the markers json and add all of them to the map
         $http.get('map/markers/markers.json').then(function(response){
-            //let markers = ;
             angular.forEach(response.data, function(marker){
                 createMarker(marker);
            });
