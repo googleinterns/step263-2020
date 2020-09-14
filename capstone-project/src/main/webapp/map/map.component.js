@@ -7,7 +7,7 @@ angular.module('map').component('mapComponent', {
     templateUrl: 'map/map.template.html',
     controller: function($scope) {
 
-        //Define some hard-coded markers to be shown on the map
+        // Define some hard-coded markers to be shown on the map
         $scope.markers = [{
             city: 'India',
             lat: 23.200000,
@@ -36,7 +36,7 @@ angular.module('map').component('mapComponent', {
 
         };
 
-        //Iterate over the list of markers and add all of them to the map
+        // Iterate over the list of markers and add all of them to the map
         for (let i = 0; i < $scope.markers.length; i++) {
             createMarker($scope.markers[i]);
         }
