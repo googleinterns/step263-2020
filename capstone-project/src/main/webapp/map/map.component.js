@@ -5,18 +5,7 @@
 
 angular.module('map').component('mapComponent', {
     templateUrl: 'map/map.template.html',
-    controller: function($scope) {
-
-        //Define some hard-coded markers to be shown on the map
-        $scope.markers = [{
-            city: 'India',
-            lat: 23.200000,
-            long: 79.225487
-        }, {
-            city: 'Gorakhpur',
-            lat: 26.7588,
-            long: 83.3697
-        }];
+    controller: function($scope, $http) {
 
         let googleMapOption = {
             zoom: 4,
@@ -35,11 +24,14 @@ angular.module('map').component('mapComponent', {
             });
 
         };
-
-        //Iterate over the list of markers and add all of them to the map
-        for (let i = 0; i < $scope.markers.length; i++) {
-            createMarker($scope.markers[i]);
-        }
-
+        
+        //Iterate over the markers json and add all of them to the map
+        $http.get('map/markers/markers.json').then(function(response){
+            //let markers = ;
+            angular.forEach(response.data, function(marker){
+                createMarker(marker);
+           });
+        });
+    
     }
 });
