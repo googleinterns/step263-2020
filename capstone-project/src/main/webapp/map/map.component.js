@@ -34,16 +34,16 @@ angular.module('map').component('mapComponent', {
 
         // Add a marker to the map
         let createMarkerForDisplay = function(marker) {
-            let markersInfo = new google.maps.Marker({
+            let markersData = new google.maps.Marker({
                 map: $scope.gMap,
                 position: new google.maps.LatLng(marker.lat, marker.long),
                 title: marker.city
             });
-            let winInfo = new google.maps.InfoWindow();
+            let markersInfoWindow = new google.maps.InfoWindow();
 
-            google.maps.event.addListener(markersInfo, 'click', function() {
-                winInfo.setContent('<h1>' + markersInfo.title + '</h1>');
-                winInfo.open($scope.gMap, markersInfo);
+            google.maps.event.addListener(markersData, 'click', function() {
+                markersInfoWindow.setContent('<h1>' + markersData.title + '</h1>');
+                markersInfoWindow.open($scope.gMap, markersData);
             });
         };
 
