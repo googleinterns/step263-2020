@@ -20,7 +20,7 @@ angular.module('map').component('mapComponent', {
             let markersInfo = new google.maps.Marker({
                 map: $scope.gMap,
                 position: new google.maps.LatLng(marker.lat, marker.long),
-                title: marker.city
+                title: marker.animal
             });
 
         };
