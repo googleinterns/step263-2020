@@ -1,0 +1,15 @@
+[
+  {
+    "animal": "Cow",
+    "description": "A nice looking cow",
+    "reporter": "Noy",
+    "lat": 23.200000,
+    "long": 79.225487
+  }, {
+    "animal": "Leopard",
+    "description": "A good looking cow",
+    "reporter": "Naama",
+    "lat": 26.7588,
+    "long": 83.3697
+  }
+]
