@@ -15,21 +15,17 @@ angular.module('map').component('mapComponent', {
         $scope.gMap = new google.maps.Map(document.getElementById('map-container'), googleMapOption);
 
         // Add a marker to the map
-        let createMarker = function(marker) {
+        const addMarker = function(marker) {
 
-            let markersInfo = new google.maps.Marker({
+            new google.maps.Marker({
                 map: $scope.gMap,
                 position: new google.maps.LatLng(marker.lat, marker.long),
-                title: marker.city
+                title: marker.animal
             });
 
         };
         
         // Iterate over the markers json and add all of them to the map
-        $http.get('map/markers/markers.json').then(function(response){
-            angular.forEach(response.data, function(marker){
-                createMarker(marker);
-           });
-        });
+        $http.get('map/markers/markers.json').then((response) => angular.forEach(response.data, addMarker));
     }
 });
