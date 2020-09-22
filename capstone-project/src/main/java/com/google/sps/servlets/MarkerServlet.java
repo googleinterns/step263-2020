@@ -32,7 +32,7 @@ import java.util.Collection;
 
 /** Handles fetching and saving markers data. */
 @WebServlet("/markers")
-public class MarkersServlet extends HttpServlet {
+public class MarkerServlet extends HttpServlet {
 
     /** Responds with a JSON array containing marker data. */
     @Override
