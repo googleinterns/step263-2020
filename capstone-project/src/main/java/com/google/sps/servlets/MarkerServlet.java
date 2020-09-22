@@ -80,7 +80,7 @@ public class MarkerServlet extends HttpServlet {
     }
 
     /** Stores a marker in Datastore. */
-    public void storeMarker(Marker marker) {
+    public static void storeMarker(Marker marker) {
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
         datastore.put(Marker.toEntity(marker));
     }
