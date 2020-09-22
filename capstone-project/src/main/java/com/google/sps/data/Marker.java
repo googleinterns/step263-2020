@@ -64,7 +64,7 @@ public class Marker {
     private final String reporter;
     private final String description;
 
-    public Marker(Builder builder) {
+    private Marker(Builder builder) {
         this.lat = builder.lat;
         this.lng = builder.lng;
         this.animal = builder.animal;
