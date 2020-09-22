@@ -77,8 +77,8 @@ public class MarkerServlet extends HttpServlet {
             double lat = (double) entity.getProperty("lat");
             double lng = (double) entity.getProperty("lng");
             String animal = (String) entity.getProperty("animal");
-            String description = (String) entity.getProperty("description");
             String reporter = (String) entity.getProperty("reporter");
+            String description = (String) entity.getProperty("description");
 
             Marker marker = new Marker.Builder()
                                 .setLat(lat)
