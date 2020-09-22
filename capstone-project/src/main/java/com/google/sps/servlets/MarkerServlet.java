@@ -66,7 +66,7 @@ public class MarkerServlet extends HttpServlet {
     }
 
     /** Fetches markers from Datastore. */
-    private Collection<Marker> getMarkers() {
+    private static Collection<Marker> getMarkers() {
         Collection<Marker> markers = new ArrayList<>();
 
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
@@ -74,34 +74,14 @@ public class MarkerServlet extends HttpServlet {
         PreparedQuery results = datastore.prepare(query);
 
         for (Entity entity : results.asIterable()) {
-            double lat = (double) entity.getProperty("lat");
-            double lng = (double) entity.getProperty("lng");
-            String animal = (String) entity.getProperty("animal");
-            String reporter = (String) entity.getProperty("reporter");
-            String description = (String) entity.getProperty("description");
-
-            Marker marker = new Marker.Builder()
-                                .setLat(lat)
-                                .setLng(lng)
-                                .setAnimal(animal)
-                                .setReporter(reporter)
-                                .setDescription(description)
-                                .build();
-            markers.add(marker);
+            markers.add(Marker.fromEntity(entity));
         }
         return markers;
     }
 
     /** Stores a marker in Datastore. */
     public void storeMarker(Marker marker) {
-        Entity markerEntity = new Entity("Marker");
-        markerEntity.setProperty("lat", marker.getLat());
-        markerEntity.setProperty("lng", marker.getLng());
-        markerEntity.setProperty("animal", marker.getAnimal());
-        markerEntity.setProperty("reporter", marker.getReporter());
-        markerEntity.setProperty("description", marker.getDescription());
-
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-        datastore.put(markerEntity);
+        datastore.put(Marker.toEntity(marker));
     }
 }

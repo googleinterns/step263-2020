@@ -14,6 +14,8 @@
 
 package com.google.sps.data;
 
+import com.google.appengine.api.datastore.Entity;
+
 /** Represents an animal report marker on the map. */
 public class Marker {
 
@@ -90,5 +92,33 @@ public class Marker {
 
     public String getDescription() {
         return description;
+    }
+
+    /** Creates a Marker from a marker entity */
+    public static Marker fromEntity(Entity entity){
+        double lat = (double) entity.getProperty("lat");
+        double lng = (double) entity.getProperty("lng");
+        String animal = (String) entity.getProperty("animal");
+        String reporter = (String) entity.getProperty("reporter");
+        String description = (String) entity.getProperty("description");
+
+        return new Marker.Builder()
+                .setLat(lat)
+                .setLng(lng)
+                .setAnimal(animal)
+                .setReporter(reporter)
+                .setDescription(description)
+                .build();
+    }
+
+    /** Creates a marker entity from a Marker */
+    public static Entity toEntity(Marker marker){
+        Entity markerEntity = new Entity("Marker");
+        markerEntity.setProperty("lat", marker.getLat());
+        markerEntity.setProperty("lng", marker.getLng());
+        markerEntity.setProperty("animal", marker.getAnimal());
+        markerEntity.setProperty("reporter", marker.getReporter());
+        markerEntity.setProperty("description", marker.getDescription());
+        return markerEntity;
     }
 }
