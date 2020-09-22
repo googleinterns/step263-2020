@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 /** Handles fetching and saving markers data. */
 @WebServlet("/markers")
-public class markersServlet extends HttpServlet {
+public class MarkersServlet extends HttpServlet {
 
     /** Responds with a JSON array containing marker data. */
     @Override
@@ -67,7 +67,7 @@ public class markersServlet extends HttpServlet {
         for (Entity entity : results.asIterable()) {
             double lat = (double) entity.getProperty("lat");
             double lng = (double) entity.getProperty("lng");
-            String content = (String) entity.getProperty("content");
+            String content = (String) entity.getProperty("animal");
 
             Marker marker = new Marker(lat, lng, content);
             markers.add(marker);
