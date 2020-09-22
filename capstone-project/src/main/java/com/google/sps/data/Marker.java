@@ -14,17 +14,62 @@
 
 package com.google.sps.data;
 
-/** Represents a marker on the map. */
+/** Represents an animal report marker on the map. */
 public class Marker {
+
+    public static class Builder {
+
+        private double lat;
+        private double lng;
+        private String animal;
+        private String reporter;
+        private String description;
+
+        public Builder(){
+        }
+
+        public Builder setLat(double lat){
+            this.lat = lat;
+            return this;
+        }
+
+        public Builder setLng(double lng){
+            this.lng = lng;
+            return this;
+        }
+
+        public Builder setAnimal(String animal){
+            this.animal = animal;
+            return this;
+        }
+
+        public Builder setReporter(String reporter){
+            this.reporter = reporter;
+            return this;
+        }
+
+        public Builder setDescription(String description){
+            this.description = description;
+            return this;
+        }
+
+        public Marker build(){
+            return new Marker(this);
+        }
+    }
 
     private final double lat;
     private final double lng;
-    private final String content;
+    private final String animal;
+    private final String reporter;
+    private final String description;
 
-    public Marker(double lat, double lng, String content) {
-        this.lat = lat;
-        this.lng = lng;
-        this.content = content;
+    public Marker(Builder builder) {
+        this.lat = builder.lat;
+        this.lng = builder.lng;
+        this.animal = builder.animal;
+        this.reporter = builder.reporter;
+        this.description = builder.description;
     }
 
     public double getLat() {
@@ -35,7 +80,15 @@ public class Marker {
         return lng;
     }
 
-    public String getContent() {
-        return content;
+    public String getAnimal() {
+        return animal;
+    }
+
+    public String getReporter() {
+        return reporter;
+    }
+
+    public String getDescription() {
+        return description;
     }
 }

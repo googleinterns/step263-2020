@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+
 /** Handles fetching and saving markers data. */
 @WebServlet("/markers")
 public class MarkersServlet extends HttpServlet {
@@ -50,9 +51,17 @@ public class MarkersServlet extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) {
         double lat = Double.parseDouble(request.getParameter("lat"));
         double lng = Double.parseDouble(request.getParameter("lng"));
-        String content = request.getParameter("content");
+        String animal = request.getParameter("animal");
+        String reporter = request.getParameter("reporter");
+        String description = request.getParameter("description");
 
-        Marker marker = new Marker(lat, lng, content);
+        Marker marker = new Marker.Builder()
+                            .setLat(lat)
+                            .setLng(lng)
+                            .setAnimal(animal)
+                            .setReporter(reporter)
+                            .setDescription(description)
+                            .build();
         storeMarker(marker);
     }
 
@@ -67,9 +76,17 @@ public class MarkersServlet extends HttpServlet {
         for (Entity entity : results.asIterable()) {
             double lat = (double) entity.getProperty("lat");
             double lng = (double) entity.getProperty("lng");
-            String content = (String) entity.getProperty("animal");
+            String animal = (String) entity.getProperty("animal");
+            String description = (String) entity.getProperty("description");
+            String reporter = (String) entity.getProperty("reporter");
 
-            Marker marker = new Marker(lat, lng, content);
+            Marker marker = new Marker.Builder()
+                                .setLat(lat)
+                                .setLng(lng)
+                                .setAnimal(animal)
+                                .setReporter(reporter)
+                                .setDescription(description)
+                                .build();
             markers.add(marker);
         }
         return markers;
@@ -80,7 +97,9 @@ public class MarkersServlet extends HttpServlet {
         Entity markerEntity = new Entity("Marker");
         markerEntity.setProperty("lat", marker.getLat());
         markerEntity.setProperty("lng", marker.getLng());
-        markerEntity.setProperty("content", marker.getContent());
+        markerEntity.setProperty("animal", marker.getAnimal());
+        markerEntity.setProperty("reporter", marker.getReporter());
+        markerEntity.setProperty("description", marker.getDescription());
 
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
         datastore.put(markerEntity);
