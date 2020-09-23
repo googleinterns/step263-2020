@@ -75,12 +75,15 @@ angular.module('map').component('mapComponent', {
 
         // Sends a marker to the backend for saving. 
         function postMarker(marker) {
-            const params = new URLSearchParams();
+
+            const params = new URLSearchParams(JSON.stringify(marker));
+            /*
             params.append('animal', marker.animal);
-            params.append('reporter', reporter);
-            params.append('description', description);
-            params.append('lat', lat);
-            params.append('lng', lng);
+            params.append('reporter', marker.reporter);
+            params.append('description', marker.description);
+            params.append('lat', marker.lat);
+            params.append('lng', marker.lng);
+            */
             $http.post('/markers', params);
             fetch('/markers', { method: 'POST', body: params });
         }
