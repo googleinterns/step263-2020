@@ -57,6 +57,7 @@ angular.module('map').component('mapComponent', {
                     lat: lat,
                     long: lng
                 };
+                postMarker(newMarker);
                 addMarkerForDisplay(newMarker);
                 editableMarker.setMap(null);
             };
@@ -69,6 +70,19 @@ angular.module('map').component('mapComponent', {
             containerDiv.appendChild(button);
 
             return containerDiv;
+        }
+
+
+        // Sends a marker to the backend for saving. 
+        function postMarker(marker) {
+            const params = new URLSearchParams();
+            params.append('animal', marker.animal);
+            params.append('reporter', reporter);
+            params.append('description', description);
+            params.append('lat', lat);
+            params.append('lng', lng);
+            $http.post('/markers', params);
+            fetch('/markers', { method: 'POST', body: params });
         }
 
         // Display a marker on the map
@@ -88,7 +102,7 @@ angular.module('map').component('mapComponent', {
             });
         };
 
-        // Iterate over the markers json and add all of them to the map
-        $http.get('map/markers/markers.json').then((response) => angular.forEach(response.data, addMarkerForDisplay));
+        //Fetches markers from the backend and adds them to the map. 
+        $http.get('/markers').then((response) => angular.forEach(response.data, addMarkerForDisplay));
     }
 });
