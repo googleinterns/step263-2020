@@ -50,7 +50,7 @@ angular.module('map').component('mapComponent', {
             button.appendChild(document.createTextNode('Submit'));
 
             button.onclick = () => {
-                let newMarker = {
+                const newMarker = {
                     animal: animal.value,
                     description: description.value,
                     reporter: reporter.value,
