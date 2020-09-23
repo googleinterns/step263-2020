@@ -49,19 +49,8 @@ public class MarkerServlet extends HttpServlet {
     /** Accepts a POST request containing a new marker. */
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) {
-        double lat = Double.parseDouble(request.getParameter("lat"));
-        double lng = Double.parseDouble(request.getParameter("lng"));
-        String animal = request.getParameter("animal");
-        String reporter = request.getParameter("reporter");
-        String description = request.getParameter("description");
-
-        Marker marker = new Marker.Builder()
-                            .setLat(lat)
-                            .setLng(lng)
-                            .setAnimal(animal)
-                            .setReporter(reporter)
-                            .setDescription(description)
-                            .build();
+        Gson gson = new Gson();
+        Marker marker = gson.fromJson(request.getParameter("marker"), Marker.class);
         storeMarker(marker);
     }
 
