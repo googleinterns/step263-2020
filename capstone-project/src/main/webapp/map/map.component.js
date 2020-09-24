@@ -19,9 +19,9 @@ angular.module('map').component('mapComponent', {
             addMarkerForEdit(event.latLng.lat(), event.latLng.lng());
         });
 
-        // Editable marker that displays when a user clicks on the map. 
+        // Editable marker that displays when a user clicks on the map.
         let editableMarker;
-        // Add a marker the user can edit. 
+        // Add a marker the user can edit.
         const addMarkerForEdit = function(lat, lng) {
             // If we're already showing an editable marker, then remove it.
             if (editableMarker) {
@@ -55,7 +55,7 @@ angular.module('map').component('mapComponent', {
                     description: description.value,
                     reporter: reporter.value,
                     lat: lat,
-                    long: lng
+                    lng: lng
                 };
                 postMarker(newMarker);
                 addMarkerForDisplay(newMarker);
@@ -73,19 +73,16 @@ angular.module('map').component('mapComponent', {
         }
 
 
-        // Sends a marker to the backend for saving. 
+        // Sends a marker to the backend for saving.
         function postMarker(marker) {
 
-            const params = new URLSearchParams(JSON.stringify(marker));
-            /*
-            params.append('animal', marker.animal);
-            params.append('reporter', marker.reporter);
-            params.append('description', marker.description);
-            params.append('lat', marker.lat);
-            params.append('lng', marker.lng);
-            */
-            $http.post('/markers', params);
-            fetch('/markers', { method: 'POST', body: params });
+            const markerJson = JSON.stringify(marker);
+            const markerParam = {marker: markerJson}
+             $http({
+                method: 'POST',
+                url: '/markers',
+                params: markerParam
+            });
         }
 
         // Display a marker on the map
@@ -93,7 +90,7 @@ angular.module('map').component('mapComponent', {
 
             const markerForDisplay = new google.maps.Marker({
                 map: $scope.gMap,
-                position: new google.maps.LatLng(marker.lat, marker.long),
+                position: new google.maps.LatLng(marker.lat, marker.lng),
                 title: marker.animal,
                 content: '<div>' + marker.description + '<br>' + 'Reported by: ' + marker.reporter + '</div>'
             });
@@ -105,7 +102,10 @@ angular.module('map').component('mapComponent', {
             });
         };
 
-        //Fetches markers from the backend and adds them to the map. 
-        $http.get('/markers').then((response) => angular.forEach(response.data, addMarkerForDisplay));
+        //Fetches markers from the backend and adds them to the map.
+        $http({
+            method: 'GET',
+            url: '/markers'
+        }).then((response) => angular.forEach(response.data, addMarkerForDisplay));
     }
 });
