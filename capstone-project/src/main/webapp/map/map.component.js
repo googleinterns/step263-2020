@@ -101,7 +101,7 @@ angular.module('map').component('mapComponent', {
             });
         };
 
-        //Fetches markers from the backend and adds them to the map.
+        // Fetches markers from the backend and adds them to the map.
         $http({
             method: 'GET',
             url: '/markers'
