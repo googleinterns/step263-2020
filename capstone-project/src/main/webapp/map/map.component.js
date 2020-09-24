@@ -22,7 +22,7 @@ angular.module('map').component('mapComponent', {
         // Editable marker that displays when a user clicks on the map.
         let editableMarker;
         // Add a marker the user can edit.
-        const addMarkerForEdit = function(lat, lng) {
+        function addMarkerForEdit(lat, lng) {
             // If we're already showing an editable marker, then remove it.
             if (editableMarker) {
                 editableMarker.setMap(null);
@@ -39,7 +39,7 @@ angular.module('map').component('mapComponent', {
         }
 
         // Build and return HTML elements that show editable textboxes and a submit button.
-        const buildInfoWindowInput = function(lat, lng) {
+        function buildInfoWindowInput(lat, lng) {
             const animal = document.createElement('textarea');
             animal.placeholder = "Animal";
             const description = document.createElement('textarea');
@@ -73,19 +73,15 @@ angular.module('map').component('mapComponent', {
         }
 
         // Sends a marker to the backend for saving.
-        const postMarker = function(marker) {
+        function postMarker(marker) {
 
             const markerJson = JSON.stringify(marker);
-            const data = { marker: markerJson }
-            $http({
-                method: 'POST',
-                url: '/markers',
-                params: data
-            });
+            const data = { marker: markerJson };
+            $http.post('/markers', null, {params: data});
         }
 
         // Display a marker on the map
-        const addMarkerForDisplay = function(marker) {
+        function addMarkerForDisplay(marker) {
 
             const markerForDisplay = new google.maps.Marker({
                 map: $scope.gMap,
@@ -102,9 +98,6 @@ angular.module('map').component('mapComponent', {
         };
 
         // Fetches markers from the backend and adds them to the map.
-        $http({
-            method: 'GET',
-            url: '/markers'
-        }).then((response) => angular.forEach(response.data, addMarkerForDisplay));
+        $http.get('/markers').then((response) => angular.forEach(response.data, addMarkerForDisplay));
     }
 });
