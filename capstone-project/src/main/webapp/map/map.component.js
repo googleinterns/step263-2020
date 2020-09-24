@@ -73,7 +73,7 @@ angular.module('map').component('mapComponent', {
         }
 
         // Sends a marker to the backend for saving.
-        function postMarker(marker) {
+        const postMarker = function(marker) {
 
             const markerJson = JSON.stringify(marker);
             const data = { marker: markerJson }
