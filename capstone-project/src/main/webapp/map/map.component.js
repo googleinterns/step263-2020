@@ -72,16 +72,15 @@ angular.module('map').component('mapComponent', {
             return containerDiv;
         }
 
-
         // Sends a marker to the backend for saving.
         function postMarker(marker) {
 
             const markerJson = JSON.stringify(marker);
-            const markerParam = {marker: markerJson}
-             $http({
+            const data = { marker: markerJson }
+            $http({
                 method: 'POST',
                 url: '/markers',
-                params: markerParam
+                params: data
             });
         }
 
