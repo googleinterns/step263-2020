@@ -34,7 +34,7 @@ import java.util.Collection;
 @WebServlet("/markers")
 public class MarkerServlet extends HttpServlet {
 
-    /** Responds with a JSON array containing marker data. */
+	/** Responds with a JSON array containing marker data. */
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
@@ -46,11 +46,12 @@ public class MarkerServlet extends HttpServlet {
         response.getWriter().println(json);
     }
 
-    /** Accepts a POST request containing a new marker. */
+    /** Accepts a POST request containing a new marker. 
+     * @throws IOException*/
     @Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response) {
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         Gson gson = new Gson();
-        Marker marker = gson.fromJson(request.getParameter("marker"), Marker.class);
+        Marker marker = gson.fromJson(request.getReader().readLine(), Marker.class);
         storeMarker(marker);
     }
 
