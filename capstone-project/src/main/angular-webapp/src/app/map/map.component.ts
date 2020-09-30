@@ -9,11 +9,11 @@ import { } from 'googlemaps';
 })
 export class MapComponent implements OnInit {
 
-  constructor(private httpClient: HttpClient) {  }
+  constructor(private httpClient: HttpClient) { }
 
   ngOnInit(): void {
 
-    const that = this;
+    const mapComponent = this;
     // Define the map.
     const googleMapOption = {
       zoom: 4,
@@ -83,12 +83,13 @@ export class MapComponent implements OnInit {
     function postMarker(marker) {
 
       const markerJson = JSON.stringify(marker);
-      that.httpClient.post('/markers', markerJson, {headers:{
-        'content':"application/json"
-      }
-    }).subscribe({
-      error: error => console.error( "There was an error!", error)
-    });
+      mapComponent.httpClient.post('/markers', markerJson, {
+        headers: {
+          'content': "application/json"
+        }
+      }).subscribe({
+        error: error => console.error("There was an error!", error)
+      });
     }
 
     // Display a marker on the map
@@ -99,27 +100,55 @@ export class MapComponent implements OnInit {
         position: new google.maps.LatLng(marker.lat, marker.lng),
         title: marker.animal
       });
-      markerForDisplay.set('content', '<div>' + marker.description + '<br>' + 'Reported by: ' + marker.reporter + '</div>')
-      const markersInfoWindow = new google.maps.InfoWindow();
+
+      const markersInfoWindow = new google.maps.InfoWindow({ content: buildDisplayInfoWindow(marker, markerForDisplay) });
 
       google.maps.event.addListener(markerForDisplay, 'click', function () {
-        markersInfoWindow.setContent('<h1>' + markerForDisplay['title'] + '</h1>' + markerForDisplay['content']);
         markersInfoWindow.open(gMap, markerForDisplay);
       });
     };
 
+    function buildDisplayInfoWindow(markerData, markerForDisplay) {
+      const animal = document.createElement('h1');
+      animal.textContent = markerData.animal;
+      const description = document.createElement('p');
+      description.textContent = markerData.description;
+      const reporter = document.createElement('p');
+      reporter.textContent = 'Reported By: ' + markerData.reporter;
+      const deleteButton = document.createElement('button');
+      deleteButton.appendChild(document.createTextNode('Delete'));
+      deleteButton.onclick = () => {
+        deleteMarker(markerData);
+        markerForDisplay.setMap(null);
+      };
+
+      const containerDiv = document.createElement('div');
+      containerDiv.appendChild(animal);
+      containerDiv.appendChild(description);
+      containerDiv.appendChild(reporter);
+      containerDiv.appendChild(deleteButton);
+
+      return containerDiv;
+    }
+
+    function deleteMarker(marker) {
+      const markerJson = JSON.stringify(marker);
+      mapComponent.httpClient.post('/delete', markerJson, {
+        headers: {
+          'content': "application/json"
+        }
+      }).subscribe({
+        error: error => console.error("There was an error!", error)
+      });
+    }
+
     // Fetches markers from the backend and adds them to the map.
-    this.httpClient.get('/markers')
+    mapComponent.httpClient.get('/markers')
       .toPromise()
-      .then((response) => 
-      
-      {
-        for(let key in response){
+      .then((response) => {
+        for (let key in response) {
           addMarkerForDisplay(response[key]);
         }
       });
-
   }
-
 }
-

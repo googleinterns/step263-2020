@@ -1,22 +1,24 @@
-<!DOCTYPE html>
-<html ng-app="mapApp">
+<!doctype html>
+<html lang="en">
 
 <head>
     <meta charset="utf-8">
-    <title>Basic Map</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="http://code.angularjs.org/1.5.7/angular.min.js"></script>
+    <title>AngularWebapp</title>
+    <base href="/">
     <script src="https://maps.googleapis.com/maps/api/js?key=ADD-KEY-HERE"></script>
-    <script src="app.module.js"></script>
-    <script src="map/map.module.js"></script>
-    <script src="map/map.component.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 
-<body>
-    <div>
-        <h1>Basic Map</h1>
-        <map-component></map-component>
-    </div>
+<body class="mat-typography">
+    <app-root></app-root>
+    <script src="runtime.js" defer></script>
+    <script src="polyfills.js" defer></script>
+    <script src="styles.js" defer></script>
+    <script src="vendor.js" defer></script>
+    <script src="main.js" defer></script>
 </body>
 
 </html>
