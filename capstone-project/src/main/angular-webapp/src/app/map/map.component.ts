@@ -13,7 +13,8 @@ export class MapComponent implements OnInit {
 
   ngOnInit(): void {
 
-    const that = this;
+    const mapComponent = this;
+
     // Define the map.
     const googleMapOption = {
       zoom: 4,
@@ -83,7 +84,7 @@ export class MapComponent implements OnInit {
     function postMarker(marker) {
 
       const markerJson = JSON.stringify(marker);
-      that.httpClient.post('/markers', markerJson, {headers:{
+      mapComponent.httpClient.post('/markers', markerJson, {headers:{
         'content':"application/json"
       }
     }).subscribe({
@@ -109,11 +110,9 @@ export class MapComponent implements OnInit {
     };
 
     // Fetches markers from the backend and adds them to the map.
-    this.httpClient.get('/markers')
+    mapComponent.httpClient.get('/markers')
       .toPromise()
-      .then((response) => 
-      
-      {
+      .then((response) => {
         for(let key in response){
           addMarkerForDisplay(response[key]);
         }
