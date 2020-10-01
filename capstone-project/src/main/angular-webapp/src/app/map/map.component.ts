@@ -83,13 +83,12 @@ export class MapComponent implements OnInit {
     function postMarker(marker) {
 
       const markerJson = JSON.stringify(marker);
-      mapComponent.httpClient.post('/markers', markerJson, {
-        headers: {
-          'content': "application/json"
-        }
-      }).subscribe({
-        error: error => console.error("There was an error!", error)
-      });
+      mapComponent.httpClient.post('/markers', markerJson, {headers:{
+        'content':"application/json"
+      }
+    }).subscribe({
+      error: error => console.error( "There was an error!", error)
+    });
     }
 
     // Display a marker on the map
@@ -149,7 +148,7 @@ export class MapComponent implements OnInit {
     mapComponent.httpClient.get('/markers')
       .toPromise()
       .then((response) => {
-        for (let key in response) {
+        for(let key in response){
           addMarkerForDisplay(response[key]);
         }
       });
