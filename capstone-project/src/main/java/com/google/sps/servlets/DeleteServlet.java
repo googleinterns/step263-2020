@@ -27,7 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-/** Handles fetching and saving markers data. */
+/** Handles deletion of existing markers. */
 @WebServlet("/delete")
 public class DeleteServlet extends HttpServlet {
 
@@ -41,7 +41,7 @@ public class DeleteServlet extends HttpServlet {
         deleteMarker(marker.getId());
     }
 
-    public void deleteMarker(long markersId) {
+    public static void deleteMarker(long markersId) {
         Key markerEntityKey = KeyFactory.createKey("Marker", markersId);
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
         datastore.delete(markerEntityKey);

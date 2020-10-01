@@ -108,6 +108,7 @@ export class MapComponent implements OnInit {
       });
     };
 
+    // Builds and returns an HTML element with the fields of an existing marker's info window.
     function buildDisplayInfoWindow(markerData, markerForDisplay) {
       const animal = document.createElement('h1');
       animal.textContent = markerData.animal;
@@ -118,8 +119,7 @@ export class MapComponent implements OnInit {
       const deleteButton = document.createElement('button');
       deleteButton.appendChild(document.createTextNode('Delete'));
       deleteButton.onclick = () => {
-        deleteMarker(markerData);
-        markerForDisplay.setMap(null);
+        deleteMarker(markerData, markerForDisplay);
       };
 
       const containerDiv = document.createElement('div');
@@ -131,8 +131,9 @@ export class MapComponent implements OnInit {
       return containerDiv;
     }
 
-    function deleteMarker(marker) {
-      const markerJson = JSON.stringify(marker);
+    // Deletes an existing marker.
+    function deleteMarker(markerData, markerForDisplay) {
+      const markerJson = JSON.stringify(markerData);
       mapComponent.httpClient.post('/delete', markerJson, {
         headers: {
           'content': "application/json"
@@ -140,6 +141,8 @@ export class MapComponent implements OnInit {
       }).subscribe({
         error: error => console.error("There was an error!", error)
       });
+      // Remove marker from the map.
+      markerForDisplay.setMap(null);
     }
 
     // Fetches markers from the backend and adds them to the map.
