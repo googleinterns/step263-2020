@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, AfterViewInit, OnInit, ViewContainerRef, ComponentFactory, ComponentFactoryResolver, ViewChild, Injector } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { } from 'googlemaps';
+import { InfoWindowComponent } from '../info-window/info-window.component';
+import { Container } from '@angular/compiler/src/i18n/i18n_ast';
 
 @Component({
   selector: 'app-map',
@@ -9,11 +11,13 @@ import { } from 'googlemaps';
 })
 export class MapComponent implements OnInit {
 
-  constructor(private httpClient: HttpClient) {  }
+  constructor(private httpClient: HttpClient, private componentFactoryResolver: ComponentFactoryResolver, private injector: Injector) {  }
 
   ngOnInit(): void {
 
     const mapComponent = this;
+    const factory: ComponentFactory<InfoWindowComponent> = this.componentFactoryResolver.resolveComponentFactory(InfoWindowComponent);
+    
 
     // Define the map.
     const googleMapOption = {
@@ -48,36 +52,40 @@ export class MapComponent implements OnInit {
 
     // Build and return HTML elements that show editable textboxes and a submit button.
     function buildInfoWindowInput(lat, lng) {
-      const animal = document.createElement('textarea');
-      animal.placeholder = "Animal";
-      const description = document.createElement('textarea');
-      description.placeholder = "Description";
-      const reporter = document.createElement('textarea');
-      reporter.placeholder = "Reporter's Name";
-      const button = document.createElement('button');
-      button.appendChild(document.createTextNode('Submit'));
+      // const animal = document.createElement('textarea');
+      // animal.placeholder = "Animal";
+      // const description = document.createElement('textarea');
+      // description.placeholder = "Description";
+      // const reporter = document.createElement('textarea');
+      // reporter.placeholder = "Reporter's Name";
+      // const button = document.createElement('button');
+      // button.appendChild(document.createTextNode('Submit'));
+      const infoWindowComponent = factory.create(mapComponent.injector);
+      infoWindowComponent.instance.display = false;
+      infoWindowComponent.instance.template = true;
+      infoWindowComponent.changeDetectorRef.detectChanges();
 
-      button.onclick = () => {
+      infoWindowComponent.instance.submitEvent.subscribe(event => {
         const newMarker = {
-          animal: animal.value,
-          description: description.value,
-          reporter: reporter.value,
+          animal: event.animal,
+          description: event.description,
+          reporter: event.reporter,
           lat: lat,
           lng: lng
         };
         postMarker(newMarker);
         addMarkerForDisplay(newMarker);
         editableMarker.setMap(null);
-      };
+      });
 
-      const containerDiv = document.createElement('div');
-      containerDiv.appendChild(animal);
-      containerDiv.appendChild(description);
-      containerDiv.appendChild(reporter);
-      containerDiv.appendChild(document.createElement('br'));
-      containerDiv.appendChild(button);
+      //const containerDiv = document.createElement('div');
+      // containerDiv.appendChild(animal);
+      // containerDiv.appendChild(description);
+      // containerDiv.appendChild(reporter);
+      // containerDiv.appendChild(document.createElement('br'));
+      // containerDiv.appendChild(button);
 
-      return containerDiv;
+      return infoWindowComponent.location.nativeElement;;
     }
 
     // Sends a marker to the backend for saving.
@@ -88,7 +96,7 @@ export class MapComponent implements OnInit {
         'content':"application/json"
       }
     }).subscribe({
-      error: error => console.error( "There was an error!", error)
+      error: error => console.error(error)
     });
     }
 
@@ -100,11 +108,21 @@ export class MapComponent implements OnInit {
         position: new google.maps.LatLng(marker.lat, marker.lng),
         title: marker.animal
       });
-      markerForDisplay.set('content', '<div>' + marker.description + '<br>' + 'Reported by: ' + marker.reporter + '</div>')
       const markersInfoWindow = new google.maps.InfoWindow();
 
+      const infoWindowComponent = factory.create(mapComponent.injector);
+      infoWindowComponent.instance.animal = marker.animal;
+      infoWindowComponent.instance.lat = marker.lat;
+      infoWindowComponent.instance.lng = marker.lng;
+      infoWindowComponent.instance.description = marker.description;
+      infoWindowComponent.instance.reporter = marker.reporter;
+      infoWindowComponent.instance.display = true;
+      infoWindowComponent.instance.template = false;
+      infoWindowComponent.changeDetectorRef.detectChanges();
+      const infoWindowHtmlElement = infoWindowComponent.location.nativeElement;
+
       google.maps.event.addListener(markerForDisplay, 'click', function () {
-        markersInfoWindow.setContent('<h1>' + markerForDisplay['title'] + '</h1>' + markerForDisplay['content']);
+        markersInfoWindow.setContent(infoWindowHtmlElement);
         markersInfoWindow.open(gMap, markerForDisplay);
       });
     };
