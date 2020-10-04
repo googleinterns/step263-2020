@@ -159,6 +159,7 @@ export class MapComponent implements OnInit {
       editableInfoWindow.open(gMap, markerForDisplay);
     }
 
+    // Builds an html element for updating the data of a marker
     function buildUpdateInfoWindow(markerData,markerForDisplay) {
       const animal = document.createElement('textarea');
       animal.value = markerData.animal;
