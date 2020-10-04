@@ -28,8 +28,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /** Handles deletion of existing markers. */
-@WebServlet("/delete")
-public class DeleteServlet extends HttpServlet {
+@WebServlet("/delete-marker")
+public class DeleteMarkerServlet extends HttpServlet {
 
     /** Accepts a POST request containing a marker to delete.
      * @throws IOException
