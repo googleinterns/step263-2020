@@ -9,12 +9,11 @@ import { } from 'googlemaps';
 })
 export class MapComponent implements OnInit {
 
-  constructor(private httpClient: HttpClient) {  }
+  constructor(private httpClient: HttpClient) { }
 
   ngOnInit(): void {
 
     const mapComponent = this;
-
     // Define the map.
     const googleMapOption = {
       zoom: 4,
@@ -100,14 +99,47 @@ export class MapComponent implements OnInit {
         position: new google.maps.LatLng(marker.lat, marker.lng),
         title: marker.animal
       });
-      markerForDisplay.set('content', '<div>' + marker.description + '<br>' + 'Reported by: ' + marker.reporter + '</div>')
-      const markersInfoWindow = new google.maps.InfoWindow();
+
+      const markersInfoWindow = new google.maps.InfoWindow({ content: buildDisplayInfoWindow(marker, markerForDisplay) });
 
       google.maps.event.addListener(markerForDisplay, 'click', function () {
-        markersInfoWindow.setContent('<h1>' + markerForDisplay['title'] + '</h1>' + markerForDisplay['content']);
         markersInfoWindow.open(gMap, markerForDisplay);
       });
     };
+
+    // Builds and returns an HTML element with the fields of an existing marker's info window.
+    function buildDisplayInfoWindow(markerData, markerForDisplay) {
+      const animal = document.createElement('h1');
+      animal.textContent = markerData.animal;
+      const description = document.createElement('p');
+      description.textContent = markerData.description;
+      const reporter = document.createElement('p');
+      reporter.textContent = 'Reported By: ' + markerData.reporter;
+      const deleteButton = document.createElement('button');
+      deleteButton.appendChild(document.createTextNode('Delete'));
+      deleteButton.onclick = () => {
+        deleteMarker(markerData, markerForDisplay);
+      };
+
+      const containerDiv = document.createElement('div');
+      containerDiv.appendChild(animal);
+      containerDiv.appendChild(description);
+      containerDiv.appendChild(reporter);
+      containerDiv.appendChild(deleteButton);
+
+      return containerDiv;
+    }
+
+    // Deletes an existing marker.
+    function deleteMarker(markerData, markerForDisplay) {
+  
+      mapComponent.httpClient.post('/delete-marker', markerData.id,
+      ).subscribe({
+        error: error => console.error("There was an error!", error)
+      });
+      // Remove marker from the map.
+      markerForDisplay.setMap(null);
+    }
 
     // Fetches markers from the backend and adds them to the map.
     mapComponent.httpClient.get('/markers')
