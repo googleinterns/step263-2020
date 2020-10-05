@@ -123,8 +123,5 @@ export class MapComponent implements OnInit {
           addMarkerForDisplay(response[key]);
         }
       });
-
   }
-
 }
-
