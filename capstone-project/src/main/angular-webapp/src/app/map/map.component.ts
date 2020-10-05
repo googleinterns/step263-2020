@@ -48,7 +48,7 @@ export class MapComponent implements OnInit {
       infoWindow.open(gMap, editableMarker);
     }
 
-    // Build and return HTML elements that show editable textboxes and a submit button.
+    // Build and return HTML element that show editable textboxes and a submit button.
     function buildInfoWindowInput(lat, lng) {
       const infoWindowComponent = factory.create(mapComponent.injector);
       infoWindowComponent.instance.type = InfoWindowType.CREATE;
@@ -82,7 +82,7 @@ export class MapComponent implements OnInit {
     });
     }
 
-    // Display a marker on the map
+    // Builds info window of a marker
     function addMarkerForDisplay(marker) {
 
       const markerForDisplay = new google.maps.Marker({
@@ -90,8 +90,11 @@ export class MapComponent implements OnInit {
         position: new google.maps.LatLng(marker.lat, marker.lng),
         title: marker.animal
       });
+
       const markersInfoWindow = new google.maps.InfoWindow();
-      const infoWindowComponent = createInfoWindowForDisplay(marker);      
+      const infoWindowComponent = createInfoWindowForDisplay(marker);
+      infoWindowComponent.instance.deleteEvent.subscribe(event => 
+        deleteMarker(marker, markerForDisplay));
 
       google.maps.event.addListener(markerForDisplay, 'click', function () {
         markersInfoWindow.setContent(infoWindowComponent.location.nativeElement);
@@ -99,6 +102,7 @@ export class MapComponent implements OnInit {
       });
     };
 
+    // Creates the info window component for display of marker
     function createInfoWindowForDisplay(marker){
       const infoWindowComponent = factory.create(mapComponent.injector);
       infoWindowComponent.instance.animal = marker.animal;
@@ -109,6 +113,17 @@ export class MapComponent implements OnInit {
       infoWindowComponent.instance.type = InfoWindowType.DISPLAY;
       infoWindowComponent.changeDetectorRef.detectChanges();
       return infoWindowComponent;
+    }   
+
+    // Deletes an existing marker.
+    function deleteMarker(markerData, markerForDisplay) {
+  
+      mapComponent.httpClient.post('/delete-marker', markerData.id,
+      ).subscribe({
+        error: error => console.error("There was an error!", error)
+      });
+      // Remove marker from the map.
+      markerForDisplay.setMap(null);
     }
 
     // Fetches markers from the backend and adds them to the map.

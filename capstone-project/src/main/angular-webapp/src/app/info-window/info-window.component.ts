@@ -16,6 +16,9 @@ export class InfoWindowComponent implements OnInit {
   @Input() type: InfoWindowType;
 
   @Output() submitEvent = new EventEmitter();
+  @Output() deleteEvent = new EventEmitter();
+
+  InfoWindowType = InfoWindowType; // For the ngIf in template
 
   constructor() { }
 
@@ -24,6 +27,10 @@ export class InfoWindowComponent implements OnInit {
 
   submit(animalValue, descriptionValue, reporterValue){
     this.submitEvent.emit({animal: animalValue, description: descriptionValue, reporter: reporterValue})
+  }
+
+  delete(){
+    this.deleteEvent.emit()
   }
 
 }

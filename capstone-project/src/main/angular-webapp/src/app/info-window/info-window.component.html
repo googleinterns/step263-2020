@@ -6,8 +6,9 @@
         <h1>{{animal}}</h1>
         <div>
             {{description}}<br>
-            Reported by: {{reporter}}
+            Reported by: {{reporter}}<br>
         </div>
+        <button (click)="delete()">Delete</button>
     </div>
     <div *ngIf="type==InfoWindowType.CREATE">
         <input #animal placeholder="Animal"><br>
