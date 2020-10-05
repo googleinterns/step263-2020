@@ -2,14 +2,14 @@
 <head>
 </head>
 <body>
-    <div *ngIf="display">
+    <div *ngIf="type==InfoWindowType.DISPLAY">
         <h1>{{animal}}</h1>
         <div>
             {{description}}<br>
             Reported by: {{reporter}}
         </div>
     </div>
-    <div *ngIf="template">
+    <div *ngIf="type==InfoWindowType.CREATE">
         <input #animal placeholder="Animal"><br>
         <input #description placeholder="Description"><br>
         <input #reporter placeholder="Reporter's Name"><br>

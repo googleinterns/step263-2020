@@ -1,7 +1,7 @@
 import { Component, AfterViewInit, OnInit, ViewContainerRef, ComponentFactory, ComponentFactoryResolver, ViewChild, Injector } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { } from 'googlemaps';
-import { InfoWindowComponent } from '../info-window/info-window.component';
+import { InfoWindowComponent, InfoWindowType } from '../info-window/info-window.component';
 import { Container } from '@angular/compiler/src/i18n/i18n_ast';
 
 @Component({
@@ -52,17 +52,8 @@ export class MapComponent implements OnInit {
 
     // Build and return HTML elements that show editable textboxes and a submit button.
     function buildInfoWindowInput(lat, lng) {
-      // const animal = document.createElement('textarea');
-      // animal.placeholder = "Animal";
-      // const description = document.createElement('textarea');
-      // description.placeholder = "Description";
-      // const reporter = document.createElement('textarea');
-      // reporter.placeholder = "Reporter's Name";
-      // const button = document.createElement('button');
-      // button.appendChild(document.createTextNode('Submit'));
       const infoWindowComponent = factory.create(mapComponent.injector);
-      infoWindowComponent.instance.display = false;
-      infoWindowComponent.instance.template = true;
+      infoWindowComponent.instance.type = InfoWindowType.CREATE;
       infoWindowComponent.changeDetectorRef.detectChanges();
 
       infoWindowComponent.instance.submitEvent.subscribe(event => {
@@ -77,13 +68,6 @@ export class MapComponent implements OnInit {
         addMarkerForDisplay(newMarker);
         editableMarker.setMap(null);
       });
-
-      //const containerDiv = document.createElement('div');
-      // containerDiv.appendChild(animal);
-      // containerDiv.appendChild(description);
-      // containerDiv.appendChild(reporter);
-      // containerDiv.appendChild(document.createElement('br'));
-      // containerDiv.appendChild(button);
 
       return infoWindowComponent.location.nativeElement;;
     }
@@ -110,15 +94,7 @@ export class MapComponent implements OnInit {
       });
       const markersInfoWindow = new google.maps.InfoWindow();
 
-      const infoWindowComponent = factory.create(mapComponent.injector);
-      infoWindowComponent.instance.animal = marker.animal;
-      infoWindowComponent.instance.lat = marker.lat;
-      infoWindowComponent.instance.lng = marker.lng;
-      infoWindowComponent.instance.description = marker.description;
-      infoWindowComponent.instance.reporter = marker.reporter;
-      infoWindowComponent.instance.display = true;
-      infoWindowComponent.instance.template = false;
-      infoWindowComponent.changeDetectorRef.detectChanges();
+      const infoWindowComponent = createInfoWindowForDisplay(marker);      
       const infoWindowHtmlElement = infoWindowComponent.location.nativeElement;
 
       google.maps.event.addListener(markerForDisplay, 'click', function () {
@@ -126,6 +102,18 @@ export class MapComponent implements OnInit {
         markersInfoWindow.open(gMap, markerForDisplay);
       });
     };
+
+    function createInfoWindowForDisplay(marker){
+      const infoWindowComponent = factory.create(mapComponent.injector);
+      infoWindowComponent.instance.animal = marker.animal;
+      infoWindowComponent.instance.lat = marker.lat;
+      infoWindowComponent.instance.lng = marker.lng;
+      infoWindowComponent.instance.description = marker.description;
+      infoWindowComponent.instance.reporter = marker.reporter;
+      infoWindowComponent.instance.type = InfoWindowType.DISPLAY;
+      infoWindowComponent.changeDetectorRef.detectChanges();
+      return infoWindowComponent;
+    }
 
     // Fetches markers from the backend and adds them to the map.
     mapComponent.httpClient.get('/markers')

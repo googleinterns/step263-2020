@@ -13,8 +13,7 @@ export class InfoWindowComponent implements OnInit {
   @Input() animal: string;
   @Input() description: string;
   @Input() reporter: string;
-  @Input() display: boolean;
-  @Input() template: boolean;
+  @Input() type: InfoWindowType;
 
   @Output() submitEvent = new EventEmitter();
 
@@ -27,4 +26,8 @@ export class InfoWindowComponent implements OnInit {
     this.submitEvent.emit({animal: animalValue, description: descriptionValue, reporter: reporterValue})
   }
 
+}
+
+export enum InfoWindowType {
+  DISPLAY, EDIT, CREATE
 }
