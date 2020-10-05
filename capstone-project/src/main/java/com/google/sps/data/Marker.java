@@ -125,9 +125,9 @@ public class Marker {
                 .build();
     }
 
-    /** Creates a marker entity from a Marker */
-    public static Entity toEntity(Marker marker){
-        Entity markerEntity = new Entity("Marker");
+    // Copies the fields of a Marker class instance to a Marker entity.
+    public static Entity toEntity(Marker marker, Entity markerEntity){
+
         markerEntity.setProperty("lat", marker.getLat());
         markerEntity.setProperty("lng", marker.getLng());
         markerEntity.setProperty("animal", marker.getAnimal());

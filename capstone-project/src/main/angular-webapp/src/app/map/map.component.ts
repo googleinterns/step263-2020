@@ -1,12 +1,18 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { } from 'googlemaps';
+
+// enum of the info window types, used in template
+export enum MarkerAction {
+  CREATE, UPDATE, DELETE
+}
 
 @Component({
   selector: 'app-map',
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.css']
 })
+
 export class MapComponent implements OnInit {
 
   constructor(private httpClient: HttpClient) { }
@@ -64,7 +70,7 @@ export class MapComponent implements OnInit {
           lat: lat,
           lng: lng
         };
-        postMarker(newMarker);
+        postMarker(newMarker, MarkerAction.CREATE);
         addMarkerForDisplay(newMarker);
         editableMarker.setMap(null);
       };
@@ -79,16 +85,16 @@ export class MapComponent implements OnInit {
       return containerDiv;
     }
 
-    // Sends a marker to the backend for saving.
-    function postMarker(marker) {
+    // Performs a back end action on a marker - create / update / delete.
+    function postMarker(marker, action) {
 
       const markerJson = JSON.stringify(marker);
-      mapComponent.httpClient.post('/markers', markerJson, {headers:{
-        'content':"application/json"
-      }
-    }).subscribe({
-      error: error => console.error( "There was an error!", error)
-    });
+      const params = new HttpParams()
+        .set('marker', markerJson)
+        .set('action', action.toString());
+      mapComponent.httpClient.post('/markers', params).subscribe({
+        error: error => console.error("The marker failed to save. Error details: ", error)
+      });
     }
 
     // Display a marker on the map
@@ -137,11 +143,14 @@ export class MapComponent implements OnInit {
 
     // Deletes an existing marker.
     function deleteMarker(markerData, markerForDisplay) {
-  
-      mapComponent.httpClient.post('/delete-marker', markerData.id,
-      ).subscribe({
-        error: error => console.error("There was an error!", error)
+
+      const params = new HttpParams()
+        .set('id', markerData.id.toString())
+        .set('action', MarkerAction.DELETE.toString());
+      mapComponent.httpClient.post('/markers', params).subscribe({
+        error: error => console.error("The marker failed to delete. Error details: ", error)
       });
+  
       // Remove marker from the map.
       markerForDisplay.setMap(null);
     }
@@ -155,6 +164,7 @@ export class MapComponent implements OnInit {
 
     // Builds and returns an HTML element letting the user update the fields of an existing marker.
     function buildUpdateInfoWindow(markerData, markerForDisplay) {
+    
       const animal = document.createElement('textarea');
       animal.value = markerData.animal;
       const description = document.createElement('textarea');
@@ -165,15 +175,14 @@ export class MapComponent implements OnInit {
       updateButton.appendChild(document.createTextNode('Update'));
       updateButton.onclick = () => {
         const updatedMarker = {
+          id: markerData.id,
           animal: animal.value,
           description: description.value,
           reporter: reporter.value,
           lat: markerData.lat,
           lng: markerData.lng
         };
-        deleteMarker(markerData,markerForDisplay);
-        postMarker(updatedMarker);
-        addMarkerForDisplay(updatedMarker);
+        postMarker(updatedMarker, MarkerAction.UPDATE);
       };
 
       const containerDiv = document.createElement('div');
@@ -190,7 +199,7 @@ export class MapComponent implements OnInit {
     mapComponent.httpClient.get('/markers')
       .toPromise()
       .then((response) => {
-        for(let key in response){
+        for (let key in response) {
           addMarkerForDisplay(response[key]);
         }
       });
