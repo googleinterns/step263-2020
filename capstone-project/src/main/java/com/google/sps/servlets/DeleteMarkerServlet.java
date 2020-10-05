@@ -36,9 +36,8 @@ public class DeleteMarkerServlet extends HttpServlet {
      */
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        Gson gson = new Gson();
-        Marker marker = gson.fromJson(request.getReader().readLine(), Marker.class);
-        deleteMarker(marker.getId());
+        long markerId = Long.parseLong(request.getReader().readLine());
+        deleteMarker(markerId);
     }
 
     public static void deleteMarker(long markersId) {

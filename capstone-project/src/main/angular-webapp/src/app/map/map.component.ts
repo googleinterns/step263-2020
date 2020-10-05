@@ -49,13 +49,10 @@ export class MapComponent implements OnInit {
     function buildInfoWindowInput(lat, lng) {
       const animal = document.createElement('textarea');
       animal.placeholder = "Animal";
-      animal.className = 'animal';
       const description = document.createElement('textarea');
       description.placeholder = "Description";
-      description.className = 'description';
       const reporter = document.createElement('textarea');
       reporter.placeholder = "Reporter's Name";
-      reporter.className = 'reporter';
       const button = document.createElement('button');
       button.appendChild(document.createTextNode('Submit'));
 
@@ -140,12 +137,9 @@ export class MapComponent implements OnInit {
 
     // Deletes an existing marker.
     function deleteMarker(markerData, markerForDisplay) {
-      const markerJson = JSON.stringify(markerData);
-      mapComponent.httpClient.post('/delete-marker', markerJson, {
-        headers: {
-          'content': "application/json"
-        }
-      }).subscribe({
+  
+      mapComponent.httpClient.post('/delete-marker', markerData.id,
+      ).subscribe({
         error: error => console.error("There was an error!", error)
       });
       // Remove marker from the map.
@@ -159,8 +153,8 @@ export class MapComponent implements OnInit {
       editableInfoWindow.open(gMap, markerForDisplay);
     }
 
-    // Builds an html element for updating the data of a marker
-    function buildUpdateInfoWindow(markerData,markerForDisplay) {
+    // Builds and returns an HTML element letting the user update the fields of an existing marker.
+    function buildUpdateInfoWindow(markerData, markerForDisplay) {
       const animal = document.createElement('textarea');
       animal.value = markerData.animal;
       const description = document.createElement('textarea');
