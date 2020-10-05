@@ -104,6 +104,7 @@ public class MarkerServlet extends HttpServlet {
         datastore.put(Marker.toEntity(marker, markerEntity));
     }
 
+    /** Updates an existing marker's data */
     public static void updateMarker(Marker marker) throws EntityNotFoundException {
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
         Key markerEntityKey = KeyFactory.createKey("Marker", marker.getId());
@@ -111,6 +112,7 @@ public class MarkerServlet extends HttpServlet {
         datastore.put(Marker.toEntity(marker, markerEntity));
     }
 
+    /** Deletes a marker */
     public static void deleteMarker(long markersId) {
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
         Key markerEntityKey = KeyFactory.createKey("Marker", markersId);
