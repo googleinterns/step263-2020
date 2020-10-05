@@ -98,14 +98,14 @@ public class MarkerServlet extends HttpServlet {
     }
 
     /** Stores a marker in Datastore. */
-    public static void storeMarker(Marker marker) {
+    private static void storeMarker(Marker marker) {
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
         Entity markerEntity = new Entity("Marker");
         datastore.put(Marker.toEntity(marker, markerEntity));
     }
 
     /** Updates an existing marker's data */
-    public static void updateMarker(Marker marker) throws EntityNotFoundException {
+    private static void updateMarker(Marker marker) throws EntityNotFoundException {
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
         Key markerEntityKey = KeyFactory.createKey("Marker", marker.getId());
         Entity markerEntity = datastore.get(markerEntityKey);
@@ -113,7 +113,7 @@ public class MarkerServlet extends HttpServlet {
     }
 
     /** Deletes a marker */
-    public static void deleteMarker(long markersId) {
+    private static void deleteMarker(long markersId) {
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
         Key markerEntityKey = KeyFactory.createKey("Marker", markersId);
         datastore.delete(markerEntityKey);
