@@ -1,8 +1,7 @@
-import { Component, AfterViewInit, OnInit, ViewContainerRef, ComponentFactory, ComponentFactoryResolver, ViewChild, Injector } from '@angular/core';
+import { Component, OnInit, ComponentFactory, ComponentFactoryResolver, Injector } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { } from 'googlemaps';
 import { InfoWindowComponent, InfoWindowType } from '../info-window/info-window.component';
-import { Container } from '@angular/compiler/src/i18n/i18n_ast';
 
 @Component({
   selector: 'app-map',
@@ -18,7 +17,6 @@ export class MapComponent implements OnInit {
     const mapComponent = this;
     const factory: ComponentFactory<InfoWindowComponent> = this.componentFactoryResolver.resolveComponentFactory(InfoWindowComponent);
     
-
     // Define the map.
     const googleMapOption = {
       zoom: 4,
@@ -93,12 +91,10 @@ export class MapComponent implements OnInit {
         title: marker.animal
       });
       const markersInfoWindow = new google.maps.InfoWindow();
-
       const infoWindowComponent = createInfoWindowForDisplay(marker);      
-      const infoWindowHtmlElement = infoWindowComponent.location.nativeElement;
 
       google.maps.event.addListener(markerForDisplay, 'click', function () {
-        markersInfoWindow.setContent(infoWindowHtmlElement);
+        markersInfoWindow.setContent(infoWindowComponent.location.nativeElement);
         markersInfoWindow.open(gMap, markerForDisplay);
       });
     };
