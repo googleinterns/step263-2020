@@ -47,7 +47,8 @@ public class MarkerServlet extends HttpServlet {
     }
 
     /** Accepts a POST request containing a new marker. 
-     * @throws IOException*/
+     * @throws IOException
+     */
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         Gson gson = new Gson();
