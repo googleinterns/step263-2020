@@ -2,7 +2,7 @@
 <head>
 </head>
 <body>
-    <div *ngIf="type==MarkerAction.CREATE">
+    <div *ngIf="type==MarkerAction.DISPLAY">
         <h1>{{animal}}</h1>
         <div>
             {{description}}<br>
@@ -11,7 +11,7 @@
         <button (click)="delete()">Delete</button>
         <button (click)="update()">Update</button>
     </div>
-    <div *ngIf="type==MarkerAction.INITIALIZE">
+    <div *ngIf="type==MarkerAction.CREATE">
         <input #inputAnimal placeholder="Animal"><br>
         <input #inputDescription placeholder="Description"><br>
         <input #inputReporter placeholder="Reporter's Name"><br>

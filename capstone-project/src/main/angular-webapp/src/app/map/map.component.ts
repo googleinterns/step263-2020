@@ -2,7 +2,7 @@ import { Component, OnInit, ComponentFactory, ComponentFactoryResolver, Injector
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { } from 'googlemaps';
 import { InfoWindowComponent } from '../info-window/info-window.component';
-import { MarkerAction } from './marker-action';
+import { MarkerAction } from '../marker-action';
 
 @Component({
   selector: 'app-map',
@@ -53,7 +53,7 @@ export class MapComponent implements OnInit {
     // Build infoWindowComponent and return it's HTML element that show editable textboxes and a submit button.
     function buildInfoWindowInput(lat, lng) {
       const infoWindowComponent = factory.create(mapComponent.injector);
-      infoWindowComponent.instance.type = MarkerAction.INITIALIZE;
+      infoWindowComponent.instance.type = MarkerAction.CREATE;
       infoWindowComponent.changeDetectorRef.detectChanges();
 
       infoWindowComponent.instance.submitEvent.subscribe(event => {
@@ -64,7 +64,7 @@ export class MapComponent implements OnInit {
           lat: lat,
           lng: lng
         };
-        postMarker(newMarker, MarkerAction.CREATE);
+        postMarker(newMarker, MarkerAction.DISPLAY);
         addMarkerForDisplay(newMarker);
         editableMarker.setMap(null);
       });
@@ -72,7 +72,7 @@ export class MapComponent implements OnInit {
       return infoWindowComponent.location.nativeElement;;
     }
 
-    // Performs a backend action on a marker - create / update / delete.
+    // Performs a backend action on a marker - display / update / delete.
     function postMarker(marker, action) {
 
       const markerJson = JSON.stringify(marker);
@@ -119,7 +119,7 @@ export class MapComponent implements OnInit {
       infoWindowComponent.instance.lng = marker.lng;
       infoWindowComponent.instance.description = marker.description;
       infoWindowComponent.instance.reporter = marker.reporter;
-      infoWindowComponent.instance.type = MarkerAction.CREATE;
+      infoWindowComponent.instance.type = MarkerAction.DISPLAY;
       infoWindowComponent.changeDetectorRef.detectChanges();
       return infoWindowComponent;
     }
@@ -155,7 +155,7 @@ export class MapComponent implements OnInit {
         };
         postMarker(newMarker, MarkerAction.UPDATE);
         // Once the user clicks "Update", we want to return the regular display
-        infoWindowComponent.instance.type = MarkerAction.CREATE;
+        infoWindowComponent.instance.type = MarkerAction.DISPLAY;
         infoWindowComponent.changeDetectorRef.detectChanges();
       });
 
