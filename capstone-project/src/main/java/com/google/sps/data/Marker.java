@@ -14,11 +14,7 @@
 
 package com.google.sps.data;
 
-import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.EntityNotFoundException;
 
 /** Represents an animal report marker on the map. */
 public class Marker {
@@ -135,14 +131,12 @@ public class Marker {
         return setEntityProperties(marker, markerEntity);
     }
 
-    // Finds the entity of the marker that needs to be updated using its ID and then overwrites its fields to update the data.
-    public static Entity toEntity(Marker marker, Key markerEntityKey) throws EntityNotFoundException {
-        DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-        Entity markerEntity = datastore.get(markerEntityKey);
+    // Overwrites a given entity's fields to update the data.
+    public static Entity toEntity(Marker marker, Entity markerEntity){
         return setEntityProperties(marker, markerEntity);
     }
 
-    // Set the properties of the marker entity
+    // Sets the properties of the marker entity
     private static Entity setEntityProperties (Marker marker, Entity markerEntity) {
         markerEntity.setProperty("lat", marker.getLat());
         markerEntity.setProperty("lng", marker.getLng());
