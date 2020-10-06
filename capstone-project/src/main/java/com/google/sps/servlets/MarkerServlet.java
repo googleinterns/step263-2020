@@ -64,10 +64,13 @@ public class MarkerServlet extends HttpServlet {
         int actionNum = Integer.parseInt(request.getParameter("action"));
         Action action = Action.values()[actionNum];
         Gson gson = new Gson();
+        long markerId;
         switch (action) {
             case CREATE:
                 Marker newMarker = gson.fromJson(request.getParameter("marker"), Marker.class);
-                storeMarker(newMarker);
+                markerId = storeMarker(newMarker);
+                // The ID of the entity need to be updated in the FE as well
+                response.getWriter().println(markerId);
                 break;
             case UPDATE:
                 Marker updatedMarker = gson.fromJson(request.getParameter("marker"), Marker.class);
@@ -78,7 +81,7 @@ public class MarkerServlet extends HttpServlet {
                 }
                 break;
             case DELETE:
-                long markerId = Long.parseLong(request.getParameter("id"));
+                markerId = Long.parseLong(request.getParameter("id"));
                 deleteMarker(markerId);
         }
     }
@@ -97,10 +100,12 @@ public class MarkerServlet extends HttpServlet {
         return markers;
     }
 
-    /** Stores a marker in Datastore. */
-    private static void storeMarker(Marker marker) {
+    /** Stores a marker in Datastore and returns the ID. */
+    private static long storeMarker(Marker marker) {
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-        datastore.put(Marker.toEntity(marker));
+        Entity markerEntity = Marker.toEntity(marker);
+        datastore.put(markerEntity);
+        return markerEntity.getKey().getId();
     }
 
     /** Updates an existing marker's data */
