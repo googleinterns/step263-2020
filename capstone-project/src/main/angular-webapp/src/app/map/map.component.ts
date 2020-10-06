@@ -32,6 +32,7 @@ export class MapComponent implements OnInit {
 
     // Editable marker that displays when a user clicks on the map.
     let editableMarker;
+
     // Add a marker the user can edit.
     function addMarkerForEdit(lat, lng) {
       // If we're already showing an editable marker, then remove it.
@@ -49,7 +50,7 @@ export class MapComponent implements OnInit {
       infoWindow.open(gMap, editableMarker);
     }
 
-    // Build and return HTML element that show editable textboxes and a submit button.
+    // Build infoWindowComponent and return it's HTML element that show editable textboxes and a submit button.
     function buildInfoWindowInput(lat, lng) {
       const infoWindowComponent = factory.create(mapComponent.injector);
       infoWindowComponent.instance.type = MarkerAction.INITIALIZE;
@@ -95,10 +96,10 @@ export class MapComponent implements OnInit {
 
       const markersInfoWindow = new google.maps.InfoWindow();
       const infoWindowComponent = createInfoWindowForDisplay(marker);
-      
+
       infoWindowComponent.instance.deleteEvent.subscribe(event =>
         deleteMarker(marker, markerForDisplay));
-      
+
       infoWindowComponent.instance.updateEvent.subscribe(event => {
         markersInfoWindow.setContent(buildUpdateInfoWindow(marker, infoWindowComponent));
         markersInfoWindow.open(gMap, markerForDisplay);
