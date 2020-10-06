@@ -9,8 +9,6 @@ import { } from 'googlemaps';
 })
 export class InfoWindowComponent implements OnInit {
 
-  @Input() lat: number;
-  @Input() lng: number;
   @Input() animal: string;
   @Input() description: string;
   @Input() reporter: string;

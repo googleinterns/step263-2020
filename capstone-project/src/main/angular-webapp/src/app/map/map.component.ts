@@ -114,8 +114,6 @@ export class MapComponent implements OnInit {
     function createInfoWindowForDisplay(marker) {
       const infoWindowComponent = factory.create(mapComponent.injector);
       infoWindowComponent.instance.animal = marker.animal;
-      infoWindowComponent.instance.lat = marker.lat;
-      infoWindowComponent.instance.lng = marker.lng;
       infoWindowComponent.instance.description = marker.description;
       infoWindowComponent.instance.reporter = marker.reporter;
       infoWindowComponent.instance.type = MarkerAction.DISPLAY;
