@@ -90,8 +90,7 @@ export class MapComponent implements OnInit {
 
       const markerForDisplay = new google.maps.Marker({
         map: gMap,
-        position: new google.maps.LatLng(marker.lat, marker.lng),
-        title: marker.animal
+        position: new google.maps.LatLng(marker.lat, marker.lng)
       });
 
       const markersInfoWindow = new google.maps.InfoWindow();
