@@ -2,18 +2,25 @@
 <head>
 </head>
 <body>
-    <div *ngIf="type==InfoWindowType.DISPLAY">
+    <div *ngIf="type==MarkerAction.CREATE">
         <h1>{{animal}}</h1>
         <div>
             {{description}}<br>
             Reported by: {{reporter}}<br>
         </div>
         <button (click)="delete()">Delete</button>
+        <button (click)="update()">Update</button>
     </div>
-    <div *ngIf="type==InfoWindowType.CREATE">
-        <input #animal placeholder="Animal"><br>
-        <input #description placeholder="Description"><br>
-        <input #reporter placeholder="Reporter's Name"><br>
-        <button (click)="submit(animal.value, description.value, reporter.value)">Submit</button>
+    <div *ngIf="type==MarkerAction.INITIALIZE">
+        <input #inputAnimal placeholder="Animal"><br>
+        <input #inputDescription placeholder="Description"><br>
+        <input #inputReporter placeholder="Reporter's Name"><br>
+        <button (click)="submit(inputAnimal.value, inputDescription.value, inputReporter.value)">Submit</button>
+    </div>
+    <div *ngIf="type==MarkerAction.UPDATE">
+        <input #inputAnimal value="{{animal}}"><br>
+        <input #inputDescription value="{{description}}"><br>
+        <input #inputReporter value="{{reporter}}"><br>
+        <button (click)="submit(inputAnimal.value, inputDescription.value, inputReporter.value)">Update</button>
     </div>
 </body>

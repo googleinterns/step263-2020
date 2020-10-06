@@ -1,4 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { MarkerAction } from '../map/marker-action';
 import { } from 'googlemaps';
 
 @Component({
@@ -9,16 +10,17 @@ import { } from 'googlemaps';
 export class InfoWindowComponent implements OnInit {
 
   @Input() lat: number;
-  @Input()  lng: number;
+  @Input() lng: number;
   @Input() animal: string;
   @Input() description: string;
   @Input() reporter: string;
-  @Input() type: InfoWindowType;
+  @Input() type: MarkerAction;
 
   @Output() submitEvent = new EventEmitter();
   @Output() deleteEvent = new EventEmitter();
+  @Output() updateEvent = new EventEmitter();
 
-  InfoWindowType = InfoWindowType; // For the ngIf in template
+  MarkerAction = MarkerAction; // For the ngIf in template
 
   constructor() { }
 
@@ -26,6 +28,9 @@ export class InfoWindowComponent implements OnInit {
   }
 
   submit(animalValue, descriptionValue, reporterValue){
+    this.animal = animalValue;
+    this.description = descriptionValue;
+    this.reporter = reporterValue;
     this.submitEvent.emit({animal: animalValue, description: descriptionValue, reporter: reporterValue})
   }
 
@@ -33,8 +38,8 @@ export class InfoWindowComponent implements OnInit {
     this.deleteEvent.emit()
   }
 
-}
+  update(){
+    this.updateEvent.emit()
+  }
 
-export enum InfoWindowType {
-  DISPLAY, EDIT, CREATE
 }

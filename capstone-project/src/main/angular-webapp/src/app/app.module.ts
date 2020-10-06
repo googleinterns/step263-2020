@@ -5,8 +5,8 @@ import { GoogleMapsModule } from '@angular/google-maps';
 import { MatSliderModule } from '@angular/material/slider';
 import { AppRoutingModule } from './app-routing.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { InfoWindowComponent } from './info-window/info-window.component';
 
+import { InfoWindowComponent } from './info-window/info-window.component';
 import { AppComponent } from './app.component';
 import { MapComponent } from './map/map.component';
 
