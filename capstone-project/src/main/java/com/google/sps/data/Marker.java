@@ -132,18 +132,18 @@ public class Marker {
     /** Creates a marker entity from a Marker */
     public static Entity toEntity(Marker marker){
         Entity markerEntity = new Entity("Marker");
-        markerEntity.setProperty("lat", marker.getLat());
-        markerEntity.setProperty("lng", marker.getLng());
-        markerEntity.setProperty("animal", marker.getAnimal());
-        markerEntity.setProperty("reporter", marker.getReporter());
-        markerEntity.setProperty("description", marker.getDescription());
-        return markerEntity;
+        return setEntityProperties(marker, markerEntity);
     }
 
     // Finds the entity of the marker that needs to be updated using its ID and then overwrites its fields to update the data.
     public static Entity toEntity(Marker marker, Key markerEntityKey) throws EntityNotFoundException {
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
         Entity markerEntity = datastore.get(markerEntityKey);
+        return setEntityProperties(marker, markerEntity);
+    }
+
+    // Set the properties of the marker entity
+    private static Entity setEntityProperties (Marker marker, Entity markerEntity) {
         markerEntity.setProperty("lat", marker.getLat());
         markerEntity.setProperty("lng", marker.getLng());
         markerEntity.setProperty("animal", marker.getAnimal());
