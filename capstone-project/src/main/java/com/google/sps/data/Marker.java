@@ -14,7 +14,11 @@
 
 package com.google.sps.data;
 
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.EntityNotFoundException;
 
 /** Represents an animal report marker on the map. */
 public class Marker {
@@ -125,9 +129,21 @@ public class Marker {
                 .build();
     }
 
-    // Copies the fields of a Marker class instance to a Marker entity.
-    public static Entity toEntity(Marker marker, Entity markerEntity){
+    /** Creates a marker entity from a Marker */
+    public static Entity toEntity(Marker marker){
+        Entity markerEntity = new Entity("Marker");
+        markerEntity.setProperty("lat", marker.getLat());
+        markerEntity.setProperty("lng", marker.getLng());
+        markerEntity.setProperty("animal", marker.getAnimal());
+        markerEntity.setProperty("reporter", marker.getReporter());
+        markerEntity.setProperty("description", marker.getDescription());
+        return markerEntity;
+    }
 
+    // Finds the entity of the marker that needs to be updated using its ID and then overwrites its fields to update the data.
+    public static Entity toEntity(Marker marker, Key markerEntityKey) throws EntityNotFoundException {
+        DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+        Entity markerEntity = datastore.get(markerEntityKey);
         markerEntity.setProperty("lat", marker.getLat());
         markerEntity.setProperty("lng", marker.getLng());
         markerEntity.setProperty("animal", marker.getAnimal());
