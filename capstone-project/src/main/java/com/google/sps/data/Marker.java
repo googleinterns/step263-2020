@@ -128,6 +128,16 @@ public class Marker {
     /** Creates a marker entity from a Marker */
     public static Entity toEntity(Marker marker){
         Entity markerEntity = new Entity("Marker");
+        return setEntityProperties(marker, markerEntity);
+    }
+
+    // Overwrites a given entity's fields to update the data.
+    public static Entity toEntity(Marker marker, Entity markerEntity){
+        return setEntityProperties(marker, markerEntity);
+    }
+
+    // Sets the properties of the marker entity
+    private static Entity setEntityProperties (Marker marker, Entity markerEntity) {
         markerEntity.setProperty("lat", marker.getLat());
         markerEntity.setProperty("lng", marker.getLng());
         markerEntity.setProperty("animal", marker.getAnimal());

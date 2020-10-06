@@ -118,7 +118,7 @@ export class MapComponent implements OnInit {
     // Deletes an existing marker.
     function deleteMarker(markerData, markerForDisplay) {
   
-      mapComponent.httpClient.post('/delete-marker', markerData.id,
+      mapComponent.httpClient.post('/delete-marker', markerData,
       ).subscribe({
         error: error => console.error("There was an error!", error)
       });
