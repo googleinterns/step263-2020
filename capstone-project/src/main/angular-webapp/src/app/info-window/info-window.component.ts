@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { MarkerAction } from '../map/marker-action';
+import { MarkerAction } from '../marker-action';
 import { } from 'googlemaps';
 
 @Component({
@@ -44,5 +44,4 @@ export class InfoWindowComponent implements OnInit {
   update(){
     this.updateEvent.emit()
   }
-
 }

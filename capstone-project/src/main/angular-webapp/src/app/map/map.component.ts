@@ -50,7 +50,7 @@ export class MapComponent implements OnInit {
       infoWindow.open(gMap, editableMarker);
     }
 
-    // Build infoWindowComponent and return it's HTML element that show editable textboxes and a submit button.
+    // Build infoWindowComponent and return its HTML element that shows editable textboxes and a submit button.
     function buildInfoWindowInput(lat, lng) {
       const infoWindowComponent = factory.create(mapComponent.injector);
       infoWindowComponent.instance.type = MarkerAction.CREATE;
