@@ -16,9 +16,12 @@ package com.google.sps.servlets;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.gson.Gson;
 import com.google.sps.data.Marker;
 
@@ -29,6 +32,13 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+
+// Enum describing which action should be performed.
+enum Action {
+    CREATE,
+    UPDATE,
+    DELETE
+}
 
 /** Handles fetching and saving markers data. */
 @WebServlet("/markers")
@@ -51,9 +61,26 @@ public class MarkerServlet extends HttpServlet {
      */
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        int actionNum = Integer.parseInt(request.getParameter("action"));
+        Action action = Action.values()[actionNum];
         Gson gson = new Gson();
-        Marker marker = gson.fromJson(request.getReader().readLine(), Marker.class);
-        storeMarker(marker);
+        switch (action) {
+            case CREATE:
+                Marker newMarker = gson.fromJson(request.getParameter("marker"), Marker.class);
+                storeMarker(newMarker);
+                break;
+            case UPDATE:
+                Marker updatedMarker = gson.fromJson(request.getParameter("marker"), Marker.class);
+                try {
+                    updateMarker(updatedMarker);
+                } catch (EntityNotFoundException e) {
+                    response.getWriter().println("Update failed, Entity not found. Error details: " + e.toString());
+                }
+                break;
+            case DELETE:
+                long markerId = Long.parseLong(request.getParameter("id"));
+                deleteMarker(markerId);
+        }
     }
 
     /** Fetches markers from Datastore. */
@@ -71,8 +98,26 @@ public class MarkerServlet extends HttpServlet {
     }
 
     /** Stores a marker in Datastore. */
-    public static void storeMarker(Marker marker) {
+    private static void storeMarker(Marker marker) {
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
         datastore.put(Marker.toEntity(marker));
+    }
+
+    /** Updates an existing marker's data */
+    private static void updateMarker(Marker marker) throws EntityNotFoundException {
+        DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+
+        // Find the entity of the marker that needs to be updated using its ID
+        Key markerEntityKey = KeyFactory.createKey("Marker", marker.getId());
+        Entity markerEntity = datastore.get(markerEntityKey);
+        // Overwrite the relevant entity with the updated data
+        datastore.put(Marker.toEntity(marker, markerEntity));
+    }
+
+    /** Deletes a marker */
+    private static void deleteMarker(long markersId) {
+        DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+        Key markerEntityKey = KeyFactory.createKey("Marker", markersId);
+        datastore.delete(markerEntityKey);
     }
 }
