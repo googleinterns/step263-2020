@@ -100,7 +100,7 @@ public class MarkerServlet extends HttpServlet {
         return markers;
     }
 
-    /** Stores a marker in Datastore. */
+    /** Stores a marker in Datastore and returns the ID. */
     private static long storeMarker(Marker marker) {
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
         Entity markerEntity = Marker.toEntity(marker);
