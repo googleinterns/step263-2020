@@ -35,7 +35,7 @@ import java.util.Collection;
 
 // Enum describing which action should be performed.
 enum Action {
-    DISPLAY,
+    CREATE,
     UPDATE,
     DELETE
 }
@@ -66,7 +66,7 @@ public class MarkerServlet extends HttpServlet {
         Gson gson = new Gson();
         long markerId;
         switch (action) {
-            case DISPLAY:
+            case CREATE:
                 Marker newMarker = gson.fromJson(request.getParameter("marker"), Marker.class);
                 markerId = storeMarker(newMarker);
                 // The ID of the entity need to be updated in the FE as well
