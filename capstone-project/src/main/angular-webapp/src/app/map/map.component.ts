@@ -76,7 +76,7 @@ export class MapComponent implements OnInit {
       this.editableMarker.setMap(null);
     }
     this.editableMarker = new google.maps.Marker({ position: { lat: lat, lng: lng }, map: this.gMap });
-    const infoWindow = new google.maps.InfoWindow({ content: this.buildCreateInfoWindow(lat, lng) });
+    const infoWindow = new google.maps.InfoWindow({ content: this.buildCreateInfoWindowHtmlElement(lat, lng) });
 
     // When the user closes the editable info window, remove the marker.
     google.maps.event.addListener(infoWindow, 'closeclick', () => {
@@ -87,7 +87,7 @@ export class MapComponent implements OnInit {
   }
 
   // Build infoWindowComponent and return its HTML element that shows editable textboxes and a submit button.
-  buildCreateInfoWindow(lat, lng) {
+  buildCreateInfoWindowHtmlElement(lat, lng) {
     const infoWindowComponent = this.factory.create(this.injector);
     infoWindowComponent.instance.type = MarkerAction.CREATE;
     infoWindowComponent.changeDetectorRef.detectChanges();
@@ -123,7 +123,7 @@ export class MapComponent implements OnInit {
       this.deleteMarker(marker, markerForDisplay));
 
     infoWindowComponent.instance.updateEvent.subscribe(event => {
-      markersInfoWindow.setContent(this.buildUpdateInfoWindow(marker, infoWindowComponent));
+      markersInfoWindow.setContent(this.buildUpdateInfoWindowHtmlElment(marker, infoWindowComponent));
       markersInfoWindow.open(this.gMap, markerForDisplay);
     });
 
@@ -145,7 +145,7 @@ export class MapComponent implements OnInit {
   }
 
   // Edits the InfoWindowComponent instance letting the user update the fields of an existing marker.
-  buildUpdateInfoWindow(markerData, infoWindowComponent) {
+  buildUpdateInfoWindowHtmlElment(markerData, infoWindowComponent) {
 
     infoWindowComponent.instance.type = MarkerAction.UPDATE;
     infoWindowComponent.changeDetectorRef.detectChanges();
