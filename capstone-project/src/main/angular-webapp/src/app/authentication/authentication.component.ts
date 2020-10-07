@@ -10,7 +10,7 @@ import { SocialUser } from "angularx-social-login";
 })
 export class AuthenticationComponent implements OnInit {
 
-  private user: SocialUser;
+  user: SocialUser;
 
   constructor(private authService: SocialAuthService) { }
 
