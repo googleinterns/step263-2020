@@ -16,6 +16,6 @@
       "es2018",
       "dom"
     ],
-    "types": ["googlemaps"]
+    "types": ["googlemaps", "gapi.auth2"]
   }
 }
