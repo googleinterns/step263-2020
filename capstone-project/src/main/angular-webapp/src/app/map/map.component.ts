@@ -42,6 +42,33 @@ export class MapComponent implements OnInit {
       });
   }
 
+  // Performs a backend action on a marker - display / update / delete.
+  postMarker(marker, action) {
+
+    const markerJson = JSON.stringify(marker);
+    const params = new HttpParams()
+      .set('marker', markerJson)
+      .set('action', action.toString());
+    this.httpClient.post('/markers', params).subscribe({
+      next: data => marker.id = data,
+      error: error => console.error("The marker failed to save. Error details: ", error)
+    });
+  }
+
+  // Deletes an existing marker.
+  deleteMarker(markerData, markerForDisplay) {
+
+    const params = new HttpParams()
+      .set('id', markerData.id.toString())
+      .set('action', MarkerAction.DELETE.toString());
+    this.httpClient.post('/markers', params).subscribe({
+      error: error => console.error("The marker failed to delete. Error details: ", error)
+    });
+
+    // Remove marker from the map.
+    markerForDisplay.setMap(null);
+  }
+
   // Add a marker the user can edit.
   addMarkerForEdit(lat, lng) {
     // If we're already showing an editable marker, then remove it.
@@ -49,7 +76,7 @@ export class MapComponent implements OnInit {
       this.editableMarker.setMap(null);
     }
     this.editableMarker = new google.maps.Marker({ position: { lat: lat, lng: lng }, map: this.gMap });
-    const infoWindow = new google.maps.InfoWindow({ content: this.buildInfoWindowInput(lat, lng) });
+    const infoWindow = new google.maps.InfoWindow({ content: this.buildCreateInfoWindow(lat, lng) });
 
     // When the user closes the editable info window, remove the marker.
     google.maps.event.addListener(infoWindow, 'closeclick', () => {
@@ -60,7 +87,7 @@ export class MapComponent implements OnInit {
   }
 
   // Build infoWindowComponent and return its HTML element that shows editable textboxes and a submit button.
-  buildInfoWindowInput(lat, lng) {
+  buildCreateInfoWindow(lat, lng) {
     const infoWindowComponent = this.factory.create(this.injector);
     infoWindowComponent.instance.type = MarkerAction.CREATE;
     infoWindowComponent.changeDetectorRef.detectChanges();
@@ -81,20 +108,7 @@ export class MapComponent implements OnInit {
     return infoWindowComponent.location.nativeElement;;
   }
 
-  // Performs a backend action on a marker - display / update / delete.
-  postMarker(marker, action) {
-
-    const markerJson = JSON.stringify(marker);
-    const params = new HttpParams()
-      .set('marker', markerJson)
-      .set('action', action.toString());
-    this.httpClient.post('/markers', params).subscribe({
-      next: data => marker.id = data,
-      error: error => console.error("The marker failed to save. Error details: ", error)
-    });
-  }
-
-  // Builds info window of a marker
+  // Builds display info window of a marker
   addMarkerForDisplay(marker) {
 
     const markerForDisplay = new google.maps.Marker({
@@ -103,7 +117,7 @@ export class MapComponent implements OnInit {
     });
 
     const markersInfoWindow = new google.maps.InfoWindow();
-    const infoWindowComponent = this.createInfoWindowForDisplay(marker);
+    const infoWindowComponent = this.buildDisplayInfoWindowComponent(marker);
 
     infoWindowComponent.instance.deleteEvent.subscribe(event =>
       this.deleteMarker(marker, markerForDisplay));
@@ -120,7 +134,7 @@ export class MapComponent implements OnInit {
   };
 
   // Creates the info window component for display of marker
-  createInfoWindowForDisplay(marker) {
+  buildDisplayInfoWindowComponent(marker) {
     const infoWindowComponent = this.factory.create(this.injector);
     infoWindowComponent.instance.animal = marker.animal;
     infoWindowComponent.instance.description = marker.description;
@@ -128,20 +142,6 @@ export class MapComponent implements OnInit {
     infoWindowComponent.instance.type = MarkerAction.DISPLAY;
     infoWindowComponent.changeDetectorRef.detectChanges();
     return infoWindowComponent;
-  }
-
-  // Deletes an existing marker.
-  deleteMarker(markerData, markerForDisplay) {
-
-    const params = new HttpParams()
-      .set('id', markerData.id.toString())
-      .set('action', MarkerAction.DELETE.toString());
-    this.httpClient.post('/markers', params).subscribe({
-      error: error => console.error("The marker failed to delete. Error details: ", error)
-    });
-
-    // Remove marker from the map.
-    markerForDisplay.setMap(null);
   }
 
   // Edits the InfoWindowComponent instance letting the user update the fields of an existing marker.
