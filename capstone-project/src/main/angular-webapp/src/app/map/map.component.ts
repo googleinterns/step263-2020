@@ -100,7 +100,7 @@ export class MapComponent implements OnInit {
         lat: lat,
         lng: lng
       };
-      this.postMarker(newMarker, MarkerAction.DISPLAY);
+      this.postMarker(newMarker, MarkerAction.CREATE);
       this.addMarkerForDisplay(newMarker);
       this.editableMarker.setMap(null);
     });
