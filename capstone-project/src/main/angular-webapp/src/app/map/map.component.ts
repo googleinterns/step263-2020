@@ -25,6 +25,9 @@ export class MapComponent implements OnInit {
       zoom: 4,
       center: new google.maps.LatLng(25, 80)
     };
+    // Try to center the map on the user's location.
+    this.focusOnUserLocation();
+
     this.gMap = new google.maps.Map(document.getElementById('map-container'), googleMapOption);
 
     // When the user clicks on the map, show a marker with a text box the user can edit.
@@ -40,6 +43,40 @@ export class MapComponent implements OnInit {
           this.addMarkerForDisplay(response[key]);
         }
       });
+  }
+
+  // Centers the map based on the user location if permission is granted.
+  focusOnUserLocation() {
+
+    // Browser supports Geolocation
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((position) => {
+          const pos = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+          this.gMap.setCenter(pos);
+          this.gMap.setZoom(14);
+        },
+        () => {
+          this.handleLocationError(true);
+        }
+      );
+    }
+
+    // Browser doesn't support Geolocation
+    else {
+      this.handleLocationError(false);
+    }
+  }
+
+  handleLocationError(broswerHasGeolocation: boolean) {
+    if (broswerHasGeolocation) {
+      console.log("Geolocation service failed. Please grant the browser permission to locate you.")
+    }
+    else {
+      console.log("Browser doesn't support Geolocation.")
+    }
   }
 
   // Performs a backend action on a marker - display / update / delete.
