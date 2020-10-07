@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { } from 'gapi.auth2';
+import { SocialAuthService } from "angularx-social-login";
+import { GoogleLoginProvider } from "angularx-social-login";
+import { SocialUser } from "angularx-social-login";
 
 @Component({
   selector: 'app-authentication',
@@ -8,46 +10,22 @@ import { } from 'gapi.auth2';
 })
 export class AuthenticationComponent implements OnInit {
 
-  constructor() { }
+  constructor(private authService: SocialAuthService) { }
 
-  ngOnInit(): void { }
-
-  private gapiSetup;
-  private authInstance;
-  private user;
-  private error;
-
-  async initGoogleAuth(): Promise<void> {
-    //  Create a new Promise where the resolve 
-    // function is the callback passed to gapi.load
-    const pload = new Promise((resolve) => {
-      gapi.load('auth2', resolve);
-    });
-
-    // When the first promise resolves, it means we have gapi
-    // loaded and that we can call gapi.init
-    return pload.then(async () => {
-      await gapi.auth2
-        .init({ client_id: '' })
-        .then(auth => {
-          this.gapiSetup = true;
-          this.authInstance = auth;
-        });
+  ngOnInit(): void {
+    this.authService.authState.subscribe((user) => {
+      this.user = user;
     });
   }
 
-  async authenticate(): Promise<gapi.auth2.GoogleUser> {
-    // Initialize gapi if not done yet
-    if (!this.gapiSetup) {
-      await this.initGoogleAuth();
-    }
+  user: SocialUser;
 
-    // Resolve or reject signin Promise
-    return new Promise(async () => {
-      await this.authInstance.signIn().then(
-        user => this.user = user,
-        error => this.error = error);
-    });
+  signInWithGoogle(): void {
+    this.authService.signIn(GoogleLoginProvider.PROVIDER_ID);
+  }
+
+  signOut(): void {
+    this.authService.signOut();
   }
 
 }
