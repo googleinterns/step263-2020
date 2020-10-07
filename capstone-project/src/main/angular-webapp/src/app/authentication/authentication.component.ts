@@ -10,6 +10,8 @@ import { SocialUser } from "angularx-social-login";
 })
 export class AuthenticationComponent implements OnInit {
 
+  private user: SocialUser;
+
   constructor(private authService: SocialAuthService) { }
 
   ngOnInit(): void {
@@ -17,8 +19,6 @@ export class AuthenticationComponent implements OnInit {
       this.user = user;
     });
   }
-
-  user: SocialUser;
 
   signInWithGoogle(): void {
     this.authService.signIn(GoogleLoginProvider.PROVIDER_ID);
