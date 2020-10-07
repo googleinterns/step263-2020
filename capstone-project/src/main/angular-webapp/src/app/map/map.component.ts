@@ -19,7 +19,7 @@ export class MapComponent implements OnInit {
   private gMap: google.maps.Map;
 
   ngOnInit(): void {
- 
+
     // Define the map.
     const googleMapOption = {
       zoom: 4,
@@ -167,5 +167,4 @@ export class MapComponent implements OnInit {
 
     return infoWindowComponent.location.nativeElement;
   }
-
 }
