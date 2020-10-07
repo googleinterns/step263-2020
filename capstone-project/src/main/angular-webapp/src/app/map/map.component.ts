@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Component, OnInit, ComponentFactory, ComponentFactoryResolver, Injector } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { } from 'googlemaps';
+import { InfoWindowComponent } from '../info-window/info-window.component';
+import { MarkerAction } from '../marker-action';
 
 @Component({
   selector: 'app-map',
@@ -9,11 +11,12 @@ import { } from 'googlemaps';
 })
 export class MapComponent implements OnInit {
 
-  constructor(private httpClient: HttpClient) {  }
+  constructor(private httpClient: HttpClient, private componentFactoryResolver: ComponentFactoryResolver, private injector: Injector) { }
 
   ngOnInit(): void {
 
     const mapComponent = this;
+    const factory: ComponentFactory<InfoWindowComponent> = this.componentFactoryResolver.resolveComponentFactory(InfoWindowComponent);
 
     // Define the map.
     const googleMapOption = {
@@ -29,6 +32,7 @@ export class MapComponent implements OnInit {
 
     // Editable marker that displays when a user clicks on the map.
     let editableMarker;
+
     // Add a marker the user can edit.
     function addMarkerForEdit(lat, lng) {
       // If we're already showing an editable marker, then remove it.
@@ -46,74 +50,120 @@ export class MapComponent implements OnInit {
       infoWindow.open(gMap, editableMarker);
     }
 
-    // Build and return HTML elements that show editable textboxes and a submit button.
+    // Build infoWindowComponent and return its HTML element that shows editable textboxes and a submit button.
     function buildInfoWindowInput(lat, lng) {
-      const animal = document.createElement('textarea');
-      animal.placeholder = "Animal";
-      const description = document.createElement('textarea');
-      description.placeholder = "Description";
-      const reporter = document.createElement('textarea');
-      reporter.placeholder = "Reporter's Name";
-      const button = document.createElement('button');
-      button.appendChild(document.createTextNode('Submit'));
+      const infoWindowComponent = factory.create(mapComponent.injector);
+      infoWindowComponent.instance.type = MarkerAction.CREATE;
+      infoWindowComponent.changeDetectorRef.detectChanges();
 
-      button.onclick = () => {
+      infoWindowComponent.instance.submitEvent.subscribe(event => {
         const newMarker = {
-          animal: animal.value,
-          description: description.value,
-          reporter: reporter.value,
+          animal: event.animal,
+          description: event.description,
+          reporter: event.reporter,
           lat: lat,
           lng: lng
         };
-        postMarker(newMarker);
+        postMarker(newMarker, MarkerAction.DISPLAY);
         addMarkerForDisplay(newMarker);
         editableMarker.setMap(null);
-      };
+      });
 
-      const containerDiv = document.createElement('div');
-      containerDiv.appendChild(animal);
-      containerDiv.appendChild(description);
-      containerDiv.appendChild(reporter);
-      containerDiv.appendChild(document.createElement('br'));
-      containerDiv.appendChild(button);
-
-      return containerDiv;
+      return infoWindowComponent.location.nativeElement;;
     }
 
-    // Sends a marker to the backend for saving.
-    function postMarker(marker) {
+    // Performs a backend action on a marker - display / update / delete.
+    function postMarker(marker, action) {
 
       const markerJson = JSON.stringify(marker);
-      mapComponent.httpClient.post('/markers', markerJson, {headers:{
-        'content':"application/json"
-      }
-    }).subscribe({
-      error: error => console.error( "There was an error!", error)
-    });
+      const params = new HttpParams()
+        .set('marker', markerJson)
+        .set('action', action.toString());
+      mapComponent.httpClient.post('/markers', params).subscribe({
+        next: data => marker.id = data,
+        error: error => console.error("The marker failed to save. Error details: ", error)
+      });
     }
 
-    // Display a marker on the map
+    // Builds info window of a marker
     function addMarkerForDisplay(marker) {
 
       const markerForDisplay = new google.maps.Marker({
         map: gMap,
-        position: new google.maps.LatLng(marker.lat, marker.lng),
-        title: marker.animal
+        position: new google.maps.LatLng(marker.lat, marker.lng)
       });
-      markerForDisplay.set('content', '<div>' + marker.description + '<br>' + 'Reported by: ' + marker.reporter + '</div>')
+
       const markersInfoWindow = new google.maps.InfoWindow();
+      const infoWindowComponent = createInfoWindowForDisplay(marker);
+
+      infoWindowComponent.instance.deleteEvent.subscribe(event =>
+        deleteMarker(marker, markerForDisplay));
+
+      infoWindowComponent.instance.updateEvent.subscribe(event => {
+        markersInfoWindow.setContent(buildUpdateInfoWindow(marker, infoWindowComponent));
+        markersInfoWindow.open(gMap, markerForDisplay);
+      });
 
       google.maps.event.addListener(markerForDisplay, 'click', function () {
-        markersInfoWindow.setContent('<h1>' + markerForDisplay['title'] + '</h1>' + markerForDisplay['content']);
+        markersInfoWindow.setContent(infoWindowComponent.location.nativeElement);
         markersInfoWindow.open(gMap, markerForDisplay);
       });
     };
+
+    // Creates the info window component for display of marker
+    function createInfoWindowForDisplay(marker) {
+      const infoWindowComponent = factory.create(mapComponent.injector);
+      infoWindowComponent.instance.animal = marker.animal;
+      infoWindowComponent.instance.description = marker.description;
+      infoWindowComponent.instance.reporter = marker.reporter;
+      infoWindowComponent.instance.type = MarkerAction.DISPLAY;
+      infoWindowComponent.changeDetectorRef.detectChanges();
+      return infoWindowComponent;
+    }
+
+    // Deletes an existing marker.
+    function deleteMarker(markerData, markerForDisplay) {
+
+      const params = new HttpParams()
+        .set('id', markerData.id.toString())
+        .set('action', MarkerAction.DELETE.toString());
+      mapComponent.httpClient.post('/markers', params).subscribe({
+        error: error => console.error("The marker failed to delete. Error details: ", error)
+      });
+
+      // Remove marker from the map.
+      markerForDisplay.setMap(null);
+    }
+
+    // Edits the InfoWindowComponent instance letting the user update the fields of an existing marker.
+    function buildUpdateInfoWindow(markerData, infoWindowComponent) {
+
+      infoWindowComponent.instance.type = MarkerAction.UPDATE;
+      infoWindowComponent.changeDetectorRef.detectChanges();
+
+      infoWindowComponent.instance.submitEvent.subscribe(event => {
+        const newMarker = {
+          id: markerData.id,
+          animal: event.animal,
+          description: event.description,
+          reporter: event.reporter,
+          lat: markerData.lat,
+          lng: markerData.lng
+        };
+        postMarker(newMarker, MarkerAction.UPDATE);
+        // Once the user clicks "Update", we want to return the regular display
+        infoWindowComponent.instance.type = MarkerAction.DISPLAY;
+        infoWindowComponent.changeDetectorRef.detectChanges();
+      });
+
+      return infoWindowComponent.location.nativeElement;
+    }
 
     // Fetches markers from the backend and adds them to the map.
     mapComponent.httpClient.get('/markers')
       .toPromise()
       .then((response) => {
-        for(let key in response){
+        for (let key in response) {
           addMarkerForDisplay(response[key]);
         }
       });

@@ -21,6 +21,7 @@ public class Marker {
 
     public static class Builder {
 
+        private long id;
         private double lat;
         private double lng;
         private String animal;
@@ -28,6 +29,11 @@ public class Marker {
         private String description;
 
         public Builder(){
+        }
+
+        public Builder setId(long id){
+            this.id = id;
+            return this;
         }
 
         public Builder setLat(double lat){
@@ -60,6 +66,7 @@ public class Marker {
         }
     }
 
+    private final long id;
     private final double lat;
     private final double lng;
     private final String animal;
@@ -67,11 +74,16 @@ public class Marker {
     private final String description;
 
     private Marker(Builder builder) {
+        this.id = builder.id;
         this.lat = builder.lat;
         this.lng = builder.lng;
         this.animal = builder.animal;
         this.reporter = builder.reporter;
         this.description = builder.description;
+    }
+
+    public long getId() {
+        return id;
     }
 
     public double getLat() {
@@ -96,6 +108,7 @@ public class Marker {
 
     /** Creates a Marker from a marker entity */
     public static Marker fromEntity(Entity entity){
+        long id = entity.getKey().getId();
         double lat = (double) entity.getProperty("lat");
         double lng = (double) entity.getProperty("lng");
         String animal = (String) entity.getProperty("animal");
@@ -103,6 +116,7 @@ public class Marker {
         String description = (String) entity.getProperty("description");
 
         return new Marker.Builder()
+                .setId(id)
                 .setLat(lat)
                 .setLng(lng)
                 .setAnimal(animal)
@@ -114,6 +128,16 @@ public class Marker {
     /** Creates a marker entity from a Marker */
     public static Entity toEntity(Marker marker){
         Entity markerEntity = new Entity("Marker");
+        return setEntityProperties(marker, markerEntity);
+    }
+
+    // Overwrites a given entity's fields to update the data.
+    public static Entity toEntity(Marker marker, Entity markerEntity){
+        return setEntityProperties(marker, markerEntity);
+    }
+
+    // Sets the properties of the marker entity
+    private static Entity setEntityProperties (Marker marker, Entity markerEntity) {
         markerEntity.setProperty("lat", marker.getLat());
         markerEntity.setProperty("lng", marker.getLng());
         markerEntity.setProperty("animal", marker.getAnimal());
