@@ -59,23 +59,24 @@ export class MapComponent implements OnInit {
           this.gMap.setZoom(14);
         },
         () => {
-          this.handleLocationError(true);
+          MapComponent.handleLocationError(true);
         }
       );
     }
 
     // Browser doesn't support Geolocation
     else {
-      this.handleLocationError(false);
+      MapComponent.handleLocationError(false);
     }
   }
 
-  handleLocationError(broswerHasGeolocation: boolean) {
+  // Alerts the user if the location process failed.
+  static handleLocationError(broswerHasGeolocation: boolean) {
     if (broswerHasGeolocation) {
-      console.log("Geolocation service failed. Please grant the browser permission to locate you.")
+      window.alert("Geolocation service failed. Please grant the browser permission to locate you.")
     }
     else {
-      console.log("Browser doesn't support Geolocation.")
+      window.alert("Browser doesn't support Geolocation.")
     }
   }
 
