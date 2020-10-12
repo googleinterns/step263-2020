@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { SocialAuthService } from "angularx-social-login";
 import { GoogleLoginProvider } from "angularx-social-login";
 import { SocialUser } from "angularx-social-login";
+import { UserService } from "../user.service";
 
 @Component({
   selector: 'app-authentication',
@@ -9,16 +10,17 @@ import { SocialUser } from "angularx-social-login";
   styleUrls: ['./authentication.component.css']
 })
 export class AuthenticationComponent implements OnInit {
+  
+  user: SocialUser;
 
-  constructor(private authService: SocialAuthService) { }
+  constructor(private authService: SocialAuthService, private data: UserService) { }
 
   ngOnInit(): void {
     this.authService.authState.subscribe((user) => {
       this.user = user;
+      this.changeUser(user);
     });
   }
-
-  user: SocialUser;
 
   signInWithGoogle(): void {
     this.authService.signIn(GoogleLoginProvider.PROVIDER_ID);
@@ -26,6 +28,10 @@ export class AuthenticationComponent implements OnInit {
 
   signOut(): void {
     this.authService.signOut();
+  }
+
+  changeUser(user) {
+    this.data.changeUser(user);
   }
 
 }
