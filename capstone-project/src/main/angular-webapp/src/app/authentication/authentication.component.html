@@ -1,12 +1,13 @@
 <div *ngIf="!user">
-    <button mat-button style="position: absolute; right: 0px;" color="primary"
-     (click)="signInWithGoogle()">Sign in with Google</button>
+    <button mat-button (click)="signInWithGoogle()">
+        Sign-in<br>With Google
+    </button>
 </div>
 <div *ngIf="user" class="dropdown">
     <input type="image" *ngIf="user.photoUrl" src="{{ user.photoUrl }}">
     <div class="dropdown-content">
         <mat-card-subtitle>{{ user.name }}</mat-card-subtitle>
         {{ user.email }}<br>
-        <button mat-button color="primary" (click)="signOut()">Sign out</button>
+        <button mat-button (click)="signOut()">Sign out</button>
     </div>
 </div>

@@ -5,6 +5,7 @@ input {
 
 div {
   float: right;
+  margin: 10px;
 }
 
 .dropdown {
