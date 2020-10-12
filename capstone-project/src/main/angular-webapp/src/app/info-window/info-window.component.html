@@ -16,8 +16,8 @@
             <button (click)="submit(inputAnimal.value, inputDescription.value, inputReporter.value)">Submit</button>
         </div>
         <div *ngIf="user">
-            <input value="{{user.name}}"><br>
-            <button (click)="submit(inputAnimal.value, inputDescription.value, user.name)">Submit</button>
+            <input #inputReporterUser value="{{user.name}}"><br>
+            <button (click)="submit(inputAnimal.value, inputDescription.value, inputReporterUser.value)">Submit</button>
         </div>
 
     </div>

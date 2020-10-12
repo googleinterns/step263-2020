@@ -11,7 +11,7 @@ import { UserService } from "../user.service";
 })
 export class InfoWindowComponent implements OnInit {
 
-  private user: SocialUser;
+  user: SocialUser;
 
   @Input() animal: string;
   @Input() description: string;
@@ -24,11 +24,11 @@ export class InfoWindowComponent implements OnInit {
 
   MarkerAction = MarkerAction; // For the ngIf in template
 
-  constructor(private data: UserService) { }
+  constructor(private userService: UserService) { }
 
   ngOnInit(): void { 
-    // Get the burrent user
-    this.data.currentUser.subscribe(user => this.user = user);
+    // Get the current user
+    this.userService.currentUser.subscribe(user => this.user = user);
   }
 
   // Update the fields according to user input and emit the submitEvent to receive the data in mapComponenet

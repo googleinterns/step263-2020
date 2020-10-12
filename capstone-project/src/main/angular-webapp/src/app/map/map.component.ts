@@ -4,7 +4,6 @@ import { } from 'googlemaps';
 import { InfoWindowComponent } from '../info-window/info-window.component';
 import { MarkerAction } from '../marker-action';
 import { SocialUser } from "angularx-social-login";
-import { UserService } from "../user.service";
 
 @Component({
   selector: 'app-map',
@@ -14,7 +13,7 @@ import { UserService } from "../user.service";
 export class MapComponent implements OnInit {
 
   constructor(private httpClient: HttpClient, private componentFactoryResolver: ComponentFactoryResolver, 
-    private injector: Injector, private data: UserService) { }
+    private injector: Injector) { }
 
   // Editable marker that displays when a user clicks on the map.
   private editableMarker: google.maps.Marker;
@@ -23,9 +22,6 @@ export class MapComponent implements OnInit {
   user: SocialUser;
 
   ngOnInit(): void {
-
-    // Get the burrent user
-    this.data.currentUser.subscribe(user => this.user = user);
 
     // Define the map.
     const googleMapOption = {
@@ -112,7 +108,7 @@ export class MapComponent implements OnInit {
       this.editableMarker.setMap(null);
     });
 
-    return infoWindowComponent.location.nativeElement;;
+    return infoWindowComponent.location.nativeElement;
   }
 
   // Builds display info window of a marker

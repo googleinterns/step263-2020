@@ -1,7 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { SocialAuthService } from "angularx-social-login";
-import { GoogleLoginProvider } from "angularx-social-login";
-import { SocialUser } from "angularx-social-login";
+import { SocialAuthService, GoogleLoginProvider, SocialUser } from "angularx-social-login";
 import { UserService } from "../user.service";
 
 @Component({
@@ -13,7 +11,7 @@ export class AuthenticationComponent implements OnInit {
   
   user: SocialUser;
 
-  constructor(private authService: SocialAuthService, private data: UserService) { }
+  constructor(private authService: SocialAuthService, private userService: UserService) { }
 
   ngOnInit(): void {
     this.authService.authState.subscribe((user) => {
@@ -30,8 +28,9 @@ export class AuthenticationComponent implements OnInit {
     this.authService.signOut();
   }
 
+  // Update the user service to the current user
   changeUser(user) {
-    this.data.changeUser(user);
+    this.userService.changeUser(user);
   }
 
 }
