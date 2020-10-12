@@ -3,7 +3,6 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { } from 'googlemaps';
 import { InfoWindowComponent } from '../info-window/info-window.component';
 import { MarkerAction } from '../marker-action';
-import { SocialUser } from "angularx-social-login";
 
 @Component({
   selector: 'app-map',
@@ -12,14 +11,12 @@ import { SocialUser } from "angularx-social-login";
 })
 export class MapComponent implements OnInit {
 
-  constructor(private httpClient: HttpClient, private componentFactoryResolver: ComponentFactoryResolver, 
-    private injector: Injector) { }
+  constructor(private httpClient: HttpClient, private componentFactoryResolver: ComponentFactoryResolver, private injector: Injector) { }
 
   // Editable marker that displays when a user clicks on the map.
   private editableMarker: google.maps.Marker;
   private factory: ComponentFactory<InfoWindowComponent> = this.componentFactoryResolver.resolveComponentFactory(InfoWindowComponent);
   private gMap: google.maps.Map;
-  user: SocialUser;
 
   ngOnInit(): void {
 
