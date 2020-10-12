@@ -14,6 +14,10 @@
 
 package com.google.sps.servlets;
 
+import com.google.appengine.api.blobstore.BlobstoreService;
+import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
+import com.google.appengine.api.blobstore.BlobKey;
+
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Key;
@@ -23,15 +27,18 @@ import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.google.sps.data.Marker;
 
+import javax.json.JsonBuilderFactory;
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.*;
 
 // Enum describing which action should be performed.
 enum Action {
@@ -64,21 +71,31 @@ public class MarkerServlet extends HttpServlet {
         int actionNum = Integer.parseInt(request.getParameter("action"));
         Action action = Action.values()[actionNum];
         Gson gson = new Gson();
+        String blobKey;
         long markerId;
         switch (action) {
             case CREATE:
                 Marker newMarker = gson.fromJson(request.getParameter("marker"), Marker.class);
+                blobKey = getBlobKey(request);
+                newMarker.setBlobKey(blobKey);
                 markerId = storeMarker(newMarker);
                 // The ID of the entity need to be updated in the FE as well
-                response.getWriter().println(markerId);
+                Map<String,String> responseMap = new HashMap<>();
+                responseMap.put("id", Long.toString(markerId));
+                responseMap.put("blobKey", blobKey);
+                String responseJson = gson.toJson(responseMap);
+                response.getWriter().println(responseJson);
                 break;
             case UPDATE:
                 Marker updatedMarker = gson.fromJson(request.getParameter("marker"), Marker.class);
+                blobKey = getBlobKey(request);
+                updatedMarker.setBlobKey(blobKey);
                 try {
                     updateMarker(updatedMarker);
                 } catch (EntityNotFoundException e) {
                     response.getWriter().println("Update failed, Entity not found. Error details: " + e.toString());
                 }
+                response.getWriter().println(blobKey);
                 break;
             case DELETE:
                 markerId = Long.parseLong(request.getParameter("id"));
@@ -124,5 +141,20 @@ public class MarkerServlet extends HttpServlet {
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
         Key markerEntityKey = KeyFactory.createKey("Marker", markersId);
         datastore.delete(markerEntityKey);
+    }
+
+    /** Returns the BlobKey of an uploaded image so we can serve the blob. */
+    private String getBlobKey(HttpServletRequest request) {
+        BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
+        // Get all files uploaded to blobstore from this request
+        Map<String, List<BlobKey>> blobs = blobstoreService.getUploads(request);
+        // Get the blobkey associated with the image uploaded
+        List<BlobKey> blobKeys = blobs.get("image");
+        String blobKey = "";
+        // If a file was uploaded
+        if(blobKeys != null && !blobKeys.isEmpty()) {
+            blobKey = blobKeys.get(0).getKeyString();
+        }
+        return blobKey;
     }
 }

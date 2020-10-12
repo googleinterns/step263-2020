@@ -25,11 +25,11 @@ export class InfoWindowComponent implements OnInit {
   ngOnInit(): void { }
 
   // Update the fields according to user input and emit the submitEvent to receive the data in mapComponenet
-  submit(animalValue, descriptionValue, reporterValue){
+  submit(animalValue, descriptionValue, reporterValue, imageValue){
     this.animal = animalValue;
     this.description = descriptionValue;
     this.reporter = reporterValue;
-    this.submitEvent.emit({animal: animalValue, description: descriptionValue, reporter: reporterValue})
+    this.submitEvent.emit({animal: animalValue, description: descriptionValue, reporter: reporterValue, image: imageValue})
   }
 
   // Indicates that the user pressed on the Delete button

@@ -48,9 +48,10 @@ export class MapComponent implements OnInit {
     const markerJson = JSON.stringify(marker);
     const params = new HttpParams()
       .set('marker', markerJson)
+      .set('image', marker.image)
       .set('action', action.toString());
     this.httpClient.post('/markers', params).subscribe({
-      next: data => marker.id = data,
+      next: data => data.json() // marker.id = data,
       error: error => console.error("The marker failed to save. Error details: ", error)
     });
   }
@@ -98,7 +99,8 @@ export class MapComponent implements OnInit {
         description: event.description,
         reporter: event.reporter,
         lat: lat,
-        lng: lng
+        lng: lng,
+        image: event.image
       };
       this.postMarker(newMarker, MarkerAction.CREATE);
       this.addMarkerForDisplay(newMarker);
@@ -157,7 +159,8 @@ export class MapComponent implements OnInit {
         description: event.description,
         reporter: event.reporter,
         lat: markerData.lat,
-        lng: markerData.lng
+        lng: markerData.lng,
+        image: event.image
       };
       this.postMarker(newMarker, MarkerAction.UPDATE);
       // Once the user clicks "Update", we want to return the regular display
@@ -167,4 +170,6 @@ export class MapComponent implements OnInit {
 
     return infoWindowComponent.location.nativeElement;
   }
+
+  getBlob(blob)
 }
