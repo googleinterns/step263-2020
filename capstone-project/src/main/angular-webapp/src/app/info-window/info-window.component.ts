@@ -1,6 +1,8 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { MarkerAction } from '../marker-action';
 import { } from 'googlemaps';
+import { SocialUser } from "angularx-social-login";
+import { UserService } from "../user.service";
 
 @Component({
   selector: 'app-info-window',
@@ -8,6 +10,8 @@ import { } from 'googlemaps';
   styleUrls: ['./info-window.component.css']
 })
 export class InfoWindowComponent implements OnInit {
+
+  private user: SocialUser;
 
   @Input() animal: string;
   @Input() description: string;
@@ -20,9 +24,12 @@ export class InfoWindowComponent implements OnInit {
 
   MarkerAction = MarkerAction; // For the ngIf in template
 
-  constructor() { }
+  constructor(private data: UserService) { }
 
-  ngOnInit(): void { }
+  ngOnInit(): void { 
+    // Get the burrent user
+    this.data.currentUser.subscribe(user => this.user = user);
+  }
 
   // Update the fields according to user input and emit the submitEvent to receive the data in mapComponenet
   submit(animalValue, descriptionValue, reporterValue){
