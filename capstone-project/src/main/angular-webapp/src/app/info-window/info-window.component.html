@@ -11,9 +11,14 @@
     <div *ngIf="type==MarkerAction.CREATE">
         <input #inputAnimal placeholder="Animal"><br>
         <input #inputDescription placeholder="Description"><br>
-        <input #inputReporter *ngIf="!user" placeholder="Reporter's Name">
-        <input #inputReporter *ngIf="user" value="{{user.name}}"><br>
-        <button (click)="submit(inputAnimal.value, inputDescription.value, inputReporter.value)">Submit</button>
+        <div *ngIf="!user">
+            <input #inputReporter placeholder="Reporter's Name"><br>
+            <button (click)="submit(inputAnimal.value, inputDescription.value, inputReporter.value)">Submit</button>
+        </div>
+        <div *ngIf="user">
+            <input value="{{user.name}}"><br>
+            <button (click)="submit(inputAnimal.value, inputDescription.value, user.name)">Submit</button>
+        </div>
 
     </div>
     <div *ngIf="type==MarkerAction.UPDATE">
