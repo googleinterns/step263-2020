@@ -25,7 +25,7 @@ export class MapComponent implements OnInit {
       zoom: 4,
       center: new google.maps.LatLng(25, 80)
     };
-    // Try to center the map on the user's location.
+    
     this.focusOnUserLocation();
 
     this.gMap = new google.maps.Map(document.getElementById('map-container'), googleMapOption);
