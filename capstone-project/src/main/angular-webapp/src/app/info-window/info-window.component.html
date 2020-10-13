@@ -9,6 +9,7 @@
         <div>
             {{description}}<br> Reported by: {{reporter}}<br>
         </div>
+        <img src="{{imageUrl}}">
         <button (click)="delete()">Delete</button>
         <button (click)="update()">Update</button>
     </div>
@@ -23,7 +24,6 @@
         <input #inputAnimal value="{{animal}}"><br>
         <input #inputDescription value="{{description}}"><br>
         <input #inputReporter value="{{reporter}}"><br>
-        <input #inputImage type="file" name="image" accept="image/png, image/jpg" multiple><br>
-        <button (click)="submit(inputAnimal.value, inputDescription.value, inputReporter.value, inputImage.files)">Update</button>
+        <button (click)="submit(inputAnimal.value, inputDescription.value, inputReporter.value, '')">Update</button>
     </div>
 </body>

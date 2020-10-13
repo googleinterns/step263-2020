@@ -43,17 +43,28 @@ export class MapComponent implements OnInit {
   }
 
   // Performs a backend action on a marker - display / update / delete.
-  postMarker(marker, action) {
-
+  postMarker(marker, image, action) {
+    let postUrl;
+    this.httpClient.get('/blob-service?blobAction=1')
+    .toPromise()
+    .then((response) => {
+      for (let key in response) {
+        postUrl = response[key];
+      }
     const markerJson = JSON.stringify(marker);
     const params = new HttpParams()
       .set('marker', markerJson)
-      .set('image', marker.image)
+      .set('image', image)
       .set('action', action.toString());
-    this.httpClient.post('/markers', params).subscribe({
-      next: data => data.json() // marker.id = data,
+    this.httpClient.post(postUrl, params).subscribe({
+      next: (data) => {
+        const dataAsObject = JSON.parse(data.toString());
+        marker.id = dataAsObject.id;
+        marker.blobKey = dataAsObject.blobKey;
+      }, // marker.id = data,
       error: error => console.error("The marker failed to save. Error details: ", error)
     });
+  });
   }
 
   // Deletes an existing marker.
@@ -100,9 +111,9 @@ export class MapComponent implements OnInit {
         reporter: event.reporter,
         lat: lat,
         lng: lng,
-        image: event.image
+        blobKey: null
       };
-      this.postMarker(newMarker, MarkerAction.CREATE);
+      this.postMarker(newMarker, event.image, MarkerAction.CREATE);
       this.addMarkerForDisplay(newMarker);
       this.editableMarker.setMap(null);
     });
@@ -141,6 +152,7 @@ export class MapComponent implements OnInit {
     infoWindowComponent.instance.animal = marker.animal;
     infoWindowComponent.instance.description = marker.description;
     infoWindowComponent.instance.reporter = marker.reporter;
+    infoWindowComponent.instance.imageUrl = this.getUrlFromBlob(marker.blobKey);
     infoWindowComponent.instance.type = MarkerAction.DISPLAY;
     infoWindowComponent.changeDetectorRef.detectChanges();
     return infoWindowComponent;
@@ -160,9 +172,9 @@ export class MapComponent implements OnInit {
         reporter: event.reporter,
         lat: markerData.lat,
         lng: markerData.lng,
-        image: event.image
+        blobKey: null
       };
-      this.postMarker(newMarker, MarkerAction.UPDATE);
+      this.postMarker(newMarker, event.image, MarkerAction.UPDATE);
       // Once the user clicks "Update", we want to return the regular display
       infoWindowComponent.instance.type = MarkerAction.DISPLAY;
       infoWindowComponent.changeDetectorRef.detectChanges();
@@ -171,5 +183,18 @@ export class MapComponent implements OnInit {
     return infoWindowComponent.location.nativeElement;
   }
 
-  getBlob(blob)
+  // Returns the URL of a blob related to a marker.
+  getUrlFromBlob(blobKey) {
+    if (!blobKey) {
+      return '';
+    }
+    let imageUrl;
+    this.httpClient.get('/blob-service?blob-key=' + blobKey + '&blobAction=0')
+      .toPromise()
+      .then((response: Blob) => {
+        const UrlCreator = window.URL;
+        imageUrl = UrlCreator.createObjectURL(response);
+      });
+    return imageUrl;
+  }
 }

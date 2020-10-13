@@ -30,7 +30,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.sps.data.Marker;
 
-import javax.json.JsonBuilderFactory;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -68,6 +67,7 @@ public class MarkerServlet extends HttpServlet {
      */
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        System.out.println("++++++++++++++++ Im here");
         int actionNum = Integer.parseInt(request.getParameter("action"));
         Action action = Action.values()[actionNum];
         Gson gson = new Gson();
@@ -77,6 +77,7 @@ public class MarkerServlet extends HttpServlet {
             case CREATE:
                 Marker newMarker = gson.fromJson(request.getParameter("marker"), Marker.class);
                 blobKey = getBlobKey(request);
+                System.out.println("##########"+blobKey);
                 newMarker.setBlobKey(blobKey);
                 markerId = storeMarker(newMarker);
                 // The ID of the entity need to be updated in the FE as well
@@ -84,6 +85,7 @@ public class MarkerServlet extends HttpServlet {
                 responseMap.put("id", Long.toString(markerId));
                 responseMap.put("blobKey", blobKey);
                 String responseJson = gson.toJson(responseMap);
+                response.setContentType("application/json");
                 response.getWriter().println(responseJson);
                 break;
             case UPDATE:
@@ -144,10 +146,12 @@ public class MarkerServlet extends HttpServlet {
     }
 
     /** Returns the BlobKey of an uploaded image so we can serve the blob. */
-    private String getBlobKey(HttpServletRequest request) {
+    private static String getBlobKey(HttpServletRequest request) {
         BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
         // Get all files uploaded to blobstore from this request
-        Map<String, List<BlobKey>> blobs = blobstoreService.getUploads(request);
+        System.out.println("**********" + request);
+         Map<String, List<BlobKey>> blobs = blobstoreService.getUploads(request);
+        System.out.println("**************" + blobs.toString());
         // Get the blobkey associated with the image uploaded
         List<BlobKey> blobKeys = blobs.get("image");
         String blobKey = "";
@@ -155,6 +159,7 @@ public class MarkerServlet extends HttpServlet {
         if(blobKeys != null && !blobKeys.isEmpty()) {
             blobKey = blobKeys.get(0).getKeyString();
         }
+
         return blobKey;
     }
 }

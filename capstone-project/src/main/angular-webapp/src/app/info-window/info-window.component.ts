@@ -12,6 +12,7 @@ export class InfoWindowComponent implements OnInit {
   @Input() animal: string;
   @Input() description: string;
   @Input() reporter: string;
+  @Input() imageUrl: string;
   @Input() type: MarkerAction;
 
   @Output() submitEvent = new EventEmitter();
@@ -19,26 +20,28 @@ export class InfoWindowComponent implements OnInit {
   @Output() updateEvent = new EventEmitter();
 
   MarkerAction = MarkerAction; // For the ngIf in template
+  imageFile;
 
   constructor() { }
 
   ngOnInit(): void { }
 
   // Update the fields according to user input and emit the submitEvent to receive the data in mapComponenet
-  submit(animalValue, descriptionValue, reporterValue, imageValue){
+  submit(animalValue, descriptionValue, reporterValue, imageValue) {
     this.animal = animalValue;
     this.description = descriptionValue;
     this.reporter = reporterValue;
-    this.submitEvent.emit({animal: animalValue, description: descriptionValue, reporter: reporterValue, image: imageValue})
+    this.imageFile = imageValue;
+    this.submitEvent.emit({ animal: animalValue, description: descriptionValue, reporter: reporterValue, image: imageValue })
   }
 
   // Indicates that the user pressed on the Delete button
-  delete(){
+  delete() {
     this.deleteEvent.emit()
   }
 
   // Indicates that the user pressed on the Update button
-  update(){
+  update() {
     this.updateEvent.emit()
   }
 }
