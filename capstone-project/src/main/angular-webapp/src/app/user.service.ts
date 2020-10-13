@@ -12,6 +12,7 @@ export class UserService {
 
   constructor() {  }
 
+  // Update the last value of userSource to be user
   changeUser(user: SocialUser){
     this.userSource.next(user);
   }
