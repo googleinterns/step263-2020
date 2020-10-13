@@ -11,6 +11,7 @@ import { InfoWindowComponent } from './info-window/info-window.component';
 import { AppComponent } from './app.component';
 import { MapComponent } from './map/map.component';
 import { AuthenticationComponent } from './authentication/authentication.component';
+import { environment } from 'src/environments/environment';
 
 
 @NgModule({
@@ -37,7 +38,7 @@ import { AuthenticationComponent } from './authentication/authentication.compone
         {
           id: GoogleLoginProvider.PROVIDER_ID,
           provider: new GoogleLoginProvider(
-            'client-id'
+            environment["CLIENT_ID"]
           ),
         }
       ],
