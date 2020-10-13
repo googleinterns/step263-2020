@@ -24,6 +24,9 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.gson.Gson;
 import com.google.sps.data.Marker;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
