@@ -43,12 +43,13 @@ export class MapComponent implements OnInit {
   }
 
   // Performs a backend action on a marker - display / update / delete.
-  postMarker(marker, action) {
+  postMarker(marker, action, userToken) {
 
     const markerJson = JSON.stringify(marker);
     const params = new HttpParams()
       .set('marker', markerJson)
-      .set('action', action.toString());
+      .set('action', action.toString())
+      .set('userToken', userToken);
     this.httpClient.post('/markers', params).subscribe({
       next: data => marker.id = data,
       error: error => console.error("The marker failed to save. Error details: ", error)
@@ -100,7 +101,7 @@ export class MapComponent implements OnInit {
         lat: lat,
         lng: lng
       };
-      this.postMarker(newMarker, MarkerAction.CREATE);
+      this.postMarker(newMarker, MarkerAction.CREATE, event.userToken);
       this.addMarkerForDisplay(newMarker);
       this.editableMarker.setMap(null);
     });
@@ -159,7 +160,7 @@ export class MapComponent implements OnInit {
         lat: markerData.lat,
         lng: markerData.lng
       };
-      this.postMarker(newMarker, MarkerAction.UPDATE);
+      this.postMarker(newMarker, MarkerAction.UPDATE, event.userToken);
       // Once the user clicks "Update", we want to return the regular display
       infoWindowComponent.instance.type = MarkerAction.DISPLAY;
       infoWindowComponent.changeDetectorRef.detectChanges();

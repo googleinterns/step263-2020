@@ -14,16 +14,13 @@
 
 package com.google.sps.servlets;
 
-import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
-import com.google.appengine.api.datastore.PreparedQuery;
-import com.google.appengine.api.datastore.Query;
-import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.EntityNotFoundException;
+import com.google.appengine.api.datastore.*;
 import com.google.gson.Gson;
 import com.google.sps.data.Marker;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
@@ -33,8 +30,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 // Enum describing which action should be performed.
 enum Action {
@@ -66,8 +65,10 @@ public class MarkerServlet extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         int actionNum = Integer.parseInt(request.getParameter("action"));
         Action action = Action.values()[actionNum];
+        String userToken = request.getParameter("userToken");
         Gson gson = new Gson();
         long markerId;
+        String userId = verifyToken(userToken);
         switch (action) {
             case CREATE:
                 Marker newMarker = gson.fromJson(request.getParameter("marker"), Marker.class);
@@ -87,6 +88,25 @@ public class MarkerServlet extends HttpServlet {
                 markerId = Long.parseLong(request.getParameter("id"));
                 deleteMarker(markerId);
         }
+    }
+
+    /** Verifies the idToken and returns the user ID */
+    private static String verifyToken(String idTokenString) {
+        JsonFactory jsonFactory = new JacksonFactory();
+        HttpTransport transport = new NetHttpTransport();
+
+        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(transport, jsonFactory)
+        .setAudience(Collections.singletonList("client-id"))
+        .build();
+        try {
+            GoogleIdToken idToken = verifier.verify(idTokenString);
+            if (idToken != null) {
+                Payload payload = idToken.getPayload();
+                return payload.getSubject();
+            }
+        }
+        catch(Exception exception) { }
+        return "";
     }
 
     /** Fetches markers from Datastore. */
