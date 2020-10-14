@@ -45,7 +45,7 @@ export class InfoWindowComponent implements OnInit {
   }
 
   // Return the current user
-  getUser(){
-    return this.userService.currentUser;
+  get user(): SocialUser {
+    return this.userService.getUser();
   }
 }
