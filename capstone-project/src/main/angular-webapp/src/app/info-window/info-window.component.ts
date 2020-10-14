@@ -11,8 +11,6 @@ import { UserService } from "../user.service";
 })
 export class InfoWindowComponent implements OnInit {
 
-  user: SocialUser;
-
   @Input() animal: string;
   @Input() description: string;
   @Input() reporter: string;
@@ -26,10 +24,7 @@ export class InfoWindowComponent implements OnInit {
 
   constructor(private userService: UserService) { }
 
-  ngOnInit(): void { 
-    // Get the current user
-    this.userService.currentUser.subscribe(user => this.user = user);
-  }
+  ngOnInit(): void { }
 
   // Update the fields according to user input and emit the submitEvent to receive the data in mapComponenet
   submit(animalValue, descriptionValue, reporterValue){
@@ -47,5 +42,10 @@ export class InfoWindowComponent implements OnInit {
   // Indicates that the user pressed on the Update button
   update(){
     this.updateEvent.emit()
+  }
+
+  // Return the current user
+  getUser(){
+    return this.userService.currentUser;
   }
 }
