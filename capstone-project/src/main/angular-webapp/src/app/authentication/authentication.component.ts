@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { SocialAuthService, GoogleLoginProvider } from "angularx-social-login";
+import { SocialAuthService, GoogleLoginProvider, SocialUser } from "angularx-social-login";
 import { UserService } from "../user.service";
 
 @Component({
@@ -14,7 +14,7 @@ export class AuthenticationComponent implements OnInit {
   ngOnInit(): void {
     // When user status changes update the user service
     this.authService.authState.subscribe((user) => {
-      this.userService.currentUser = user;
+      this.userService.setUser(user);
     });
   }
 
@@ -30,8 +30,8 @@ export class AuthenticationComponent implements OnInit {
   }
 
   // Return the current user
-  getUser(){
-    return this.userService.currentUser;
+  get user(): SocialUser {
+    return this.userService.getUser();
   }
 
 }

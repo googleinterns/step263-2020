@@ -1,13 +1,13 @@
-<div *ngIf="!getUser()">
+<div *ngIf="!user">
     <button mat-button (click)="signInWithGoogle()">
         Sign-in<br>With Google
     </button>
 </div>
-<div *ngIf="getUser()" class="dropdown">
-    <input type="image" *ngIf="getUser().photoUrl" src="{{ getUser().photoUrl }}">
+<div *ngIf="user" class="dropdown">
+    <input type="image" *ngIf="user.photoUrl" src="{{ user.photoUrl }}">
     <div class="dropdown-content">
-        <mat-card-subtitle>{{ getUser().name }}</mat-card-subtitle>
-        {{ getUser().email }}<br>
+        <mat-card-subtitle>{{ user.name }}</mat-card-subtitle>
+        {{ user.email }}<br>
         <button mat-button (click)="signOut()">Sign out</button>
     </div>
 </div>
