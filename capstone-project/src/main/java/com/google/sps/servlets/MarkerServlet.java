@@ -15,7 +15,10 @@
 package com.google.sps.servlets;
 
 import com.google.appengine.api.datastore.*;
+import com.google.appengine.repackaged.com.google.gson.JsonObject;
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.google.sps.data.Marker;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -67,10 +70,13 @@ public class MarkerServlet extends HttpServlet {
         Action action = Action.values()[actionNum];
         String userToken = request.getParameter("userToken");
         Gson gson = new Gson();
+        JsonElement markerJson = JsonParser.parseString(request.getParameter("marker"));
         long markerId;
         String userId = verifyToken(userToken);
         switch (action) {
             case CREATE:
+                // Add userId to marker json
+                markerJson.getAsJsonObject().addProperty("userId", userId);
                 Marker newMarker = gson.fromJson(request.getParameter("marker"), Marker.class);
                 markerId = storeMarker(newMarker);
                 // The ID of the entity need to be updated in the FE as well
