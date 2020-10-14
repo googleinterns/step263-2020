@@ -5,6 +5,7 @@ import { Injectable } from '@angular/core';
 })
 export class UserService {
 
+  // Holds the current user, updated in authentication component
   currentUser;
 
   constructor() {  }
