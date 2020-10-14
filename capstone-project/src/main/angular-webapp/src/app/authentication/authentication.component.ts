@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { SocialAuthService, GoogleLoginProvider, SocialUser } from "angularx-social-login";
+import { SocialAuthService, GoogleLoginProvider } from "angularx-social-login";
 import { UserService } from "../user.service";
 
 @Component({
@@ -9,28 +9,29 @@ import { UserService } from "../user.service";
 })
 export class AuthenticationComponent implements OnInit {
   
-  user: SocialUser;
-
   constructor(private authService: SocialAuthService, private userService: UserService) { }
 
   ngOnInit(): void {
+    // When user status changes update the user service
     this.authService.authState.subscribe((user) => {
-      this.user = user;
-      this.changeUser(user);
+      this.userService.currentUser = user;
     });
   }
 
+  // Sign in user
   signInWithGoogle(): void {
     this.authService.signIn(GoogleLoginProvider.PROVIDER_ID);
   }
 
+  // Sign out user and reload page
   signOut(): void {
     this.authService.signOut();
+    window.location.reload();
   }
 
-  // Update the user service to the current user
-  changeUser(user) {
-    this.userService.changeUser(user);
+  // Return the current user
+  getUser(){
+    return this.userService.currentUser;
   }
 
 }
