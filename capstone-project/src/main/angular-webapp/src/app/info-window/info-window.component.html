@@ -1,6 +1,3 @@
-<!DOCTYPE html>
-<head>
-</head>
 <body>
     <div *ngIf="type==MarkerAction.DISPLAY">
         <h1>{{animal}}</h1>
@@ -14,8 +11,15 @@
     <div *ngIf="type==MarkerAction.CREATE">
         <input #inputAnimal placeholder="Animal"><br>
         <input #inputDescription placeholder="Description"><br>
-        <input #inputReporter placeholder="Reporter's Name"><br>
-        <button (click)="submit(inputAnimal.value, inputDescription.value, inputReporter.value)">Submit</button>
+        <div *ngIf="!user">
+            <input #inputReporter placeholder="Reporter's Name"><br>
+            <button (click)="submit(inputAnimal.value, inputDescription.value, inputReporter.value)">Submit</button>
+        </div>
+        <div *ngIf="user">
+            <input #inputReporterUser value="{{user.name}}"><br>
+            <button (click)="submit(inputAnimal.value, inputDescription.value, inputReporterUser.value)">Submit</button>
+        </div>
+
     </div>
     <div *ngIf="type==MarkerAction.UPDATE">
         <input #inputAnimal value="{{animal}}"><br>

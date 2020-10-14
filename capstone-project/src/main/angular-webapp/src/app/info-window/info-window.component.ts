@@ -1,6 +1,8 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { MarkerAction } from '../marker-action';
 import { } from 'googlemaps';
+import { SocialUser } from "angularx-social-login";
+import { UserService } from "../user.service";
 
 @Component({
   selector: 'app-info-window',
@@ -20,7 +22,7 @@ export class InfoWindowComponent implements OnInit {
 
   MarkerAction = MarkerAction; // For the ngIf in template
 
-  constructor() { }
+  constructor(private userService: UserService) { }
 
   ngOnInit(): void { }
 
@@ -40,5 +42,10 @@ export class InfoWindowComponent implements OnInit {
   // Indicates that the user pressed on the Update button
   update(){
     this.updateEvent.emit()
+  }
+
+  // Return the current user
+  get user(): SocialUser {
+    return this.userService.getUser();
   }
 }

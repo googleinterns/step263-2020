@@ -143,7 +143,7 @@ export class MapComponent implements OnInit {
       this.editableMarker.setMap(null);
     });
 
-    return infoWindowComponent.location.nativeElement;;
+    return infoWindowComponent.location.nativeElement;
   }
 
   // Builds display info window of a marker
