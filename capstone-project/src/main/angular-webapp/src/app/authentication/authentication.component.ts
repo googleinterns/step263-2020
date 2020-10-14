@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { SocialAuthService, GoogleLoginProvider, SocialUser } from "angularx-social-login";
+import { SocialAuthService, GoogleLoginProvider } from "angularx-social-login";
 import { UserService } from "../user.service";
 
 @Component({
@@ -23,6 +23,7 @@ export class AuthenticationComponent implements OnInit {
 
   signOut(): void {
     this.authService.signOut();
+    window.location.reload()
   }
 
   // Return the current user
