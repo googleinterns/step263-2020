@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { } from 'googlemaps';
 import { InfoWindowComponent } from '../info-window/info-window.component';
 import { MarkerAction } from '../marker-action';
+import { BlobAction } from '../blob-action';
 
 @Component({
   selector: 'app-map',
@@ -25,6 +26,9 @@ export class MapComponent implements OnInit {
       zoom: 4,
       center: new google.maps.LatLng(25, 80)
     };
+
+    this.focusOnUserLocation();
+
     this.gMap = new google.maps.Map(document.getElementById('map-container'), googleMapOption);
 
     // When the user clicks on the map, show a marker with a text box the user can edit.
@@ -37,34 +41,76 @@ export class MapComponent implements OnInit {
       .toPromise()
       .then((response) => {
         for (let key in response) {
-          this.addMarkerForDisplay(response[key]);
+
+          // If the marker has a blob key - get its URL 
+          if (response[key].blobKey) {
+            let imageUrl;
+            this.httpClient.get('/blob-service?' + 'blobAction=' + BlobAction.KEY_TO_BLOB +  '&blob-key=' + response[key].blobKey, { responseType: 'blob' })
+              .toPromise()
+              .then((blob) => {
+                imageUrl = MapComponent.getUrlFromBlob(blob)
+                this.addMarkerForDisplay(response[key], imageUrl)
+              });
+          }
+          else {
+            this.addMarkerForDisplay(response[key], '');
+          }
         }
       });
   }
 
+  // Returns the URL of a blob related to a marker.
+  static getUrlFromBlob(blob) {
+    const urlCreator = window.URL;
+    return urlCreator.createObjectURL(blob);
+  }
+
+  // Centers the map based on the user location if permission is granted.
+  focusOnUserLocation() {
+
+    // Browser supports Geolocation
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        const pos = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        };
+        this.gMap.setCenter(pos);
+        this.gMap.setZoom(14);
+      },
+        () => {
+          MapComponent.handleLocationError(true);
+        }
+      );
+    }
+
+    // Browser doesn't support Geolocation
+    else {
+      MapComponent.handleLocationError(false);
+    }
+  }
+
+  // Alerts the user if the location process failed.
+  static handleLocationError(broswerHasGeolocation: boolean) {
+    if (broswerHasGeolocation) {
+      window.alert("Geolocation service failed. Please grant the browser permission to locate you.")
+    }
+    else {
+      window.alert("Browser doesn't support Geolocation.")
+    }
+  }
+
   // Performs a backend action on a marker - display / update / delete.
-  postMarker(marker, image, action) {
-    let postUrl;
-    this.httpClient.get('/blob-service?blobAction=1')
-    .toPromise()
-    .then((response) => {
-      for (let key in response) {
-        postUrl = response[key];
-      }
+  postMarker(marker, action) {
+
     const markerJson = JSON.stringify(marker);
     const params = new HttpParams()
       .set('marker', markerJson)
-      .set('image', image)
       .set('action', action.toString());
-    this.httpClient.post(postUrl, params).subscribe({
-      next: (data) => {
-        const dataAsObject = JSON.parse(data.toString());
-        marker.id = dataAsObject.id;
-        marker.blobKey = dataAsObject.blobKey;
-      }, // marker.id = data,
+    this.httpClient.post('/markers', params).subscribe({
+      next: data => marker.id = data,
       error: error => console.error("The marker failed to save. Error details: ", error)
     });
-  });
   }
 
   // Deletes an existing marker.
@@ -111,18 +157,33 @@ export class MapComponent implements OnInit {
         reporter: event.reporter,
         lat: lat,
         lng: lng,
-        blobKey: null
+        blobKey: event.blobKey
       };
-      this.postMarker(newMarker, event.image, MarkerAction.CREATE);
-      this.addMarkerForDisplay(newMarker);
-      this.editableMarker.setMap(null);
+      this.postMarker(newMarker, MarkerAction.CREATE);
+
+      // Get the image URL from the blob key so we can add the new marker for display
+      let imageUrl;
+      if (newMarker.blobKey) {
+        this.httpClient.get('/blob-service?' + 'blobAction=' + BlobAction.KEY_TO_BLOB +  '&blob-key=' + newMarker.blobKey, { responseType: 'blob' })
+          .toPromise()
+          .then((blob) => {
+            imageUrl = MapComponent.getUrlFromBlob(blob)
+            this.addMarkerForDisplay(newMarker, imageUrl)
+            this.editableMarker.setMap(null);
+          });
+      }
+      else {
+        this.addMarkerForDisplay(newMarker, '');
+        this.editableMarker.setMap(null);
+      }
+
     });
 
-    return infoWindowComponent.location.nativeElement;;
+    return infoWindowComponent.location.nativeElement;
   }
 
   // Builds display info window of a marker
-  addMarkerForDisplay(marker) {
+  addMarkerForDisplay(marker, imageUrl) {
 
     const markerForDisplay = new google.maps.Marker({
       map: this.gMap,
@@ -130,7 +191,7 @@ export class MapComponent implements OnInit {
     });
 
     const markersInfoWindow = new google.maps.InfoWindow();
-    const infoWindowComponent = this.buildDisplayInfoWindowComponent(marker);
+    const infoWindowComponent = this.buildDisplayInfoWindowComponent(marker, imageUrl);
 
     infoWindowComponent.instance.deleteEvent.subscribe(event =>
       this.deleteMarker(marker, markerForDisplay));
@@ -147,12 +208,12 @@ export class MapComponent implements OnInit {
   };
 
   // Creates the info window component for display of marker
-  buildDisplayInfoWindowComponent(marker) {
+  buildDisplayInfoWindowComponent(marker, imageUrl) {
     const infoWindowComponent = this.factory.create(this.injector);
     infoWindowComponent.instance.animal = marker.animal;
     infoWindowComponent.instance.description = marker.description;
     infoWindowComponent.instance.reporter = marker.reporter;
-    infoWindowComponent.instance.imageUrl = this.getUrlFromBlob(marker.blobKey);
+    infoWindowComponent.instance.imageUrl = imageUrl; 
     infoWindowComponent.instance.type = MarkerAction.DISPLAY;
     infoWindowComponent.changeDetectorRef.detectChanges();
     return infoWindowComponent;
@@ -172,29 +233,14 @@ export class MapComponent implements OnInit {
         reporter: event.reporter,
         lat: markerData.lat,
         lng: markerData.lng,
-        blobKey: null
+        blobKey: event.blobKey
       };
-      this.postMarker(newMarker, event.image, MarkerAction.UPDATE);
+      this.postMarker(newMarker, MarkerAction.UPDATE);
       // Once the user clicks "Update", we want to return the regular display
       infoWindowComponent.instance.type = MarkerAction.DISPLAY;
       infoWindowComponent.changeDetectorRef.detectChanges();
     });
 
     return infoWindowComponent.location.nativeElement;
-  }
-
-  // Returns the URL of a blob related to a marker.
-  getUrlFromBlob(blobKey) {
-    if (!blobKey) {
-      return '';
-    }
-    let imageUrl;
-    this.httpClient.get('/blob-service?blob-key=' + blobKey + '&blobAction=0')
-      .toPromise()
-      .then((response: Blob) => {
-        const UrlCreator = window.URL;
-        imageUrl = UrlCreator.createObjectURL(response);
-      });
-    return imageUrl;
   }
 }

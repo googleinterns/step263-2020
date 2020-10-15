@@ -62,42 +62,29 @@ public class MarkerServlet extends HttpServlet {
         response.getWriter().println(json);
     }
 
-    /** Accepts a POST request containing a new marker. 
+    /** Accepts a POST request containing a marker to save / update / delete.
      * @throws IOException
      */
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        System.out.println("++++++++++++++++ Im here");
         int actionNum = Integer.parseInt(request.getParameter("action"));
         Action action = Action.values()[actionNum];
         Gson gson = new Gson();
-        String blobKey;
         long markerId;
         switch (action) {
             case CREATE:
                 Marker newMarker = gson.fromJson(request.getParameter("marker"), Marker.class);
-                blobKey = getBlobKey(request);
-                System.out.println("##########"+blobKey);
-                newMarker.setBlobKey(blobKey);
                 markerId = storeMarker(newMarker);
                 // The ID of the entity need to be updated in the FE as well
-                Map<String,String> responseMap = new HashMap<>();
-                responseMap.put("id", Long.toString(markerId));
-                responseMap.put("blobKey", blobKey);
-                String responseJson = gson.toJson(responseMap);
-                response.setContentType("application/json");
-                response.getWriter().println(responseJson);
+                response.getWriter().println(markerId);
                 break;
             case UPDATE:
                 Marker updatedMarker = gson.fromJson(request.getParameter("marker"), Marker.class);
-                blobKey = getBlobKey(request);
-                updatedMarker.setBlobKey(blobKey);
                 try {
                     updateMarker(updatedMarker);
                 } catch (EntityNotFoundException e) {
                     response.getWriter().println("Update failed, Entity not found. Error details: " + e.toString());
                 }
-                response.getWriter().println(blobKey);
                 break;
             case DELETE:
                 markerId = Long.parseLong(request.getParameter("id"));
@@ -143,23 +130,5 @@ public class MarkerServlet extends HttpServlet {
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
         Key markerEntityKey = KeyFactory.createKey("Marker", markersId);
         datastore.delete(markerEntityKey);
-    }
-
-    /** Returns the BlobKey of an uploaded image so we can serve the blob. */
-    private static String getBlobKey(HttpServletRequest request) {
-        BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
-        // Get all files uploaded to blobstore from this request
-        System.out.println("**********" + request);
-         Map<String, List<BlobKey>> blobs = blobstoreService.getUploads(request);
-        System.out.println("**************" + blobs.toString());
-        // Get the blobkey associated with the image uploaded
-        List<BlobKey> blobKeys = blobs.get("image");
-        String blobKey = "";
-        // If a file was uploaded
-        if(blobKeys != null && !blobKeys.isEmpty()) {
-            blobKey = blobKeys.get(0).getKeyString();
-        }
-
-        return blobKey;
     }
 }
