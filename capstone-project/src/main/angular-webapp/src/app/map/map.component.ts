@@ -3,6 +3,9 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { } from 'googlemaps';
 import { InfoWindowComponent } from '../info-window/info-window.component';
 import { MarkerAction } from '../marker-action';
+import { UserService } from '../user.service'
+import { SocialUser } from 'angularx-social-login';
+import { CompileShallowModuleMetadata } from '@angular/compiler';
 
 @Component({
   selector: 'app-map',
@@ -11,7 +14,10 @@ import { MarkerAction } from '../marker-action';
 })
 export class MapComponent implements OnInit {
 
-  constructor(private httpClient: HttpClient, private componentFactoryResolver: ComponentFactoryResolver, private injector: Injector) { }
+  constructor(private httpClient: HttpClient,
+              private componentFactoryResolver: ComponentFactoryResolver,
+              private injector: Injector,
+              private userService: UserService) { }
 
   // Editable marker that displays when a user clicks on the map.
   private editableMarker: google.maps.Marker;
@@ -81,15 +87,18 @@ export class MapComponent implements OnInit {
   }
 
   // Performs a backend action on a marker - display / update / delete.
-  postMarker(marker, action, userToken) {
+  postMarker(marker, action) {
 
     const markerJson = JSON.stringify(marker);
     const params = new HttpParams()
       .set('marker', markerJson)
       .set('action', action.toString())
-      .set('userToken', userToken);
-    this.httpClient.post('/markers', params).subscribe({
-      next: data => marker.id = data,
+      .set('userToken', this.getCurrentUserToken());
+    this.httpClient.post<any>('/markers', params).subscribe({
+      next: data => {
+        marker.id = data.id;
+        marker.userId = data.userId;
+      },
       error: error => console.error("The marker failed to save. Error details: ", error)
     });
   }
@@ -99,7 +108,8 @@ export class MapComponent implements OnInit {
 
     const params = new HttpParams()
       .set('id', markerData.id.toString())
-      .set('action', MarkerAction.DELETE.toString());
+      .set('action', MarkerAction.DELETE.toString())
+      .set('userToken', this.getCurrentUserToken());
     this.httpClient.post('/markers', params).subscribe({
       error: error => console.error("The marker failed to delete. Error details: ", error)
     });
@@ -139,7 +149,7 @@ export class MapComponent implements OnInit {
         lat: lat,
         lng: lng
       };
-      this.postMarker(newMarker, MarkerAction.CREATE, event.userToken);
+      this.postMarker(newMarker, MarkerAction.CREATE);
       this.addMarkerForDisplay(newMarker);
       this.editableMarker.setMap(null);
     });
@@ -179,6 +189,10 @@ export class MapComponent implements OnInit {
     infoWindowComponent.instance.description = marker.description;
     infoWindowComponent.instance.reporter = marker.reporter;
     infoWindowComponent.instance.type = MarkerAction.DISPLAY;
+    //console.log(marker.userId);
+    // if (this.user && marker.userId == this.user.id){
+    //   infoWindowComponent.instance.showEditButtons = true;
+    // }
     infoWindowComponent.changeDetectorRef.detectChanges();
     return infoWindowComponent;
   }
@@ -198,12 +212,22 @@ export class MapComponent implements OnInit {
         lat: markerData.lat,
         lng: markerData.lng
       };
-      this.postMarker(newMarker, MarkerAction.UPDATE, event.userToken);
+      this.postMarker(newMarker, MarkerAction.UPDATE);
       // Once the user clicks "Update", we want to return the regular display
       infoWindowComponent.instance.type = MarkerAction.DISPLAY;
       infoWindowComponent.changeDetectorRef.detectChanges();
     });
 
     return infoWindowComponent.location.nativeElement;
+  }
+
+  // Return the current user
+  get user(): SocialUser {
+    return this.userService.getUser();
+  }
+
+  // If user exist returns the idToken, else an empty string
+  getCurrentUserToken() {
+    return this.user ? this.user.idToken : "";
   }
 }

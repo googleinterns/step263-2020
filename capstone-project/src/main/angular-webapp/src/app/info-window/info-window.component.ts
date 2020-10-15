@@ -15,6 +15,7 @@ export class InfoWindowComponent implements OnInit {
   @Input() description: string;
   @Input() reporter: string;
   @Input() type: MarkerAction;
+  @Input() showEditButtons: boolean;
 
   @Output() submitEvent = new EventEmitter();
   @Output() deleteEvent = new EventEmitter();
@@ -37,7 +38,8 @@ export class InfoWindowComponent implements OnInit {
 
   // Indicates that the user pressed on the Delete button
   delete(){
-    this.deleteEvent.emit()
+    let idToken = (this.user ? this.user.idToken : "")
+    this.deleteEvent.emit({userToken: idToken})
   }
 
   // Indicates that the user pressed on the Update button

@@ -41,6 +41,7 @@ import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Optional;
 
 // Enum describing which action should be performed.
@@ -75,27 +76,42 @@ public class MarkerServlet extends HttpServlet {
         Action action = Action.values()[actionNum];
         Gson gson = new Gson();
         long markerId;
+        String userToken = request.getParameter("userToken");
+        Optional<String> userId = verifyToken(userToken);
         switch (action) {
             case CREATE:
-                String userToken = request.getParameter("userToken");
-                Optional<String> userId = verifyToken(userToken);
                 Marker newMarker = gson.fromJson(request.getParameter("marker"), Marker.class);
+                HashMap<String, String> returnParameters = new HashMap<>();
                 newMarker.setUserId(userId);
                 markerId = storeMarker(newMarker);
                 // The ID of the entity need to be updated in the FE as well
-                response.getWriter().println(markerId);
+                returnParameters.put("id", Long.toString(markerId));
+                if (userId.isPresent()){
+                    returnParameters.put("userId", (userId.get()));
+                }
+                response.getWriter().println(gson.toJson(returnParameters));
                 break;
             case UPDATE:
                 Marker updatedMarker = gson.fromJson(request.getParameter("marker"), Marker.class);
                 try {
-                    updateMarker(updatedMarker);
+                    updateMarker(updatedMarker, userId);
                 } catch (EntityNotFoundException e) {
                     response.getWriter().println("Update failed, Entity not found. Error details: " + e.toString());
+                }
+                catch (GeneralSecurityException securityException) {
+                    response.getWriter().println("Update failed, " + securityException.toString());
                 }
                 break;
             case DELETE:
                 markerId = Long.parseLong(request.getParameter("id"));
-                deleteMarker(markerId);
+                try {
+                    deleteMarker(markerId, userId);
+                } catch (EntityNotFoundException e) {
+                    response.getWriter().println("Delete failed, Entity not found. Error details: " + e.toString());
+                }
+                catch (GeneralSecurityException securityException) {
+                    response.getWriter().println("Delete failed, " + securityException.toString());
+                }
         }
     }
 
@@ -147,26 +163,42 @@ public class MarkerServlet extends HttpServlet {
     }
 
     /** Updates an existing marker's data */
-    private static void updateMarker(Marker marker) throws EntityNotFoundException {
+    private static void updateMarker(Marker marker, Optional<String> userId) throws EntityNotFoundException, GeneralSecurityException {
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
         // Find the entity of the marker that needs to be updated using its ID
         Key markerEntityKey = KeyFactory.createKey("Marker", marker.getId());
         Entity markerEntity = datastore.get(markerEntityKey);
-        // If markerEntity has userId, the updated marker should have the same userId
-        Optional<String> userId = Optional.empty();
-        if (markerEntity.hasProperty("userId")){
-            userId = Optional.of((String) markerEntity.getProperty("userId"));
+        if (userHasPermissions(markerEntity, userId)){
+            marker.setUserId(userId);
+            // Overwrite the relevant entity with the updated data
+            datastore.put(Marker.toEntity(marker, markerEntity));
         }
-        marker.setUserId(userId);
-        // Overwrite the relevant entity with the updated data
-        datastore.put(Marker.toEntity(marker, markerEntity));
+        // There is no user, or user did not the create the marker
+        else {
+            throw new GeneralSecurityException("User do not have permissions to access this marker");
+        }       
     }
 
     /** Deletes a marker */
-    private static void deleteMarker(long markersId) {
+    private static void deleteMarker(long markersId, Optional<String> userId) throws EntityNotFoundException, GeneralSecurityException {
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
         Key markerEntityKey = KeyFactory.createKey("Marker", markersId);
-        datastore.delete(markerEntityKey);
+        Entity markerEntity = datastore.get(markerEntityKey);
+        if (userHasPermissions(markerEntity, userId)){
+            datastore.delete(markerEntityKey);
+        }
+        // There is no user, or user did not the create the marker
+        else {
+            throw new GeneralSecurityException("User do not have permissions to access this marker");
+        }
+    }
+
+    /** Checks if user has permissions to access marker */
+    private static boolean userHasPermissions(Entity markerEntity, Optional<String> userId) {
+        // If markerEntity has userId and it matchs the request user - the user has permissions
+        return (markerEntity.hasProperty("userId") 
+            && userId.isPresent() 
+            && userId.get().equals((String) markerEntity.getProperty("userId")));       
     }
 }

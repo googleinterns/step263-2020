@@ -5,8 +5,10 @@
             {{description}}<br>
             Reported by: {{reporter}}<br>
         </div>
-        <button (click)="delete()">Delete</button>
-        <button (click)="update()">Update</button>
+        <div *ngIf="showEditButtons">
+            <button (click)="delete()">Delete</button>
+            <button (click)="update()">Update</button>
+        </div>
     </div>
     <div *ngIf="type==MarkerAction.CREATE">
         <input #inputAnimal placeholder="Animal"><br>
