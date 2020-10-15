@@ -21,7 +21,6 @@ export class AuthenticationComponent implements OnInit {
   // Sign in user
   signInWithGoogle(): void {
     this.authService.signIn(GoogleLoginProvider.PROVIDER_ID);
-    window.location.reload();
   }
 
   // Sign out user and reload page
