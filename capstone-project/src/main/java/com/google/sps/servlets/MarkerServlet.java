@@ -15,10 +15,7 @@
 package com.google.sps.servlets;
 
 import com.google.appengine.api.datastore.*;
-import com.google.appengine.repackaged.com.google.gson.JsonObject;
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import com.google.sps.data.Marker;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -37,6 +34,7 @@ import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Optional;
 
 // Enum describing which action should be performed.
 enum Action {
@@ -68,16 +66,15 @@ public class MarkerServlet extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         int actionNum = Integer.parseInt(request.getParameter("action"));
         Action action = Action.values()[actionNum];
-        String userToken = request.getParameter("userToken");
         Gson gson = new Gson();
-        JsonElement markerJson = JsonParser.parseString(request.getParameter("marker"));
         long markerId;
-        String userId = verifyToken(userToken);
+        
         switch (action) {
             case CREATE:
-                // Add userId to marker json
-                markerJson.getAsJsonObject().addProperty("userId", userId);
+                String userToken = request.getParameter("userToken");
+                Optional<String> userId = verifyToken(userToken);
                 Marker newMarker = gson.fromJson(request.getParameter("marker"), Marker.class);
+                newMarker.setUserId(userId);
                 markerId = storeMarker(newMarker);
                 // The ID of the entity need to be updated in the FE as well
                 response.getWriter().println(markerId);
@@ -96,23 +93,29 @@ public class MarkerServlet extends HttpServlet {
         }
     }
 
-    /** Verifies the idToken and returns the user ID */
-    private static String verifyToken(String idTokenString) {
-        JsonFactory jsonFactory = new JacksonFactory();
-        HttpTransport transport = new NetHttpTransport();
-
-        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(transport, jsonFactory)
-        .setAudience(Collections.singletonList("client-id"))
-        .build();
-        try {
-            GoogleIdToken idToken = verifier.verify(idTokenString);
+    /** Verifies the idToken and returns the user ID if token is verified */
+    private static Optional<String> verifyToken(String idTokenString) throws IOException {
+        // If there's no user, the idTokenString received is an empty string
+        if (idTokenString.equals("")){
+            return Optional.empty();
+        }
+		try {
+            JsonFactory jsonFactory = new JacksonFactory();
+            HttpTransport transport = new NetHttpTransport();
+            GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(transport, jsonFactory)
+                .setAudience(Collections.singletonList("client-id"))
+                .build();
+            GoogleIdToken idToken;
+            idToken = verifier.verify(idTokenString);
             if (idToken != null) {
                 Payload payload = idToken.getPayload();
-                return payload.getSubject();
+                return Optional.of(payload.getSubject());
             }
-        }
-        catch(Exception exception) { }
-        return "";
+		} catch (GeneralSecurityException e) {
+            System.out.println("idToken unauthorized");
+			e.printStackTrace();
+		}
+        return Optional.empty();
     }
 
     /** Fetches markers from Datastore. */
@@ -144,6 +147,12 @@ public class MarkerServlet extends HttpServlet {
         // Find the entity of the marker that needs to be updated using its ID
         Key markerEntityKey = KeyFactory.createKey("Marker", marker.getId());
         Entity markerEntity = datastore.get(markerEntityKey);
+        // If markerEntity has userId, the updated marker should have the same userId
+        Optional<String> userId = Optional.empty();
+        if (markerEntity.hasProperty("userId")){
+            userId = Optional.of((String) markerEntity.getProperty("userId"));
+        }
+        marker.setUserId(userId);
         // Overwrite the relevant entity with the updated data
         datastore.put(Marker.toEntity(marker, markerEntity));
     }

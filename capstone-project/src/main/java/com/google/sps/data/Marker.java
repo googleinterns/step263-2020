@@ -14,6 +14,8 @@
 
 package com.google.sps.data;
 
+import java.util.Optional;
+
 import com.google.appengine.api.datastore.Entity;
 
 /** Represents an animal report marker on the map. */
@@ -27,6 +29,7 @@ public class Marker {
         private String animal;
         private String reporter;
         private String description;
+        private Optional<String> userId;
 
         public Builder(){
         }
@@ -61,6 +64,11 @@ public class Marker {
             return this;
         }
 
+        public Builder setUserId(Optional<String> userId){
+            this.userId = userId;
+            return this;
+        }
+
         public Marker build(){
             return new Marker(this);
         }
@@ -72,6 +80,7 @@ public class Marker {
     private final String animal;
     private final String reporter;
     private final String description;
+    private Optional<String> userId;
 
     private Marker(Builder builder) {
         this.id = builder.id;
@@ -80,6 +89,7 @@ public class Marker {
         this.animal = builder.animal;
         this.reporter = builder.reporter;
         this.description = builder.description;
+        this.userId = builder.userId;
     }
 
     public long getId() {
@@ -106,6 +116,14 @@ public class Marker {
         return description;
     }
 
+    public void setUserId(Optional<String> userId){
+        this.userId = userId;
+    }
+
+    public Optional<String> getUserId(){
+        return userId;
+    }
+
     /** Creates a Marker from a marker entity */
     public static Marker fromEntity(Entity entity){
         long id = entity.getKey().getId();
@@ -114,6 +132,10 @@ public class Marker {
         String animal = (String) entity.getProperty("animal");
         String reporter = (String) entity.getProperty("reporter");
         String description = (String) entity.getProperty("description");
+        Optional<String> userId = Optional.empty();
+        if (entity.hasProperty("userId")){
+            userId = Optional.of((String) entity.getProperty("userId"));
+        }
 
         return new Marker.Builder()
                 .setId(id)
@@ -122,6 +144,7 @@ public class Marker {
                 .setAnimal(animal)
                 .setReporter(reporter)
                 .setDescription(description)
+                .setUserId(userId)
                 .build();
     }
 
@@ -143,6 +166,9 @@ public class Marker {
         markerEntity.setProperty("animal", marker.getAnimal());
         markerEntity.setProperty("reporter", marker.getReporter());
         markerEntity.setProperty("description", marker.getDescription());
+        if (marker.getUserId().isPresent()){
+            markerEntity.setProperty("userId", marker.getUserId().get());
+        }
         return markerEntity;
     }
 }
