@@ -31,7 +31,7 @@ export class InfoWindowComponent implements OnInit {
     this.animal = animalValue;
     this.description = descriptionValue;
     this.reporter = reporterValue;
-    let idToken = (this.user ? this.user.idToken : "")
+    const idToken = (this.user ? this.user.idToken : "")
     this.submitEvent.emit({animal: animalValue, description: descriptionValue, reporter: reporterValue, userToken: idToken})
   }
 
