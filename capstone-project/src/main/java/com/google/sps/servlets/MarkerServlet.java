@@ -75,7 +75,6 @@ public class MarkerServlet extends HttpServlet {
         Action action = Action.values()[actionNum];
         Gson gson = new Gson();
         long markerId;
-        
         switch (action) {
             case CREATE:
                 String userToken = request.getParameter("userToken");
