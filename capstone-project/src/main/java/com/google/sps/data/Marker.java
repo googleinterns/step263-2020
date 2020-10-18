@@ -14,7 +14,6 @@
 
 package com.google.sps.data;
 
-import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.datastore.Entity;
 
 /** Represents an animal report marker on the map. */
