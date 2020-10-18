@@ -117,10 +117,10 @@ public class MarkerServlet extends HttpServlet {
                 Payload payload = idToken.getPayload();
                 return Optional.of(payload.getSubject());
             }
-		} catch (GeneralSecurityException e) {
+        } catch (GeneralSecurityException e) {
             System.out.println("idToken unauthorized");
-			e.printStackTrace();
-		}
+            e.printStackTrace();
+        }
         return Optional.empty();
     }
 
