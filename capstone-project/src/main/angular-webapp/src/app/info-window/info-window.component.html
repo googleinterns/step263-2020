@@ -10,7 +10,7 @@
             {{description}}<br> Reported by: {{reporter}}<br>
         </div>
         <br>
-        <img [src]="srcUrl" width="200px" height="auto"><br>
+        <img *ngIf="imageUrl" [src]="srcUrl" width="200px" height="auto"><br>
         <br>
         <button (click)="delete()">Delete</button>
         <button (click)="update()">Update</button>

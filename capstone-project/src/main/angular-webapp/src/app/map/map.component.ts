@@ -53,7 +53,7 @@ export class MapComponent implements OnInit {
               });
           }
           else {
-            this.addMarkerForDisplay(response[key], '');
+            this.addMarkerForDisplay(response[key]);
           }
         }
       });
@@ -173,7 +173,7 @@ export class MapComponent implements OnInit {
           });
       }
       else {
-        this.addMarkerForDisplay(newMarker, '');
+        this.addMarkerForDisplay(newMarker);
         this.editableMarker.setMap(null);
       }
 
@@ -183,7 +183,7 @@ export class MapComponent implements OnInit {
   }
 
   // Builds display info window of a marker
-  addMarkerForDisplay(marker, imageUrl) {
+  addMarkerForDisplay(marker, imageUrl?) {
 
     const markerForDisplay = new google.maps.Marker({
       map: this.gMap,
