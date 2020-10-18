@@ -5,7 +5,7 @@ import { InfoWindowComponent } from '../info-window/info-window.component';
 import { MarkerAction } from '../marker-action';
 import { UserService } from '../user.service'
 import { SocialUser } from 'angularx-social-login';
-import { CompileShallowModuleMetadata } from '@angular/compiler';
+import { Action } from 'rxjs/internal/scheduler/Action';
 
 @Component({
   selector: 'app-map',
@@ -15,9 +15,9 @@ import { CompileShallowModuleMetadata } from '@angular/compiler';
 export class MapComponent implements OnInit {
 
   constructor(private httpClient: HttpClient,
-              private componentFactoryResolver: ComponentFactoryResolver,
-              private injector: Injector,
-              private userService: UserService) { }
+    private componentFactoryResolver: ComponentFactoryResolver,
+    private injector: Injector,
+    private userService: UserService) { }
 
   // Editable marker that displays when a user clicks on the map.
   private editableMarker: google.maps.Marker;
@@ -31,7 +31,7 @@ export class MapComponent implements OnInit {
       zoom: 4,
       center: new google.maps.LatLng(25, 80)
     };
-    
+
     this.focusOnUserLocation();
 
     this.gMap = new google.maps.Map(document.getElementById('map-container'), googleMapOption);
@@ -42,13 +42,15 @@ export class MapComponent implements OnInit {
     });
 
     // Fetches markers from the backend and adds them to the map.
-    this.httpClient.get('/markers')
-      .toPromise()
-      .then((response) => {
-        for (let key in response) {
-          this.addMarkerForDisplay(response[key]);
-        }
-      });
+    this.userService.userObservable.subscribe(() =>
+      this.httpClient.get('/markers')
+        .toPromise()
+        .then((response) => {
+          for (let key in response) {
+            this.addMarkerForDisplay(response[key]);
+          }
+        })
+      );
   }
 
   // Centers the map based on the user location if permission is granted.
@@ -57,13 +59,13 @@ export class MapComponent implements OnInit {
     // Browser supports Geolocation
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition((position) => {
-          const pos = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          };
-          this.gMap.setCenter(pos);
-          this.gMap.setZoom(14);
-        },
+        const pos = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        };
+        this.gMap.setCenter(pos);
+        this.gMap.setZoom(14);
+      },
         () => {
           MapComponent.handleLocationError(true);
         }
@@ -97,7 +99,11 @@ export class MapComponent implements OnInit {
     this.httpClient.post<any>('/markers', params).subscribe({
       next: data => {
         marker.id = data.id;
-        marker.userId = data.userId;
+        marker.userId = JSON.parse(data.userId).toString();
+        console.log(marker.userId);
+        if (action == MarkerAction.CREATE) {
+          this.addMarkerForDisplay(marker);
+        }
       },
       error: error => console.error("The marker failed to save. Error details: ", error)
     });
@@ -150,7 +156,6 @@ export class MapComponent implements OnInit {
         lng: lng
       };
       this.postMarker(newMarker, MarkerAction.CREATE);
-      this.addMarkerForDisplay(newMarker);
       this.editableMarker.setMap(null);
     });
 
@@ -189,10 +194,12 @@ export class MapComponent implements OnInit {
     infoWindowComponent.instance.description = marker.description;
     infoWindowComponent.instance.reporter = marker.reporter;
     infoWindowComponent.instance.type = MarkerAction.DISPLAY;
-    //console.log(marker.userId);
-    // if (this.user && marker.userId == this.user.id){
-    //   infoWindowComponent.instance.showEditButtons = true;
-    // }
+    console.log(marker.userId);
+    console.log(this.user.id);
+    console.log(this.user.id == marker.userId);
+    if (this.user && marker.userId == this.userId) {
+      infoWindowComponent.instance.showEditButtons = true;
+    }
     infoWindowComponent.changeDetectorRef.detectChanges();
     return infoWindowComponent;
   }
@@ -224,6 +231,11 @@ export class MapComponent implements OnInit {
   // Return the current user
   get user(): SocialUser {
     return this.userService.getUser();
+  }
+
+  // Return the current userId
+  get userId(): String {
+    return this.userService.getUser().id;
   }
 
   // If user exist returns the idToken, else an empty string
