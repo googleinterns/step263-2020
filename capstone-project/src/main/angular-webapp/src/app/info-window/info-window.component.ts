@@ -31,8 +31,7 @@ export class InfoWindowComponent implements OnInit {
     this.animal = animalValue;
     this.description = descriptionValue;
     this.reporter = reporterValue;
-    const idToken = (this.user ? this.user.idToken : "")
-    this.submitEvent.emit({animal: animalValue, description: descriptionValue, reporter: reporterValue, userToken: idToken})
+    this.submitEvent.emit({animal: animalValue, description: descriptionValue, reporter: reporterValue})
   }
 
   // Indicates that the user pressed on the Delete button

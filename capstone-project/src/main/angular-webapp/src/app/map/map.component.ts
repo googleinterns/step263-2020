@@ -3,6 +3,8 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { } from 'googlemaps';
 import { InfoWindowComponent } from '../info-window/info-window.component';
 import { MarkerAction } from '../marker-action';
+import { UserService } from '../user.service';
+import { SocialUser } from 'angularx-social-login';
 
 @Component({
   selector: 'app-map',
@@ -11,7 +13,12 @@ import { MarkerAction } from '../marker-action';
 })
 export class MapComponent implements OnInit {
 
-  constructor(private httpClient: HttpClient, private componentFactoryResolver: ComponentFactoryResolver, private injector: Injector) { }
+  constructor(
+    private httpClient: HttpClient,
+    private componentFactoryResolver: ComponentFactoryResolver,
+    private injector: Injector,
+    private userService: UserService
+  ) { }
 
   // Editable marker that displays when a user clicks on the map.
   private editableMarker: google.maps.Marker;
@@ -25,7 +32,7 @@ export class MapComponent implements OnInit {
       zoom: 4,
       center: new google.maps.LatLng(25, 80)
     };
-    
+
     this.focusOnUserLocation();
 
     this.gMap = new google.maps.Map(document.getElementById('map-container'), googleMapOption);
@@ -51,13 +58,13 @@ export class MapComponent implements OnInit {
     // Browser supports Geolocation
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition((position) => {
-          const pos = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          };
-          this.gMap.setCenter(pos);
-          this.gMap.setZoom(14);
-        },
+        const pos = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        };
+        this.gMap.setCenter(pos);
+        this.gMap.setZoom(14);
+      },
         () => {
           MapComponent.handleLocationError(true);
         }
@@ -81,13 +88,13 @@ export class MapComponent implements OnInit {
   }
 
   // Performs a backend action on a marker - display / update / delete.
-  postMarker(marker, action, userToken) {
+  postMarker(marker, action) {
 
     const markerJson = JSON.stringify(marker);
     const params = new HttpParams()
       .set('marker', markerJson)
       .set('action', action.toString())
-      .set('userToken', userToken);
+      .set('userToken', this.user?.idToken);
     this.httpClient.post('/markers', params).subscribe({
       next: data => marker.id = data,
       error: error => console.error("The marker failed to save. Error details: ", error)
@@ -139,7 +146,7 @@ export class MapComponent implements OnInit {
         lat: lat,
         lng: lng
       };
-      this.postMarker(newMarker, MarkerAction.CREATE, event.userToken);
+      this.postMarker(newMarker, MarkerAction.CREATE);
       this.addMarkerForDisplay(newMarker);
       this.editableMarker.setMap(null);
     });
@@ -198,12 +205,17 @@ export class MapComponent implements OnInit {
         lat: markerData.lat,
         lng: markerData.lng
       };
-      this.postMarker(newMarker, MarkerAction.UPDATE, event.userToken);
+      this.postMarker(newMarker, MarkerAction.UPDATE);
       // Once the user clicks "Update", we want to return the regular display
       infoWindowComponent.instance.type = MarkerAction.DISPLAY;
       infoWindowComponent.changeDetectorRef.detectChanges();
     });
 
     return infoWindowComponent.location.nativeElement;
+  }
+
+  // Return the current user
+  get user(): SocialUser {
+    return this.userService.getUser();
   }
 }

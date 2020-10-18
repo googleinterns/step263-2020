@@ -101,8 +101,8 @@ public class MarkerServlet extends HttpServlet {
 
     /** Verifies the idToken and returns the user ID if token is verified */
     private static Optional<String> verifyToken(String idTokenString) throws IOException {
-        // If there's no user, the idTokenString received is an empty string
-        if (idTokenString.equals("")){
+        // If there's no user, the idTokenString received is "undefined"
+        if (idTokenString.equals("undefined")){
             return Optional.empty();
         }
 		try {
