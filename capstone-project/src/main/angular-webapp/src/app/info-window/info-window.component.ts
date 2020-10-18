@@ -4,6 +4,8 @@ import { MarkerAction } from '../marker-action';
 import { BlobAction } from '../blob-action';
 import { HttpClient } from '@angular/common/http';
 import { } from 'googlemaps';
+import { SocialUser } from "angularx-social-login";
+import { UserService } from "../user.service";
 
 @Component({
   selector: 'app-info-window',
@@ -28,7 +30,7 @@ export class InfoWindowComponent implements OnInit {
   isUploading = false; // A flag to avoid submitting a report before the image processing is finished.
   srcUrl : SafeUrl;
 
-  constructor(private httpClient: HttpClient, private domSanitizer: DomSanitizer) { }
+  constructor(private httpClient: HttpClient, private domSanitizer: DomSanitizer, private userService: UserService) { }
 
   ngOnInit(): void { 
     this.srcUrl = this.domSanitizer.bypassSecurityTrustUrl(this.imageUrl);
@@ -83,5 +85,10 @@ export class InfoWindowComponent implements OnInit {
   // Indicates that the user pressed on the Update button
   update() {
     this.updateEvent.emit()
+  }
+
+  // Return the current user
+  get user(): SocialUser {
+    return this.userService.getUser();
   }
 }
