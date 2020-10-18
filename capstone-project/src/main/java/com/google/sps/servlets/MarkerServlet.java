@@ -105,7 +105,7 @@ public class MarkerServlet extends HttpServlet {
         if (idTokenString.equals("undefined")){
             return Optional.empty();
         }
-		try {
+        try {
             JsonFactory jsonFactory = new JacksonFactory();
             HttpTransport transport = new NetHttpTransport();
             GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(transport, jsonFactory)
