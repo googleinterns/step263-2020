@@ -15,9 +15,9 @@
         <button (click)="delete()">Delete</button>
         <button (click)="update()">Update</button>
     </div>
-    <div *ngIf="type==MarkerAction.CREATE ">
-        <input #inputAnimal placeholder="Animal "><br>
-        <input #inputDescription placeholder="Description "><br>
+    <div *ngIf="type==MarkerAction.CREATE">
+        <input #inputAnimal placeholder="Animal"><br>
+        <input #inputDescription placeholder="Description"><br>
         <div *ngIf="!user">
             <input #inputReporter placeholder="Reporter's Name"><br>
             <form enctype="multipart/form-data">
