@@ -117,11 +117,11 @@ public class MarkerServlet extends HttpServlet {
 
     /** Verifies the idToken and returns the user ID if token is verified */
     private static Optional<String> verifyToken(String idTokenString) throws IOException {
-        // If there's no user, the idTokenString received is an empty string
-        if (idTokenString.equals("")){
+        // If there's no user, the idTokenString received is "undefined"
+        if (idTokenString.equals("undefined")){
             return Optional.empty();
         }
-		try {
+        try {
             JsonFactory jsonFactory = new JacksonFactory();
             HttpTransport transport = new NetHttpTransport();
             GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(transport, jsonFactory)
@@ -133,10 +133,10 @@ public class MarkerServlet extends HttpServlet {
                 Payload payload = idToken.getPayload();
                 return Optional.of(payload.getSubject());
             }
-		} catch (GeneralSecurityException e) {
+        } catch (GeneralSecurityException e) {
             System.out.println("idToken unauthorized");
-			e.printStackTrace();
-		}
+            e.printStackTrace();
+        }
         return Optional.empty();
     }
 

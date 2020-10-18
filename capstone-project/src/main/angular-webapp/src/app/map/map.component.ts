@@ -5,7 +5,6 @@ import { InfoWindowComponent } from '../info-window/info-window.component';
 import { MarkerAction } from '../marker-action';
 import { UserService } from '../user.service'
 import { SocialUser } from 'angularx-social-login';
-import { Action } from 'rxjs/internal/scheduler/Action';
 
 @Component({
   selector: 'app-map',
@@ -95,7 +94,7 @@ export class MapComponent implements OnInit {
     const params = new HttpParams()
       .set('marker', markerJson)
       .set('action', action.toString())
-      .set('userToken', this.getCurrentUserToken());
+      .set('userToken', this.user?.idToken);
     this.httpClient.post<any>('/markers', params).subscribe({
       next: data => {
         marker.id = data.id;
@@ -115,7 +114,7 @@ export class MapComponent implements OnInit {
     const params = new HttpParams()
       .set('id', markerData.id.toString())
       .set('action', MarkerAction.DELETE.toString())
-      .set('userToken', this.getCurrentUserToken());
+      .set('userToken', this.user?.idToken);
     this.httpClient.post('/markers', params).subscribe({
       error: error => console.error("The marker failed to delete. Error details: ", error)
     });
@@ -238,8 +237,4 @@ export class MapComponent implements OnInit {
     return this.userService.getUser().id;
   }
 
-  // If user exist returns the idToken, else an empty string
-  getCurrentUserToken() {
-    return this.user ? this.user.idToken : "";
-  }
 }

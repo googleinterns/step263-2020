@@ -32,8 +32,12 @@ export class InfoWindowComponent implements OnInit {
     this.animal = animalValue;
     this.description = descriptionValue;
     this.reporter = reporterValue;
+<<<<<<< HEAD
     const idToken = (this.user ? this.user.idToken : "")
     this.submitEvent.emit({animal: animalValue, description: descriptionValue, reporter: reporterValue, userToken: idToken})
+=======
+    this.submitEvent.emit({animal: animalValue, description: descriptionValue, reporter: reporterValue})
+>>>>>>> add-user-id-to-marker-entity
   }
 
   // Indicates that the user pressed on the Delete button
