@@ -67,7 +67,7 @@ public class MarkerServlet extends HttpServlet {
         response.getWriter().println(json);
     }
 
-    /** Accepts a POST request containing a new marker. 
+    /** Accepts a POST request containing a marker to save / update / delete.
      * @throws IOException
      */
     @Override

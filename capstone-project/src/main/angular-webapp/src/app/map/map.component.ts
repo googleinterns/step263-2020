@@ -5,6 +5,7 @@ import { InfoWindowComponent } from '../info-window/info-window.component';
 import { MarkerAction } from '../marker-action';
 import { UserService } from '../user.service';
 import { SocialUser } from 'angularx-social-login';
+import { BlobAction } from '../blob-action';
 
 @Component({
   selector: 'app-map',
@@ -47,9 +48,28 @@ export class MapComponent implements OnInit {
       .toPromise()
       .then((response) => {
         for (let key in response) {
-          this.addMarkerForDisplay(response[key]);
+
+          // If the marker has a blob key - get its URL 
+          if (response[key].blobKey) {
+            let imageUrl;
+            this.httpClient.get('/blob-service?' + 'blobAction=' + BlobAction.KEY_TO_BLOB +  '&blob-key=' + response[key].blobKey, { responseType: 'blob' })
+              .toPromise()
+              .then((blob) => {
+                imageUrl = MapComponent.getUrlFromBlob(blob)
+                this.addMarkerForDisplay(response[key], imageUrl)
+              });
+          }
+          else {
+            this.addMarkerForDisplay(response[key]);
+          }
         }
       });
+  }
+
+  // Returns the URL of a blob related to a marker.
+  static getUrlFromBlob(blob) {
+    const urlCreator = window.URL;
+    return urlCreator.createObjectURL(blob);
   }
 
   // Centers the map based on the user location if permission is granted.
@@ -144,18 +164,33 @@ export class MapComponent implements OnInit {
         description: event.description,
         reporter: event.reporter,
         lat: lat,
-        lng: lng
+        lng: lng,
+        blobKey: event.blobKey
       };
       this.postMarker(newMarker, MarkerAction.CREATE);
-      this.addMarkerForDisplay(newMarker);
-      this.editableMarker.setMap(null);
+
+      // Get the image URL from the blob key so we can add the new marker for display
+      if (newMarker.blobKey) {
+        this.httpClient.get('/blob-service?' + 'blobAction=' + BlobAction.KEY_TO_BLOB +  '&blob-key=' + newMarker.blobKey, { responseType: 'blob' })
+          .toPromise()
+          .then((blob) => {
+            const imageUrl = MapComponent.getUrlFromBlob(blob)
+            this.addMarkerForDisplay(newMarker, imageUrl)
+            this.editableMarker.setMap(null);
+          });
+      }
+      else {
+        this.addMarkerForDisplay(newMarker);
+        this.editableMarker.setMap(null);
+      }
+
     });
 
     return infoWindowComponent.location.nativeElement;
   }
 
   // Builds display info window of a marker
-  addMarkerForDisplay(marker) {
+  addMarkerForDisplay(marker, imageUrl?) {
 
     const markerForDisplay = new google.maps.Marker({
       map: this.gMap,
@@ -163,7 +198,7 @@ export class MapComponent implements OnInit {
     });
 
     const markersInfoWindow = new google.maps.InfoWindow();
-    const infoWindowComponent = this.buildDisplayInfoWindowComponent(marker);
+    const infoWindowComponent = this.buildDisplayInfoWindowComponent(marker, imageUrl);
 
     infoWindowComponent.instance.deleteEvent.subscribe(event =>
       this.deleteMarker(marker, markerForDisplay));
@@ -180,11 +215,12 @@ export class MapComponent implements OnInit {
   };
 
   // Creates the info window component for display of marker
-  buildDisplayInfoWindowComponent(marker) {
+  buildDisplayInfoWindowComponent(marker, imageUrl) {
     const infoWindowComponent = this.factory.create(this.injector);
     infoWindowComponent.instance.animal = marker.animal;
     infoWindowComponent.instance.description = marker.description;
     infoWindowComponent.instance.reporter = marker.reporter;
+    infoWindowComponent.instance.imageUrl = imageUrl; 
     infoWindowComponent.instance.type = MarkerAction.DISPLAY;
     infoWindowComponent.changeDetectorRef.detectChanges();
     return infoWindowComponent;
@@ -203,7 +239,8 @@ export class MapComponent implements OnInit {
         description: event.description,
         reporter: event.reporter,
         lat: markerData.lat,
-        lng: markerData.lng
+        lng: markerData.lng,
+        blobKey: event.blobKey
       };
       this.postMarker(newMarker, MarkerAction.UPDATE);
       // Once the user clicks "Update", we want to return the regular display

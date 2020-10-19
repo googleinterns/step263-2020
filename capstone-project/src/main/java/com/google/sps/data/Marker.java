@@ -30,6 +30,7 @@ public class Marker {
         private String reporter;
         private String description;
         private Optional<String> userId;
+        private String blobKey;
 
         public Builder(){
         }
@@ -68,6 +69,11 @@ public class Marker {
             this.userId = userId;
             return this;
         }
+        
+        public Builder setBlobKey(String blobKey){
+            this.blobKey = blobKey;
+            return this;
+        }
 
         public Marker build(){
             return new Marker(this);
@@ -81,6 +87,7 @@ public class Marker {
     private final String reporter;
     private final String description;
     private Optional<String> userId;
+    private String blobKey;
 
     private Marker(Builder builder) {
         this.id = builder.id;
@@ -90,6 +97,7 @@ public class Marker {
         this.reporter = builder.reporter;
         this.description = builder.description;
         this.userId = builder.userId;
+        this.blobKey = builder.blobKey;
     }
 
     public long getId() {
@@ -124,6 +132,14 @@ public class Marker {
         return userId;
     }
 
+    public String getBlobKey() {
+        return blobKey;
+    }
+
+    public void setBlobKey(String blobKey) {
+        this.blobKey = blobKey;
+    }
+
     /** Creates a Marker from a marker entity */
     public static Marker fromEntity(Entity entity){
         long id = entity.getKey().getId();
@@ -132,6 +148,7 @@ public class Marker {
         String animal = (String) entity.getProperty("animal");
         String reporter = (String) entity.getProperty("reporter");
         String description = (String) entity.getProperty("description");
+        String blobKey = (String) entity.getProperty("blobKey");
         Optional<String> userId = Optional.empty();
         if (entity.hasProperty("userId")){
             userId = Optional.of((String) entity.getProperty("userId"));
@@ -145,6 +162,7 @@ public class Marker {
                 .setReporter(reporter)
                 .setDescription(description)
                 .setUserId(userId)
+                .setBlobKey(blobKey)
                 .build();
     }
 
@@ -166,6 +184,7 @@ public class Marker {
         markerEntity.setProperty("animal", marker.getAnimal());
         markerEntity.setProperty("reporter", marker.getReporter());
         markerEntity.setProperty("description", marker.getDescription());
+        markerEntity.setProperty("blobKey", marker.getBlobKey());
         if (marker.getUserId().isPresent()){
             markerEntity.setProperty("userId", marker.getUserId().get());
         }
