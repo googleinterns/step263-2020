@@ -51,11 +51,10 @@ export class MapComponent implements OnInit {
 
           // If the marker has a blob key - get its URL 
           if (response[key].blobKey) {
-            let imageUrl;
             this.httpClient.get('/blob-service?' + 'blobAction=' + BlobAction.KEY_TO_BLOB + '&blob-key=' + response[key].blobKey, { responseType: 'blob' })
               .toPromise()
               .then((blob) => {
-                imageUrl = MapComponent.getUrlFromBlob(blob)
+                const imageUrl = MapComponent.getUrlFromBlob(blob)
                 this.addMarkerForDisplay(response[key], imageUrl)
               });
           }
