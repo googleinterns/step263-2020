@@ -97,22 +97,24 @@ public class MarkerServlet extends HttpServlet {
                 Marker updatedMarker = gson.fromJson(request.getParameter("marker"), Marker.class);
                 try {
                     updateMarker(updatedMarker, userId);
-                } catch (EntityNotFoundException e) {
-                    context.log("Update failed, Entity not found. Error details: ", e);
-                }
-                catch (GeneralSecurityException securityException) {
-                    response.getWriter().println("Update failed, " + securityException.toString());
+                } catch (EntityNotFoundException entityNotFoundException) {
+                    context.log("Update failed, Entity not found. Error details: ",
+                        entityNotFoundException);
+                } catch (GeneralSecurityException securityException) {
+                    context.log("Update failed, security problem. Error details:",
+                    securityException);
                 }
                 break;
             case DELETE:
                 markerId = Long.parseLong(request.getParameter("id"));
                 try {
                     deleteMarker(markerId, userId);
-                } catch (EntityNotFoundException e) {
-                    response.getWriter().println("Delete failed, Entity not found. Error details: " + e.toString());
-                }
-                catch (GeneralSecurityException securityException) {
-                    response.getWriter().println("Delete failed, " + securityException.toString());
+                } catch (EntityNotFoundException entityNotFoundException) {
+                    context.log("Delete failed, Entity not found. Error details: ",
+                    entityNotFoundException);
+                } catch (GeneralSecurityException securityException) {
+                    context.log("Delete failed, security problem. Error details:",
+                    securityException);
                 }
         }
     }
@@ -164,7 +166,7 @@ public class MarkerServlet extends HttpServlet {
         return markerEntity.getKey().getId();
     }
 
-    /** Updates an existing marker's data */
+    /** Updates an existing marker's data if the request was from the uploader */
     private static void updateMarker(Marker marker, Optional<String> userId) throws EntityNotFoundException, GeneralSecurityException {
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
@@ -182,7 +184,7 @@ public class MarkerServlet extends HttpServlet {
         }       
     }
 
-    /** Deletes a marker */
+    /** Deletes a marker if the request was from the uploader*/
     private static void deleteMarker(long markersId, Optional<String> userId) throws EntityNotFoundException, GeneralSecurityException {
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
         Key markerEntityKey = KeyFactory.createKey("Marker", markersId);

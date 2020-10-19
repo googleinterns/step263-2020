@@ -268,5 +268,4 @@ export class MapComponent implements OnInit {
   get user(): SocialUser {
     return this.userService.getUser();
   }
-
 }
