@@ -41,10 +41,11 @@ export class MapComponent implements OnInit {
       this.addMarkerForEdit(event.latLng.lat(), event.latLng.lng());
     });
 
-    // Fetches markers from the backend and adds them to the map.
+    // When a user is updated, remove all marker and display them with correct buttons
     this.userService.getUserObservable().subscribe(user => {
       this.markers.forEach(marker => marker.setMap(null));
       this.markers = [];
+      // Fetches markers from the backend and adds them to the map.
       this.httpClient.get('/markers')
       .toPromise()
       .then((response) => {
