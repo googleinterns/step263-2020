@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { SocialUser } from 'angularx-social-login';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +10,7 @@ export class UserService {
   // Holds the current user, updated in authentication component
   private currentUser;
   private userSource = new BehaviorSubject<SocialUser>(null);
-  userObservable = this.userSource.asObservable();
+  private userObservable = this.userSource.asObservable();
 
   constructor() {  }
 
@@ -23,6 +23,11 @@ export class UserService {
   // Return the current user
   getUser(): SocialUser {
     return this.currentUser;
+  }
+
+  // Returns the userObservable
+  getUserObservable(): Observable<SocialUser> {
+    return this.userObservable;
   }
 
 }

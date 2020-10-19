@@ -1,4 +1,4 @@
-import { Component, OnInit, ComponentFactory, ComponentFactoryResolver, Injector } from '@angular/core';
+import { Component, OnInit, ComponentFactory, ComponentFactoryResolver, Injector, ɵCompiler_compileModuleAndAllComponentsAsync__POST_R3__ } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { } from 'googlemaps';
 import { InfoWindowComponent } from '../info-window/info-window.component';
@@ -22,9 +22,9 @@ export class MapComponent implements OnInit {
   private editableMarker: google.maps.Marker;
   private factory: ComponentFactory<InfoWindowComponent> = this.componentFactoryResolver.resolveComponentFactory(InfoWindowComponent);
   private gMap: google.maps.Map;
+  private markers: google.maps.Marker[] = [];
 
   ngOnInit(): void {
-
     // Define the map.
     const googleMapOption = {
       zoom: 4,
@@ -41,15 +41,17 @@ export class MapComponent implements OnInit {
     });
 
     // Fetches markers from the backend and adds them to the map.
-    this.userService.userObservable.subscribe(() =>
+    this.userService.getUserObservable().subscribe(user => {
+      this.markers.forEach(marker => marker.setMap(null));
+      this.markers = [];
       this.httpClient.get('/markers')
         .toPromise()
         .then((response) => {
           for (let key in response) {
             this.addMarkerForDisplay(response[key]);
           }
-        })
-      );
+        });
+    });
   }
 
   // Centers the map based on the user location if permission is granted.
@@ -97,10 +99,9 @@ export class MapComponent implements OnInit {
       .set('userToken', this.user?.idToken);
     this.httpClient.post<any>('/markers', params).subscribe({
       next: data => {
-        marker.id = data.id;
-        marker.userId = JSON.parse(data.userId).toString();
-        console.log(marker.userId);
         if (action == MarkerAction.CREATE) {
+          marker.id = data.id;
+          marker.userId = {value: data.userId};
           this.addMarkerForDisplay(marker);
         }
       },
@@ -184,6 +185,8 @@ export class MapComponent implements OnInit {
       markersInfoWindow.setContent(infoWindowComponent.location.nativeElement);
       markersInfoWindow.open(this.gMap, markerForDisplay);
     });
+
+    this.markers.push(markerForDisplay)
   };
 
   // Creates the info window component for display of marker
@@ -193,10 +196,7 @@ export class MapComponent implements OnInit {
     infoWindowComponent.instance.description = marker.description;
     infoWindowComponent.instance.reporter = marker.reporter;
     infoWindowComponent.instance.type = MarkerAction.DISPLAY;
-    console.log(marker.userId);
-    console.log(this.user.id);
-    console.log(this.user.id == marker.userId);
-    if (this.user && marker.userId == this.userId) {
+    if (this.user && marker.userId.value == this.user.id) {
       infoWindowComponent.instance.showEditButtons = true;
     }
     infoWindowComponent.changeDetectorRef.detectChanges();
@@ -230,11 +230,6 @@ export class MapComponent implements OnInit {
   // Return the current user
   get user(): SocialUser {
     return this.userService.getUser();
-  }
-
-  // Return the current userId
-  get userId(): String {
-    return this.userService.getUser().id;
   }
 
 }

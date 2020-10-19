@@ -87,7 +87,7 @@ public class MarkerServlet extends HttpServlet {
                 // The ID of the entity need to be updated in the FE as well
                 returnParameters.put("id", Long.toString(markerId));
                 if (userId.isPresent()){
-                    returnParameters.put("userId", (userId.get()));
+                    returnParameters.put("userId", userId.get());
                 }
                 response.getWriter().println(gson.toJson(returnParameters));
                 break;
