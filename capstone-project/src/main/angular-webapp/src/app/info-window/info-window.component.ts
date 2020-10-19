@@ -26,7 +26,7 @@ export class InfoWindowComponent implements OnInit {
   @Output() deleteEvent = new EventEmitter();
   @Output() updateEvent = new EventEmitter();
 
-  MarkerAction = MarkerAction; // For the ngIf in template
+  MarkerAction = MarkerAction; // Setting a variable because the HTML template needs it in order to recognize the MarkerAction enum.
   blobKeyValue : string;
   isUploading = false; // A flag to avoid submitting a report before the image processing is finished.
   srcUrl : SafeUrl;
@@ -56,17 +56,16 @@ export class InfoWindowComponent implements OnInit {
 
     this.isUploading = true;
 
-    let formData = new FormData();
+    const formData = new FormData();
     const imageFile = files.item(0);
     formData.append('image', imageFile, imageFile.name);
 
-    let postUrl;
     this.httpClient.get('/blob-service?blobAction=' + BlobAction.GET_URL)
       .toPromise()
       .then((response) => {
         // Get the URL that directs the form to BlobStore and then to blob-service servlet for further processing.
         const jsonKey = Object.keys(response)[0];
-        postUrl = response[jsonKey];
+        const postUrl = response[jsonKey];
         this.httpClient.post(postUrl, formData).subscribe({
           next: (data) => {
             const jsonKey = Object.keys(data)[0];
@@ -92,7 +91,7 @@ export class InfoWindowComponent implements OnInit {
   get user(): SocialUser {
     return this.userService.getUser();
   }
-
+  
   // Remove the image of an existing marker (in MarkerAction.UPDATE)
   removeImage(event) {
     this.blobKeyValue = "";

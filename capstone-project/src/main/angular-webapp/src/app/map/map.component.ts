@@ -162,12 +162,11 @@ export class MapComponent implements OnInit {
       this.postMarker(newMarker, MarkerAction.CREATE);
 
       // Get the image URL from the blob key so we can add the new marker for display
-      let imageUrl;
       if (newMarker.blobKey) {
         this.httpClient.get('/blob-service?' + 'blobAction=' + BlobAction.KEY_TO_BLOB + '&blob-key=' + newMarker.blobKey, { responseType: 'blob' })
           .toPromise()
           .then((blob) => {
-            imageUrl = MapComponent.getUrlFromBlob(blob)
+            const imageUrl = MapComponent.getUrlFromBlob(blob)
             this.addMarkerForDisplay(newMarker, imageUrl)
             this.editableMarker.setMap(null);
           });
