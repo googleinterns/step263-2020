@@ -36,6 +36,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.ServletContext;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
@@ -67,7 +68,7 @@ public class MarkerServlet extends HttpServlet {
         response.getWriter().println(json);
     }
 
-    /** Accepts a POST request containing a new marker. 
+    /** Accepts a POST request containing a marker to save / update / delete.
      * @throws IOException
      */
     @Override
@@ -78,6 +79,7 @@ public class MarkerServlet extends HttpServlet {
         long markerId;
         String userToken = request.getParameter("userToken");
         Optional<String> userId = verifyToken(userToken);
+        ServletContext context = getServletContext();
         switch (action) {
             case CREATE:
                 Marker newMarker = gson.fromJson(request.getParameter("marker"), Marker.class);
@@ -96,7 +98,7 @@ public class MarkerServlet extends HttpServlet {
                 try {
                     updateMarker(updatedMarker, userId);
                 } catch (EntityNotFoundException e) {
-                    response.getWriter().println("Update failed, Entity not found. Error details: " + e.toString());
+                    context.log("Update failed, Entity not found. Error details: ", e);
                 }
                 catch (GeneralSecurityException securityException) {
                     response.getWriter().println("Update failed, " + securityException.toString());
@@ -116,7 +118,8 @@ public class MarkerServlet extends HttpServlet {
     }
 
     /** Verifies the idToken and returns the user ID if token is verified */
-    private static Optional<String> verifyToken(String idTokenString) throws IOException {
+    private Optional<String> verifyToken(String idTokenString) throws IOException {
+        ServletContext context = getServletContext();
         // If there's no user, the idTokenString received is "undefined"
         if (idTokenString.equals("undefined")){
             return Optional.empty();
@@ -134,8 +137,7 @@ public class MarkerServlet extends HttpServlet {
                 return Optional.of(payload.getSubject());
             }
         } catch (GeneralSecurityException e) {
-            System.out.println("idToken unauthorized");
-            e.printStackTrace();
+            context.log("idToken unauthorized", e);
         }
         return Optional.empty();
     }
