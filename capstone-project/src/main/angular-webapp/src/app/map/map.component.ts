@@ -3,6 +3,8 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { } from 'googlemaps';
 import { InfoWindowComponent } from '../info-window/info-window.component';
 import { MarkerAction } from '../marker-action';
+import { UserService } from '../user.service';
+import { SocialUser } from 'angularx-social-login';
 import { BlobAction } from '../blob-action';
 
 @Component({
@@ -12,7 +14,12 @@ import { BlobAction } from '../blob-action';
 })
 export class MapComponent implements OnInit {
 
-  constructor(private httpClient: HttpClient, private componentFactoryResolver: ComponentFactoryResolver, private injector: Injector) { }
+  constructor(
+    private httpClient: HttpClient,
+    private componentFactoryResolver: ComponentFactoryResolver,
+    private injector: Injector,
+    private userService: UserService
+  ) { }
 
   // Editable marker that displays when a user clicks on the map.
   private editableMarker: google.maps.Marker;
@@ -106,7 +113,8 @@ export class MapComponent implements OnInit {
     const markerJson = JSON.stringify(marker);
     const params = new HttpParams()
       .set('marker', markerJson)
-      .set('action', action.toString());
+      .set('action', action.toString())
+      .set('userToken', this.user?.idToken);
     this.httpClient.post('/markers', params).subscribe({
       next: data => marker.id = data,
       error: error => console.error("The marker failed to save. Error details: ", error)
@@ -251,5 +259,10 @@ export class MapComponent implements OnInit {
       }
     });
     return infoWindowComponent.location.nativeElement;
+  }
+
+  // Return the current user
+  get user(): SocialUser {
+    return this.userService.getUser();
   }
 }
