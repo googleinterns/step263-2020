@@ -19,21 +19,24 @@ export class InfoWindowComponent implements OnInit {
   @Input() description: string;
   @Input() reporter: string;
   @Input() imageUrl : string;
-  @Input() type: MarkerAction;
+  @Input() type : MarkerAction;
+  @Input() originalBlobKey : string;
 
   @Output() submitEvent = new EventEmitter();
   @Output() deleteEvent = new EventEmitter();
   @Output() updateEvent = new EventEmitter();
 
   MarkerAction = MarkerAction; // For the ngIf in template
-  blobKeyValue = ""; // Set the default blob key to be an empty string to handle reports that don't include an image
+  //blobKeyValue = ""; // Set the default blob key to be an empty string to handle reports that don't include an image
   isUploading = false; // A flag to avoid submitting a report before the image processing is finished.
   srcUrl : SafeUrl;
+  blobKeyValue : string;
 
-  constructor(private httpClient: HttpClient, private domSanitizer: DomSanitizer, private userService: UserService) { }
+  constructor(private httpClient: HttpClient, public domSanitizer: DomSanitizer, private userService: UserService) { }
 
   ngOnInit(): void { 
     this.srcUrl = this.domSanitizer.bypassSecurityTrustUrl(this.imageUrl);
+    this.blobKeyValue = this.originalBlobKey;
   }
 
   // Update the fields according to user input and emit the submitEvent to receive the data in mapComponenet
@@ -49,7 +52,7 @@ export class InfoWindowComponent implements OnInit {
 
     // If a file was submitted and then removed - clear blobKeyValue
     if(!files.item(0)) {
-      this.blobKeyValue = '';
+      this.blobKeyValue = this.originalBlobKey;
       return;
     }
 
@@ -90,5 +93,10 @@ export class InfoWindowComponent implements OnInit {
   // Return the current user
   get user(): SocialUser {
     return this.userService.getUser();
+  }
+
+  removeImage() {
+    this.blobKeyValue = "";
+    this.imageUrl = "";
   }
 }

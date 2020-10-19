@@ -45,7 +45,7 @@ export class MapComponent implements OnInit {
           // If the marker has a blob key - get its URL 
           if (response[key].blobKey) {
             let imageUrl;
-            this.httpClient.get('/blob-service?' + 'blobAction=' + BlobAction.KEY_TO_BLOB +  '&blob-key=' + response[key].blobKey, { responseType: 'blob' })
+            this.httpClient.get('/blob-service?' + 'blobAction=' + BlobAction.KEY_TO_BLOB + '&blob-key=' + response[key].blobKey, { responseType: 'blob' })
               .toPromise()
               .then((blob) => {
                 imageUrl = MapComponent.getUrlFromBlob(blob)
@@ -164,7 +164,7 @@ export class MapComponent implements OnInit {
       // Get the image URL from the blob key so we can add the new marker for display
       let imageUrl;
       if (newMarker.blobKey) {
-        this.httpClient.get('/blob-service?' + 'blobAction=' + BlobAction.KEY_TO_BLOB +  '&blob-key=' + newMarker.blobKey, { responseType: 'blob' })
+        this.httpClient.get('/blob-service?' + 'blobAction=' + BlobAction.KEY_TO_BLOB + '&blob-key=' + newMarker.blobKey, { responseType: 'blob' })
           .toPromise()
           .then((blob) => {
             imageUrl = MapComponent.getUrlFromBlob(blob)
@@ -213,7 +213,7 @@ export class MapComponent implements OnInit {
     infoWindowComponent.instance.animal = marker.animal;
     infoWindowComponent.instance.description = marker.description;
     infoWindowComponent.instance.reporter = marker.reporter;
-    infoWindowComponent.instance.imageUrl = imageUrl; 
+    infoWindowComponent.instance.imageUrl = imageUrl;
     infoWindowComponent.instance.type = MarkerAction.DISPLAY;
     infoWindowComponent.changeDetectorRef.detectChanges();
     return infoWindowComponent;
@@ -223,6 +223,7 @@ export class MapComponent implements OnInit {
   buildUpdateInfoWindowHtmlElment(markerData, infoWindowComponent) {
 
     infoWindowComponent.instance.type = MarkerAction.UPDATE;
+    infoWindowComponent.instance.originalBlobKey = markerData.blobKey;
     infoWindowComponent.changeDetectorRef.detectChanges();
 
     infoWindowComponent.instance.submitEvent.subscribe(event => {
@@ -236,9 +237,22 @@ export class MapComponent implements OnInit {
         blobKey: event.blobKey
       };
       this.postMarker(newMarker, MarkerAction.UPDATE);
-      // Once the user clicks "Update", we want to return the regular display
-      infoWindowComponent.instance.type = MarkerAction.DISPLAY;
-      infoWindowComponent.changeDetectorRef.detectChanges();
+      // Once the user clicks "Update", we want to return the regular display with the updated image
+      if (newMarker.blobKey) {
+        this.httpClient.get('/blob-service?' + 'blobAction=' + BlobAction.KEY_TO_BLOB + '&blob-key=' + newMarker.blobKey, { responseType: 'blob' })
+          .toPromise()
+          .then((blob) => {
+            infoWindowComponent.instance.imageUrl = MapComponent.getUrlFromBlob(blob)
+            infoWindowComponent.instance.type = MarkerAction.DISPLAY;
+            infoWindowComponent.changeDetectorRef.detectChanges();
+          });
+      }
+      else {
+        infoWindowComponent.instance.type = MarkerAction.DISPLAY;
+        infoWindowComponent.changeDetectorRef.detectChanges();
+      }
+
+
     });
 
     return infoWindowComponent.location.nativeElement;
