@@ -27,7 +27,7 @@ export class InfoWindowComponent implements OnInit {
   @Output() updateEvent = new EventEmitter();
 
   MarkerAction = MarkerAction; // Setting a variable because the HTML template needs it in order to recognize the MarkerAction enum.
-  blobKeyValue : string;
+  private blobKeyValue : string;
   isUploading = false; // A flag to avoid submitting a report before the image processing is finished.
 
   constructor(private httpClient: HttpClient, public domSanitizer: DomSanitizer, private userService: UserService) { }

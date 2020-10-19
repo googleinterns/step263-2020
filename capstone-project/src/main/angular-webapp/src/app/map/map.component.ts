@@ -242,18 +242,18 @@ export class MapComponent implements OnInit {
         blobKey: event.blobKey
       };
       this.postMarker(newMarker, MarkerAction.UPDATE);
+
       // Once the user clicks "Update", we want to return the regular display with the updated image
+      infoWindowComponent.instance.type = MarkerAction.DISPLAY;
       if (newMarker.blobKey) {
         this.httpClient.get('/blob-service?' + 'blobAction=' + BlobAction.KEY_TO_BLOB + '&blob-key=' + newMarker.blobKey, { responseType: 'blob' })
           .toPromise()
           .then((blob) => {
             infoWindowComponent.instance.imageUrl = MapComponent.getUrlFromBlob(blob)
-            infoWindowComponent.instance.type = MarkerAction.DISPLAY;
             infoWindowComponent.changeDetectorRef.detectChanges();
           });
       }
       else {
-        infoWindowComponent.instance.type = MarkerAction.DISPLAY;
         infoWindowComponent.changeDetectorRef.detectChanges();
       }
     });
