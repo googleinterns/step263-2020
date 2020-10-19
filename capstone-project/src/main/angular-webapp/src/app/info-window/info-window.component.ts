@@ -20,22 +20,20 @@ export class InfoWindowComponent implements OnInit {
   @Input() reporter: string;
   @Input() imageUrl : string;
   @Input() type : MarkerAction;
-  @Input() originalBlobKey : string;
+  @Input() originalBlobKey : string; // Used when updating the image of an existing marker
 
   @Output() submitEvent = new EventEmitter();
   @Output() deleteEvent = new EventEmitter();
   @Output() updateEvent = new EventEmitter();
 
   MarkerAction = MarkerAction; // For the ngIf in template
-  //blobKeyValue = ""; // Set the default blob key to be an empty string to handle reports that don't include an image
+  blobKeyValue : string;
   isUploading = false; // A flag to avoid submitting a report before the image processing is finished.
   srcUrl : SafeUrl;
-  blobKeyValue : string;
 
   constructor(private httpClient: HttpClient, public domSanitizer: DomSanitizer, private userService: UserService) { }
 
   ngOnInit(): void { 
-    this.srcUrl = this.domSanitizer.bypassSecurityTrustUrl(this.imageUrl);
     this.blobKeyValue = this.originalBlobKey;
   }
 
@@ -95,8 +93,11 @@ export class InfoWindowComponent implements OnInit {
     return this.userService.getUser();
   }
 
-  removeImage() {
+  // Remove the image of an existing marker (in MarkerAction.UPDATE)
+  removeImage(event) {
     this.blobKeyValue = "";
+    this.originalBlobKey = "";
     this.imageUrl = "";
+    event.target.disabled = true;
   }
 }

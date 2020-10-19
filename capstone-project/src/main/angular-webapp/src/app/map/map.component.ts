@@ -176,7 +176,6 @@ export class MapComponent implements OnInit {
         this.addMarkerForDisplay(newMarker);
         this.editableMarker.setMap(null);
       }
-
     });
 
     return infoWindowComponent.location.nativeElement;
@@ -251,10 +250,7 @@ export class MapComponent implements OnInit {
         infoWindowComponent.instance.type = MarkerAction.DISPLAY;
         infoWindowComponent.changeDetectorRef.detectChanges();
       }
-
-
     });
-
     return infoWindowComponent.location.nativeElement;
   }
 }

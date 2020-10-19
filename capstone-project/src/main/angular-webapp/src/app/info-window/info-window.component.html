@@ -44,7 +44,7 @@
                 <input #inputImage type="file" name="image" accept="image/png, image/jpg" (change)="postFile($event.target.files)"><br>
             </form>
             <br>
-            <button (click)="removeImage()">Remove Image</button><br>
+            <button (click)="removeImage($event)">Remove Image</button><br>
             <br>
         </div>
         <div *ngIf="!imageUrl">
