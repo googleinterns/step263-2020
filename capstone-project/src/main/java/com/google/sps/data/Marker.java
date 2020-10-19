@@ -27,6 +27,7 @@ public class Marker {
         private String animal;
         private String reporter;
         private String description;
+        private String blobKey;
 
         public Builder(){
         }
@@ -61,6 +62,11 @@ public class Marker {
             return this;
         }
 
+        public Builder setBlobKey(String blobKey){
+            this.blobKey = blobKey;
+            return this;
+        }
+
         public Marker build(){
             return new Marker(this);
         }
@@ -72,6 +78,7 @@ public class Marker {
     private final String animal;
     private final String reporter;
     private final String description;
+    private String blobKey;
 
     private Marker(Builder builder) {
         this.id = builder.id;
@@ -80,6 +87,7 @@ public class Marker {
         this.animal = builder.animal;
         this.reporter = builder.reporter;
         this.description = builder.description;
+        this.blobKey = builder.blobKey;
     }
 
     public long getId() {
@@ -106,6 +114,14 @@ public class Marker {
         return description;
     }
 
+    public String getBlobKey() {
+        return blobKey;
+    }
+
+    public void setBlobKey(String blobKey) {
+        this.blobKey = blobKey;
+    }
+
     /** Creates a Marker from a marker entity */
     public static Marker fromEntity(Entity entity){
         long id = entity.getKey().getId();
@@ -114,6 +130,7 @@ public class Marker {
         String animal = (String) entity.getProperty("animal");
         String reporter = (String) entity.getProperty("reporter");
         String description = (String) entity.getProperty("description");
+        String blobKey = (String) entity.getProperty("blobKey");
 
         return new Marker.Builder()
                 .setId(id)
@@ -122,6 +139,7 @@ public class Marker {
                 .setAnimal(animal)
                 .setReporter(reporter)
                 .setDescription(description)
+                .setBlobKey(blobKey)
                 .build();
     }
 
@@ -143,6 +161,7 @@ public class Marker {
         markerEntity.setProperty("animal", marker.getAnimal());
         markerEntity.setProperty("reporter", marker.getReporter());
         markerEntity.setProperty("description", marker.getDescription());
+        markerEntity.setProperty("blobKey", marker.getBlobKey());
         return markerEntity;
     }
 }
