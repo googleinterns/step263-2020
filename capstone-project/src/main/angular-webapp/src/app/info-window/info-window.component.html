@@ -21,17 +21,17 @@
         <br>
     </div>
     <div *ngIf="type==MarkerAction.CREATE">
-        <mat-form-field floatLabel="always">
+        <mat-form-field floatLabel="always" appearance="outline">
             <mat-label>Animal</mat-label>
             <input matInput #inputAnimal><br>
         </mat-form-field>
         <br>
-        <mat-form-field floatLabel="always">
+        <mat-form-field floatLabel="always" appearance="outline">
             <mat-label>Description</mat-label>
             <input matInput #inputDescription><br>
         </mat-form-field>
         <div *ngIf="!user">
-            <mat-form-field floatLabel="never" floatPlaceHolder="never">
+            <mat-form-field floatLabel="always" appearance="outline">
                 <mat-label>Reporter's Name</mat-label>
                 <input matInput #inputReporter><br>
             </mat-form-field>
@@ -49,7 +49,7 @@
             <br>
         </div>
         <div *ngIf="user">
-            <mat-form-field floatLabel="always">
+            <mat-form-field floatLabel="always" appearance="outline">
                 <mat-label>Reporter's Name</mat-label>
                 <input matInput #inputReporterUser value="{{user.name}}"><br>
             </mat-form-field>
@@ -68,15 +68,15 @@
         </div>
     </div>
     <div *ngIf="type==MarkerAction.UPDATE">
-        <mat-form-field floatLabel="always">
+        <mat-form-field floatLabel="always" appearance="outline">
             <mat-label>Animal</mat-label>
             <input matInput #inputAnimal value="{{animal}}"><br>
         </mat-form-field><br>
-        <mat-form-field floatLabel="always">
+        <mat-form-field floatLabel="always" appearance="outline">
             <mat-label>Description</mat-label>
             <input matInput #inputDescription value="{{description}}"><br>
         </mat-form-field><br>
-        <mat-form-field floatLabel="always">
+        <mat-form-field floatLabel="always" appearance="outline">
             <mat-label>Reporter's Name</mat-label>
             <input matInput #inputReporter value="{{reporter}}"><br>
         </mat-form-field>
