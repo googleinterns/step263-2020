@@ -10,7 +10,7 @@
             {{description}}<br> Reported by: {{reporter}}<br>
         </div>
         <br>
-        <img *ngIf="imageUrl" [src]="srcUrl" width="200px" height="auto"><br>
+        <img *ngIf="imageUrl" [src]="this.domSanitizer.bypassSecurityTrustUrl(imageUrl)" width="200px" height="auto"><br>
         <br>
         <button (click)="delete()">Delete</button>
         <button (click)="update()">Update</button>
@@ -37,6 +37,22 @@
         <input #inputAnimal value="{{animal}}"><br>
         <input #inputDescription value="{{description}}"><br>
         <input #inputReporter value="{{reporter}}"><br>
+        <div *ngIf="imageUrl">
+            Current image is: <br>
+            <img [src]="this.domSanitizer.bypassSecurityTrustUrl(imageUrl)" width="200px" height="auto"><br> You can choose a new image here: <br>
+            <form enctype="multipart/form-data">
+                <input #inputImage type="file" name="image" accept="image/png, image/jpg" (change)="postFile($event.target.files)"><br>
+            </form>
+            <br>
+            <button (click)="removeImage($event)">Remove Image</button><br>
+            <br>
+        </div>
+        <div *ngIf="!imageUrl">
+            No image available <br> You can add an image here: <br>
+            <form enctype="multipart/form-data">
+                <input #inputImage type="file" name="image" accept="image/png, image/jpg" (change)="postFile($event.target.files)"><br>
+            </form>
+        </div>
         <button (click)="submit(inputAnimal.value, inputDescription.value, inputReporter.value)">Update</button>
     </div>
 </body>

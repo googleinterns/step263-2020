@@ -19,21 +19,21 @@ export class InfoWindowComponent implements OnInit {
   @Input() description: string;
   @Input() reporter: string;
   @Input() imageUrl : string;
-  @Input() type: MarkerAction;
+  @Input() type : MarkerAction;
+  @Input() originalBlobKey : string; // Used when updating the image of an existing marker
 
   @Output() submitEvent = new EventEmitter();
   @Output() deleteEvent = new EventEmitter();
   @Output() updateEvent = new EventEmitter();
 
   MarkerAction = MarkerAction; // Setting a variable because the HTML template needs it in order to recognize the MarkerAction enum.
-  blobKeyValue = ""; // Set the default blob key to be an empty string to handle reports that don't include an image
+  private blobKeyValue : string;
   isUploading = false; // A flag to avoid submitting a report before the image processing is finished.
-  srcUrl : SafeUrl;
 
-  constructor(private httpClient: HttpClient, private domSanitizer: DomSanitizer, private userService: UserService) { }
+  constructor(private httpClient: HttpClient, public domSanitizer: DomSanitizer, private userService: UserService) { }
 
   ngOnInit(): void { 
-    this.srcUrl = this.domSanitizer.bypassSecurityTrustUrl(this.imageUrl);
+    this.blobKeyValue = this.originalBlobKey;
   }
 
   // Update the fields according to user input and emit the submitEvent to receive the data in mapComponenet
@@ -49,7 +49,7 @@ export class InfoWindowComponent implements OnInit {
 
     // If a file was submitted and then removed - clear blobKeyValue
     if(!files.item(0)) {
-      this.blobKeyValue = '';
+      this.blobKeyValue = this.originalBlobKey;
       return;
     }
 
@@ -89,5 +89,13 @@ export class InfoWindowComponent implements OnInit {
   // Return the current user
   get user(): SocialUser {
     return this.userService.getUser();
+  }
+  
+  // Remove the image of an existing marker (in MarkerAction.UPDATE)
+  removeImage(event) {
+    this.blobKeyValue = "";
+    this.originalBlobKey = "";
+    this.imageUrl = "";
+    event.target.disabled = true;
   }
 }
