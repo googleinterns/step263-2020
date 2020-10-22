@@ -231,6 +231,21 @@ export class MapComponent implements OnInit {
     infoWindowComponent.instance.originalBlobKey = markerData.blobKey;
     infoWindowComponent.changeDetectorRef.detectChanges();
 
+    infoWindowComponent.instance.cancelEvent.subscribe(() => {
+      infoWindowComponent.instance.type = MarkerAction.DISPLAY;
+      if (markerData.blobKey) {
+        this.httpClient.get('/blob-service?' + 'blobAction=' + BlobAction.KEY_TO_BLOB + '&blob-key=' + markerData.blobKey, { responseType: 'blob' })
+          .toPromise()
+          .then((blob) => {
+            infoWindowComponent.instance.imageUrl = MapComponent.getUrlFromBlob(blob)
+            infoWindowComponent.changeDetectorRef.detectChanges();
+          });
+      }
+      else {
+        infoWindowComponent.changeDetectorRef.detectChanges();
+      }
+    });
+
     infoWindowComponent.instance.submitEvent.subscribe(event => {
       const newMarker = {
         id: markerData.id,
@@ -243,17 +258,16 @@ export class MapComponent implements OnInit {
       };
       this.postMarker(newMarker, MarkerAction.UPDATE);
       // Once the user clicks "Update", we want to return the regular display with the updated image
+      infoWindowComponent.instance.type = MarkerAction.DISPLAY;
       if (newMarker.blobKey) {
         this.httpClient.get('/blob-service?' + 'blobAction=' + BlobAction.KEY_TO_BLOB + '&blob-key=' + newMarker.blobKey, { responseType: 'blob' })
           .toPromise()
           .then((blob) => {
             infoWindowComponent.instance.imageUrl = MapComponent.getUrlFromBlob(blob)
-            infoWindowComponent.instance.type = MarkerAction.DISPLAY;
             infoWindowComponent.changeDetectorRef.detectChanges();
           });
       }
       else {
-        infoWindowComponent.instance.type = MarkerAction.DISPLAY;
         infoWindowComponent.changeDetectorRef.detectChanges();
       }
     });

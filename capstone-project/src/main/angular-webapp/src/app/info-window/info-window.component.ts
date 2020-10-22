@@ -25,10 +25,12 @@ export class InfoWindowComponent implements OnInit {
   @Output() submitEvent = new EventEmitter();
   @Output() deleteEvent = new EventEmitter();
   @Output() updateEvent = new EventEmitter();
+  @Output() cancelEvent = new EventEmitter();
 
   MarkerAction = MarkerAction; // Setting a variable because the HTML template needs it in order to recognize the MarkerAction enum.
   blobKeyValue : string;
   isUploading = false; // A flag to avoid submitting a report before the image processing is finished.
+  fileName = "";
 
   constructor(private httpClient: HttpClient, public domSanitizer: DomSanitizer, private userService: UserService) { }
 
@@ -50,6 +52,7 @@ export class InfoWindowComponent implements OnInit {
     // If a file was submitted and then removed - clear blobKeyValue
     if(!files.item(0)) {
       this.blobKeyValue = this.originalBlobKey;
+      document.getElementById("file-name").textContent = "";
       return;
     }
 
@@ -70,6 +73,7 @@ export class InfoWindowComponent implements OnInit {
             const jsonKey = Object.keys(data)[0];
             this.blobKeyValue = data[jsonKey];
             this.isUploading = false;
+            document.getElementById("file-name").textContent = imageFile.name;
           },
           error: error => console.error("The image failed to save. Error details: ", error)
         });
@@ -78,12 +82,17 @@ export class InfoWindowComponent implements OnInit {
 
   // Indicates that the user pressed on the Delete button
   delete() {
-    this.deleteEvent.emit()
+    this.deleteEvent.emit();
   }
 
   // Indicates that the user pressed on the Update button
   update() {
-    this.updateEvent.emit()
+    this.updateEvent.emit();
+  }
+
+  // Cancels changes made in the 'update' mode
+  cancel() {
+    this.cancelEvent.emit();
   }
 
   // Return the current user

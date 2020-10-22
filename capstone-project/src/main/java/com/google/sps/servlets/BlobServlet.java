@@ -43,6 +43,7 @@ public class BlobServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
+        
         int actionNum = Integer.parseInt(request.getParameter("blobAction"));
         BlobAction action = BlobAction.values()[actionNum];
         switch (action) {
