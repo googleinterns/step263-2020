@@ -12,7 +12,6 @@ import { MapComponent } from './map/map.component';
 import { AuthenticationComponent } from './authentication/authentication.component';
 import { environment } from 'src/environments/environment';
 import { MaterialModule } from './material/material.module';
-import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -28,8 +27,7 @@ import { FormsModule } from '@angular/forms';
     GoogleMapsModule,
     BrowserAnimationsModule,
     SocialLoginModule,
-    MaterialModule,
-    FormsModule
+    MaterialModule
   ],
   providers: [{
     provide: 'SocialAuthServiceConfig',
