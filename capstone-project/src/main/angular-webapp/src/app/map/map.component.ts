@@ -51,8 +51,7 @@ export class MapComponent implements OnInit {
 
           // If the marker has a blob key - get its URL 
           if (response[key].blobKey) {
-            this.httpClient.get('/blob-service?' + 'blobAction=' + BlobAction.KEY_TO_BLOB + '&blob-key=' + response[key].blobKey, { responseType: 'blob' })
-              .toPromise()
+            this.getBlobFromKey(response[key].blobKey)
               .then((blob) => {
                 const imageUrl = MapComponent.getUrlFromBlob(blob)
                 this.addMarkerForDisplay(response[key], imageUrl)
@@ -69,6 +68,11 @@ export class MapComponent implements OnInit {
   static getUrlFromBlob(blob) {
     const urlCreator = window.URL;
     return urlCreator.createObjectURL(blob);
+  }
+
+  getBlobFromKey(blobKey) {
+    return this.httpClient.get('/blob-service?' + 'blobAction=' + BlobAction.KEY_TO_BLOB + '&blob-key=' + blobKey, { responseType: 'blob' })
+    .toPromise();
   }
 
   // Centers the map based on the user location if permission is granted.
@@ -170,8 +174,7 @@ export class MapComponent implements OnInit {
 
       // Get the image URL from the blob key so we can add the new marker for display
       if (newMarker.blobKey) {
-        this.httpClient.get('/blob-service?' + 'blobAction=' + BlobAction.KEY_TO_BLOB + '&blob-key=' + newMarker.blobKey, { responseType: 'blob' })
-          .toPromise()
+        this.getBlobFromKey(newMarker.blobKey)
           .then((blob) => {
             const imageUrl = MapComponent.getUrlFromBlob(blob)
             this.addMarkerForDisplay(newMarker, imageUrl)
@@ -231,11 +234,11 @@ export class MapComponent implements OnInit {
     infoWindowComponent.instance.originalBlobKey = markerData.blobKey;
     infoWindowComponent.changeDetectorRef.detectChanges();
 
+    // Once the user clicks "Cancel", we want to return the regular display with the original marker and image
     infoWindowComponent.instance.cancelEvent.subscribe(() => {
       infoWindowComponent.instance.type = MarkerAction.DISPLAY;
       if (markerData.blobKey) {
-        this.httpClient.get('/blob-service?' + 'blobAction=' + BlobAction.KEY_TO_BLOB + '&blob-key=' + markerData.blobKey, { responseType: 'blob' })
-          .toPromise()
+        this.getBlobFromKey(markerData.blobKey)
           .then((blob) => {
             infoWindowComponent.instance.imageUrl = MapComponent.getUrlFromBlob(blob)
             infoWindowComponent.changeDetectorRef.detectChanges();
@@ -261,8 +264,7 @@ export class MapComponent implements OnInit {
       // Once the user clicks "Update", we want to return the regular display with the updated image
       infoWindowComponent.instance.type = MarkerAction.DISPLAY;
       if (newMarker.blobKey) {
-        this.httpClient.get('/blob-service?' + 'blobAction=' + BlobAction.KEY_TO_BLOB + '&blob-key=' + newMarker.blobKey, { responseType: 'blob' })
-          .toPromise()
+        this.getBlobFromKey(newMarker.blobKey)
           .then((blob) => {
             infoWindowComponent.instance.imageUrl = MapComponent.getUrlFromBlob(blob)
             infoWindowComponent.changeDetectorRef.detectChanges();
