@@ -257,6 +257,7 @@ export class MapComponent implements OnInit {
         blobKey: event.blobKey
       };
       this.postMarker(newMarker, MarkerAction.UPDATE);
+
       // Once the user clicks "Update", we want to return the regular display with the updated image
       infoWindowComponent.instance.type = MarkerAction.DISPLAY;
       if (newMarker.blobKey) {
