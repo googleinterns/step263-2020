@@ -1,4 +1,4 @@
-import { Component, OnInit, ComponentFactory, ComponentFactoryResolver, Injector } from '@angular/core';
+import { Component, OnInit, ComponentFactory, ComponentFactoryResolver, Injector, ViewChild, ElementRef } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { } from 'googlemaps';
 import { InfoWindowComponent } from '../info-window/info-window.component';
@@ -6,19 +6,23 @@ import { MarkerAction } from '../marker-action';
 import { UserService } from '../user.service';
 import { SocialUser } from 'angularx-social-login';
 import { BlobAction } from '../blob-action';
+import { ToastService } from '../toast.service';
 
 @Component({
   selector: 'app-map',
   templateUrl: './map.component.html',
-  styleUrls: ['./map.component.css']
+  styleUrls: ['./map.component.css'],
+  providers: [ToastService]
 })
 export class MapComponent implements OnInit {
+  @ViewChild("toast") toast: ElementRef;
 
   constructor(
     private httpClient: HttpClient,
     private componentFactoryResolver: ComponentFactoryResolver,
     private injector: Injector,
-    private userService: UserService
+    private userService: UserService,
+    private toastService : ToastService
   ) { }
 
   // Editable marker that displays when a user clicks on the map.
@@ -27,6 +31,10 @@ export class MapComponent implements OnInit {
   private gMap: google.maps.Map;
 
   ngOnInit(): void {
+    this.toastService.showToast({
+      title: "Geolocation service failed",
+      content: "Please grant the browser permission to locate you."
+    });
 
     // Define the map.
     const googleMapOption = {
@@ -85,24 +93,33 @@ export class MapComponent implements OnInit {
         this.gMap.setZoom(14);
       },
         () => {
-          MapComponent.handleLocationError(true);
+          this.handleLocationError(true);
         }
       );
     }
 
     // Browser doesn't support Geolocation
     else {
-      MapComponent.handleLocationError(false);
+      this.handleLocationError(false);
     }
   }
 
   // Alerts the user if the location process failed.
-  static handleLocationError(broswerHasGeolocation: boolean) {
+  handleLocationError(broswerHasGeolocation: boolean) {
     if (broswerHasGeolocation) {
-      window.alert("Geolocation service failed. Please grant the browser permission to locate you.")
+      console.log("failed");
+      this.toastService.showToast({
+        title: "Geolocation service failed",
+        content: "Please grant the browser permission to locate you."
+      });
+      //window.alert("Geolocation service failed. Please grant the browser permission to locate you.")
     }
     else {
-      window.alert("Browser doesn't support Geolocation.")
+      this.toastService.showToast({
+        title: "Geolocation service failed",
+        content: "Browser doesn't support Geolocation."
+      });
+      //window.alert("Browser doesn't support Geolocation.")
     }
   }
 

@@ -12,6 +12,7 @@ import { AppComponent } from './app.component';
 import { MapComponent } from './map/map.component';
 import { AuthenticationComponent } from './authentication/authentication.component';
 import { environment } from 'src/environments/environment';
+import { ToastService } from './toast.service'
 
 
 @NgModule({
@@ -30,7 +31,9 @@ import { environment } from 'src/environments/environment';
     SocialLoginModule,
     MatCardModule
   ],
-  providers: [{
+  providers: [
+    ToastService,
+    {
     provide: 'SocialAuthServiceConfig',
     useValue: {
       autoLogin: false,
