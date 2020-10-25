@@ -1,9 +1,11 @@
-input {
+.img-circle {
     border-radius: 50%;
     width: 50px;
 }
 
 div {
+  position: absolute;
+  right: 0;
   float: right;
   margin: 10px;
 }

@@ -1,13 +1,15 @@
 <div *ngIf="!user">
-    <button mat-button (click)="signInWithGoogle()">
-        Sign-in<br>With Google
-    </button>
+    <input type="image" (click)="signInWithGoogle();" width="170px" height="auto"
+        src="../assets/images/btn_google_signin_light_focus_web.png">
 </div>
-<div *ngIf="user" class="dropdown">
-    <input type="image" *ngIf="user.photoUrl" src="{{ user.photoUrl }}">
+<div *ngIf="user" class="dropdown"> 
+    <input class="img-circle" type="image" *ngIf="user.photoUrl"
+        src="{{ user.photoUrl }}"> 
+    <input class="img-circle" type="image" *ngIf="!user.photoUrl"
+        src="../assets/images/no-image-avatar.png">
     <div class="dropdown-content">
-        <mat-card-subtitle>{{ user.name }}</mat-card-subtitle>
-        {{ user.email }}<br>
-        <button mat-button (click)="signOut()">Sign out</button>
+        <mat-card-subtitle>{{ user.name }}</mat-card-subtitle> 
+        {{ user.email }}<br> 
+        <button mat-raised-button (click)="signOut()">Sign out</button>
     </div>
 </div>
