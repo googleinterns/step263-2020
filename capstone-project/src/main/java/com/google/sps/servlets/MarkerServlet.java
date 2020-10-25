@@ -97,24 +97,16 @@ public class MarkerServlet extends HttpServlet {
                 Marker updatedMarker = gson.fromJson(request.getParameter("marker"), Marker.class);
                 try {
                     updateMarker(updatedMarker, userId);
-                } catch (EntityNotFoundException entityNotFoundException) {
-                    context.log("Update failed, Entity not found. Error details: ",
-                        entityNotFoundException);
-                } catch (GeneralSecurityException securityException) {
-                    context.log("Update failed, security problem. Error details:",
-                    securityException);
+                } catch (EntityNotFoundException | GeneralSecurityException e) {
+                    context.log("Update failed. Error details: ", e);
                 }
                 break;
             case DELETE:
                 markerId = Long.parseLong(request.getParameter("id"));
                 try {
                     deleteMarker(markerId, userId);
-                } catch (EntityNotFoundException entityNotFoundException) {
-                    context.log("Delete failed, Entity not found. Error details: ",
-                    entityNotFoundException);
-                } catch (GeneralSecurityException securityException) {
-                    context.log("Delete failed, security problem. Error details:",
-                    securityException);
+                } catch (EntityNotFoundException | GeneralSecurityException e) {
+                    context.log("Update failed. Error details: ", e);
                 }
         }
     }
