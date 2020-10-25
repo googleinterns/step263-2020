@@ -83,15 +83,15 @@ public class MarkerServlet extends HttpServlet {
         switch (action) {
             case CREATE:
                 Marker newMarker = gson.fromJson(request.getParameter("marker"), Marker.class);
-                HashMap<String, String> returnParameters = new HashMap<>();
+                HashMap<String, String> responseParameters = new HashMap<>();
                 newMarker.setUserId(userId);
                 markerId = storeMarker(newMarker);
                 // The ID of the entity need to be updated in the FE as well
-                returnParameters.put("id", Long.toString(markerId));
+                responseParameters.put("id", Long.toString(markerId));
                 if (userId.isPresent()){
-                    returnParameters.put("userId", userId.get());
+                    responseParameters.put("userId", userId.get());
                 }
-                response.getWriter().println(gson.toJson(returnParameters));
+                response.getWriter().println(gson.toJson(responseParameters));
                 break;
             case UPDATE:
                 Marker updatedMarker = gson.fromJson(request.getParameter("marker"), Marker.class);
