@@ -2,7 +2,7 @@ import { Component, OnInit, ComponentFactory, ComponentFactoryResolver, Injector
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { } from 'googlemaps';
 import { InfoWindowComponent } from '../info-window/info-window.component';
-import { MarkerAction } from '../marker-action';
+import { MarkerMode } from '../marker-mode';
 import { UserService } from '../user.service'
 import { SocialUser } from 'angularx-social-login';
 import { BlobAction } from '../blob-action';
@@ -118,7 +118,7 @@ export class MapComponent implements OnInit {
       .set('userToken', this.user?.idToken);
     this.httpClient.post<any>('/markers', params).subscribe({
       next: data => {
-        if (action == MarkerAction.CREATE) {
+        if (action == MarkerMode.CREATE) {
           marker.id = data.id;
           marker.userId = {value: data.userId};
           this.addMarkerForDisplay(marker);
@@ -133,7 +133,7 @@ export class MapComponent implements OnInit {
 
     const params = new HttpParams()
       .set('id', markerData.id.toString())
-      .set('action', MarkerAction.DELETE.toString())
+      .set('action', MarkerMode.DELETE.toString())
       .set('userToken', this.user?.idToken);
     this.httpClient.post('/markers', params).subscribe({
       error: error => console.error("The marker failed to delete. Error details: ", error)
@@ -163,7 +163,7 @@ export class MapComponent implements OnInit {
   // Build infoWindowComponent and return its HTML element that shows editable textboxes and a submit button.
   buildCreateInfoWindowHtmlElement(lat, lng) {
     const infoWindowComponent = this.factory.create(this.injector);
-    infoWindowComponent.instance.type = MarkerAction.CREATE;
+    infoWindowComponent.instance.type = MarkerMode.CREATE;
     infoWindowComponent.changeDetectorRef.detectChanges();
 
     infoWindowComponent.instance.submitEvent.subscribe(event => {
@@ -175,7 +175,7 @@ export class MapComponent implements OnInit {
         lng: lng,
         blobKey: event.blobKey
       };
-      this.postMarker(newMarker, MarkerAction.CREATE);
+      this.postMarker(newMarker, MarkerMode.CREATE);
 
       // Get the image URL from the blob key so we can add the new marker for display
       if (newMarker.blobKey) {
@@ -229,9 +229,9 @@ export class MapComponent implements OnInit {
     infoWindowComponent.instance.description = marker.description;
     infoWindowComponent.instance.reporter = marker.reporter;
     infoWindowComponent.instance.imageUrl = imageUrl;
-    infoWindowComponent.instance.type = MarkerAction.DISPLAY;
+    infoWindowComponent.instance.type = MarkerMode.VIEW;
     if (this.user && marker.userId.value == this.user.id) {
-      infoWindowComponent.instance.showEditButtons = true;
+      infoWindowComponent.instance.type = MarkerMode.USER_VIEW;
     }
     infoWindowComponent.changeDetectorRef.detectChanges();
     return infoWindowComponent;
@@ -240,7 +240,7 @@ export class MapComponent implements OnInit {
   // Edits the InfoWindowComponent instance letting the user update the fields of an existing marker.
   buildUpdateInfoWindowHtmlElment(markerData, infoWindowComponent) {
 
-    infoWindowComponent.instance.type = MarkerAction.UPDATE;
+    infoWindowComponent.instance.type = MarkerMode.UPDATE;
     infoWindowComponent.instance.originalBlobKey = markerData.blobKey;
     infoWindowComponent.changeDetectorRef.detectChanges();
 
@@ -254,10 +254,10 @@ export class MapComponent implements OnInit {
         lng: markerData.lng,
         blobKey: event.blobKey
       };
-      this.postMarker(newMarker, MarkerAction.UPDATE);
+      this.postMarker(newMarker, MarkerMode.UPDATE);
 
       // Once the user clicks "Update", we want to return the regular display with the updated image
-      infoWindowComponent.instance.type = MarkerAction.DISPLAY;
+      infoWindowComponent.instance.type = MarkerMode.USER_VIEW;
       if (newMarker.blobKey) {
         this.httpClient.get('/blob-service?' + 'blobAction=' + BlobAction.KEY_TO_BLOB + '&blob-key=' + newMarker.blobKey, { responseType: 'blob' })
           .toPromise()

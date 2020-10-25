@@ -4,7 +4,7 @@
 </head>
 
 <body>
-    <div *ngIf="type==MarkerAction.DISPLAY">
+    <div *ngIf="type==MarkerMode.VIEW || type==MarkerMode.USER_VIEW">
         <h1>{{animal}}</h1>
         <div>
             {{description}}<br> Reported by: {{reporter}}<br>
@@ -14,12 +14,12 @@
             <img [src]="this.domSanitizer.bypassSecurityTrustUrl(imageUrl)" width="200px" height="auto"><br>
             <br>
         </div>
-        <div *ngIf="showEditButtons">
+        <div *ngIf="type==MarkerMode.USER_VIEW">
             <button (click)="delete()">Delete</button>
             <button (click)="update()">Update</button>
         </div>
     </div>
-    <div *ngIf="type==MarkerAction.CREATE">
+    <div *ngIf="type==MarkerMode.CREATE">
         <input #inputAnimal placeholder="Animal"><br>
         <input #inputDescription placeholder="Description"><br>
         <div *ngIf="!user">
@@ -41,7 +41,7 @@
                 (click)="submit(inputAnimal.value, inputDescription.value, inputReporterUser.value)">Submit</button>
         </div>
     </div>
-    <div *ngIf="type==MarkerAction.UPDATE">
+    <div *ngIf="type==MarkerMode.UPDATE">
         <input #inputAnimal value="{{animal}}"><br>
         <input #inputDescription value="{{description}}"><br>
         <input #inputReporter value="{{reporter}}"><br>
