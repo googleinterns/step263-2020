@@ -4,36 +4,44 @@
 </head>
 
 <body>
-    <div *ngIf="type==MarkerAction.DISPLAY">
+    <div *ngIf="type==MarkerMode.VIEW || type==MarkerMode.USER_VIEW">
         <h1>{{animal}}</h1>
         <div>
             {{description}}<br> Reported by: {{reporter}}<br>
         </div>
-        <br>
-        <img *ngIf="imageUrl" [src]="this.domSanitizer.bypassSecurityTrustUrl(imageUrl)" width="200px" height="auto"><br>
-        <br>
-        <button (click)="delete()">Delete</button>
-        <button (click)="update()">Update</button>
+        <div *ngIf="imageUrl">
+            <br>
+            <img [src]="this.domSanitizer.bypassSecurityTrustUrl(imageUrl)" width="200px" height="auto"><br>
+            <br>
+        </div>
+        <div *ngIf="type==MarkerMode.USER_VIEW">
+            <button (click)="delete()">Delete</button>
+            <button (click)="update()">Update</button>
+        </div>
     </div>
-    <div *ngIf="type==MarkerAction.CREATE">
+    <div *ngIf="type==MarkerMode.CREATE">
         <input #inputAnimal placeholder="Animal"><br>
         <input #inputDescription placeholder="Description"><br>
         <div *ngIf="!user">
             <input #inputReporter placeholder="Reporter's Name"><br>
             <form enctype="multipart/form-data">
-                <input #inputImage type="file" name="image" accept="image/png, image/jpg" (change)="postFile($event.target.files)"><br>
+                <input #inputImage type="file" name="image" accept="image/png, image/jpg"
+                    (change)="postFile($event.target.files)"><br>
             </form>
-            <button [disabled]="isUploading" (click)="submit(inputAnimal.value, inputDescription.value, inputReporter.value)">Submit</button>
+            <button [disabled]="isUploading"
+                (click)="submit(inputAnimal.value, inputDescription.value, inputReporter.value)">Submit</button>
         </div>
         <div *ngIf="user">
             <input #inputReporterUser value="{{user.name}}"><br>
             <form enctype="multipart/form-data">
-                <input #inputImage type="file" name="image" accept="image/png, image/jpg" (change)="postFile($event.target.files)"><br>
+                <input #inputImage type="file" name="image" accept="image/png, image/jpg"
+                    (change)="postFile($event.target.files)"><br>
             </form>
-            <button [disabled]="isUploading" (click)="submit(inputAnimal.value, inputDescription.value, inputReporterUser.value)">Submit</button>
+            <button [disabled]="isUploading"
+                (click)="submit(inputAnimal.value, inputDescription.value, inputReporterUser.value)">Submit</button>
         </div>
     </div>
-    <div *ngIf="type==MarkerAction.UPDATE">
+    <div *ngIf="type==MarkerMode.UPDATE">
         <input #inputAnimal value="{{animal}}"><br>
         <input #inputDescription value="{{description}}"><br>
         <input #inputReporter value="{{reporter}}"><br>

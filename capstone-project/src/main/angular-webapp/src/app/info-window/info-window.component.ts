@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import {DomSanitizer, SafeUrl} from '@angular/platform-browser'
-import { MarkerAction } from '../marker-action';
+import { MarkerMode } from '../marker-mode';
 import { BlobAction } from '../blob-action';
 import { HttpClient } from '@angular/common/http';
 import { } from 'googlemaps';
@@ -19,14 +19,14 @@ export class InfoWindowComponent implements OnInit {
   @Input() description: string;
   @Input() reporter: string;
   @Input() imageUrl : string;
-  @Input() type : MarkerAction;
+  @Input() type: MarkerMode;
   @Input() originalBlobKey : string; // Used when updating the image of an existing marker
 
   @Output() submitEvent = new EventEmitter();
   @Output() deleteEvent = new EventEmitter();
   @Output() updateEvent = new EventEmitter();
 
-  MarkerAction = MarkerAction; // Setting a variable because the HTML template needs it in order to recognize the MarkerAction enum.
+  MarkerMode = MarkerMode; // Setting a variable because the HTML template needs it in order to recognize the MarkerAction enum.
   private blobKeyValue : string;
   isUploading = false; // A flag to avoid submitting a report before the image processing is finished.
 
