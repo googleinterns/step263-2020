@@ -15,52 +15,104 @@
             <br>
         </div>
         <div *ngIf="type==MarkerMode.USER_VIEW">
-            <button (click)="delete()">Delete</button>
-            <button (click)="update()">Update</button>
+            <button mat-stroked-button (click)="delete()" style="float: left;">
+                <mat-icon>delete</mat-icon>
+            </button>
+            <button mat-stroked-button (click)="update()" style="float: right;">
+                <mat-icon>edit</mat-icon>
+            </button>
         </div>
     </div>
     <div *ngIf="type==MarkerMode.CREATE">
-        <input #inputAnimal placeholder="Animal"><br>
-        <input #inputDescription placeholder="Description"><br>
+        <mat-form-field floatLabel="always" appearance="outline">
+            <mat-label>Animal</mat-label>
+            <input matInput #inputAnimal><br>
+        </mat-form-field>
+        <br>
+        <mat-form-field floatLabel="always" appearance="outline">
+            <mat-label>Description</mat-label>
+            <input matInput #inputDescription><br>
+        </mat-form-field>
         <div *ngIf="!user">
-            <input #inputReporter placeholder="Reporter's Name"><br>
+            <mat-form-field floatLabel="always" appearance="outline">
+                <mat-label>Reporter's Name</mat-label>
+                <input matInput #inputReporter><br>
+            </mat-form-field>
             <form enctype="multipart/form-data">
-                <input #inputImage type="file" name="image" accept="image/png, image/jpg"
-                    (change)="postFile($event.target.files)"><br>
+                <input [hidden]='true' id="input-file-id" #inputImage type="file" name="image" accept="image/png, image/jpg" (change)="postFile($event.target.files)"><br>
+                <label for="input-file-id" class="mat-stroked-button">
+                    <mat-icon style="margin-top: 50%;">image</mat-icon>
+                </label>
+                <p id="file-name">
             </form>
-            <button [disabled]="isUploading"
-                (click)="submit(inputAnimal.value, inputDescription.value, inputReporter.value)">Submit</button>
+            <br>
+            <button mat-stroked-button style="float: right;" [disabled]="isUploading" (click)="submit(inputAnimal.value, inputDescription.value, inputReporter.value)">
+                <mat-icon>done</mat-icon>
+            </button>
+            <br>
         </div>
         <div *ngIf="user">
-            <input #inputReporterUser value="{{user.name}}"><br>
+            <mat-form-field floatLabel="always" appearance="outline">
+                <mat-label>Reporter's Name</mat-label>
+                <input matInput #inputReporterUser value="{{user.name}}"><br>
+            </mat-form-field>
             <form enctype="multipart/form-data">
-                <input #inputImage type="file" name="image" accept="image/png, image/jpg"
-                    (change)="postFile($event.target.files)"><br>
+                <input [hidden]='true' id="input-file-id" #inputImage type="file" name="image" accept="image/png, image/jpg" (change)="postFile($event.target.files)"><br>
+                <label for="input-file-id" class="mat-stroked-button">
+                    <mat-icon style="margin-top: 50%;">image</mat-icon>
+                </label>
+                <p id="file-name">
             </form>
-            <button [disabled]="isUploading"
-                (click)="submit(inputAnimal.value, inputDescription.value, inputReporterUser.value)">Submit</button>
+            <br>
+            <button mat-stroked-button style="float: right;" [disabled]="isUploading" (click)="submit(inputAnimal.value, inputDescription.value, inputReporterUser.value)">
+                <mat-icon>done</mat-icon>
+            </button>
+            <br>
         </div>
     </div>
     <div *ngIf="type==MarkerMode.UPDATE">
-        <input #inputAnimal value="{{animal}}"><br>
-        <input #inputDescription value="{{description}}"><br>
-        <input #inputReporter value="{{reporter}}"><br>
+        <mat-form-field floatLabel="always" appearance="outline">
+            <mat-label>Animal</mat-label>
+            <input matInput #inputAnimal value="{{animal}}"><br>
+        </mat-form-field><br>
+        <mat-form-field floatLabel="always" appearance="outline">
+            <mat-label>Description</mat-label>
+            <input matInput #inputDescription value="{{description}}"><br>
+        </mat-form-field><br>
+        <mat-form-field floatLabel="always" appearance="outline">
+            <mat-label>Reporter's Name</mat-label>
+            <input matInput #inputReporter value="{{reporter}}"><br>
+        </mat-form-field>
         <div *ngIf="imageUrl">
             Current image is: <br>
             <img [src]="this.domSanitizer.bypassSecurityTrustUrl(imageUrl)" width="200px" height="auto"><br> You can choose a new image here: <br>
             <form enctype="multipart/form-data">
-                <input #inputImage type="file" name="image" accept="image/png, image/jpg" (change)="postFile($event.target.files)"><br>
+                <input [hidden]='true' id="input-file-id" #inputImage type="file" name="image" accept="image/png, image/jpg" (change)="postFile($event.target.files)"><br>
+                <label for="input-file-id" class="mat-stroked-button">
+                    <mat-icon style="margin-top: 50%;">image</mat-icon>
+                </label>
+                <p id="file-name">
             </form>
             <br>
-            <button (click)="removeImage($event)">Remove Image</button><br>
+            <button mat-stroked-button (click)="removeImage($event)">Remove Image</button><br>
             <br>
         </div>
         <div *ngIf="!imageUrl">
             No image available <br> You can add an image here: <br>
             <form enctype="multipart/form-data">
-                <input #inputImage type="file" name="image" accept="image/png, image/jpg" (change)="postFile($event.target.files)"><br>
+                <input [hidden]='true' id="input-file-id" #inputImage type="file" name="image" accept="image/png, image/jpg" (change)="postFile($event.target.files)"><br>
+                <label for="input-file-id" class="mat-stroked-button">
+                    <mat-icon style="margin-top: 50%;">image</mat-icon>
+                </label>
+                <p id="file-name">
             </form>
         </div>
-        <button (click)="submit(inputAnimal.value, inputDescription.value, inputReporter.value)">Update</button>
+        <button mat-stroked-button style="float: left;" (click)="cancel()">
+            <mat-icon>close</mat-icon>
+        </button>
+        <button mat-stroked-button style="float: right;" (click)="submit(inputAnimal.value, inputDescription.value, inputReporter.value)">
+            <mat-icon>done</mat-icon>
+        </button>
+        <br>
     </div>
 </body>

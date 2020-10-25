@@ -2,7 +2,6 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 import { GoogleMapsModule } from '@angular/google-maps';
-import { MatCardModule } from '@angular/material/card'
 import { AppRoutingModule } from './app-routing.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { SocialLoginModule, SocialAuthServiceConfig } from 'angularx-social-login';
@@ -12,7 +11,7 @@ import { AppComponent } from './app.component';
 import { MapComponent } from './map/map.component';
 import { AuthenticationComponent } from './authentication/authentication.component';
 import { environment } from 'src/environments/environment';
-
+import { MaterialModule } from './material/material.module';
 
 @NgModule({
   declarations: [
@@ -28,7 +27,7 @@ import { environment } from 'src/environments/environment';
     GoogleMapsModule,
     BrowserAnimationsModule,
     SocialLoginModule,
-    MatCardModule
+    MaterialModule
   ],
   providers: [{
     provide: 'SocialAuthServiceConfig',
