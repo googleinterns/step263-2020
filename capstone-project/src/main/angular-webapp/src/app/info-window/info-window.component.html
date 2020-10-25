@@ -4,23 +4,26 @@
 </head>
 
 <body>
-    <div *ngIf="type==MarkerAction.DISPLAY">
+    <div *ngIf="type==MarkerMode.VIEW || type==MarkerMode.USER_VIEW">
         <h1>{{animal}}</h1>
         <div>
             {{description}}<br> Reported by: {{reporter}}<br>
         </div>
-        <br>
-        <img *ngIf="imageUrl" [src]="this.domSanitizer.bypassSecurityTrustUrl(imageUrl)" width="200px" height="auto"><br>
-        <br>
-        <button mat-stroked-button (click)="delete()" style="float: left;">
-            <mat-icon>delete</mat-icon>
-        </button>
-        <button mat-stroked-button (click)="update()" style="float: right;">
-            <mat-icon>edit</mat-icon>
-        </button>
-        <br>
+        <div *ngIf="imageUrl">
+            <br>
+            <img [src]="this.domSanitizer.bypassSecurityTrustUrl(imageUrl)" width="200px" height="auto"><br>
+            <br>
+        </div>
+        <div *ngIf="type==MarkerMode.USER_VIEW">
+            <button mat-stroked-button (click)="delete()" style="float: left;">
+                <mat-icon>delete</mat-icon>
+            </button>
+            <button mat-stroked-button (click)="update()" style="float: right;">
+                <mat-icon>edit</mat-icon>
+            </button>
+        </div>
     </div>
-    <div *ngIf="type==MarkerAction.CREATE">
+    <div *ngIf="type==MarkerMode.CREATE">
         <mat-form-field floatLabel="always" appearance="outline">
             <mat-label>Animal</mat-label>
             <input matInput #inputAnimal><br>
@@ -67,7 +70,7 @@
             <br>
         </div>
     </div>
-    <div *ngIf="type==MarkerAction.UPDATE">
+    <div *ngIf="type==MarkerMode.UPDATE">
         <mat-form-field floatLabel="always" appearance="outline">
             <mat-label>Animal</mat-label>
             <input matInput #inputAnimal value="{{animal}}"><br>

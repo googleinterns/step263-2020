@@ -2,8 +2,8 @@ import { Component, OnInit, ComponentFactory, ComponentFactoryResolver, Injector
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { } from 'googlemaps';
 import { InfoWindowComponent } from '../info-window/info-window.component';
-import { MarkerAction } from '../marker-action';
-import { UserService } from '../user.service';
+import { MarkerMode } from '../marker-mode';
+import { UserService } from '../user.service'
 import { SocialUser } from 'angularx-social-login';
 import { BlobAction } from '../blob-action';
 
@@ -14,20 +14,18 @@ import { BlobAction } from '../blob-action';
 })
 export class MapComponent implements OnInit {
 
-  constructor(
-    private httpClient: HttpClient,
+  constructor(private httpClient: HttpClient,
     private componentFactoryResolver: ComponentFactoryResolver,
     private injector: Injector,
-    private userService: UserService
-  ) { }
+    private userService: UserService) { }
 
   // Editable marker that displays when a user clicks on the map.
   private editableMarker: google.maps.Marker;
   private factory: ComponentFactory<InfoWindowComponent> = this.componentFactoryResolver.resolveComponentFactory(InfoWindowComponent);
   private gMap: google.maps.Map;
+  private markers: google.maps.Marker[] = [];
 
   ngOnInit(): void {
-
     // Define the map.
     const googleMapOption = {
       zoom: 4,
@@ -43,12 +41,15 @@ export class MapComponent implements OnInit {
       this.addMarkerForEdit(event.latLng.lat(), event.latLng.lng());
     });
 
-    // Fetches markers from the backend and adds them to the map.
-    this.httpClient.get('/markers')
+    // When a user is updated, remove all marker and display them with correct buttons
+    this.userService.getUserObservable().subscribe(user => {
+      this.markers.forEach(marker => marker.setMap(null));
+      this.markers = [];
+      // Fetches markers from the backend and adds them to the map.
+      this.httpClient.get('/markers')
       .toPromise()
       .then((response) => {
         for (let key in response) {
-
           // If the marker has a blob key - get its URL 
           if (response[key].blobKey) {
             this.getBlobFromKey(response[key].blobKey)
@@ -62,6 +63,7 @@ export class MapComponent implements OnInit {
           }
         }
       });
+    });
   }
 
   // Returns the URL of a blob related to a marker.
@@ -118,8 +120,14 @@ export class MapComponent implements OnInit {
       .set('marker', markerJson)
       .set('action', action.toString())
       .set('userToken', this.user?.idToken);
-    this.httpClient.post('/markers', params).subscribe({
-      next: data => marker.id = data,
+    this.httpClient.post<any>('/markers', params).subscribe({
+      next: data => {
+        if (action == MarkerMode.CREATE) {
+          marker.id = data.id;
+          marker.userId = {value: data.userId};
+          this.addMarkerForDisplay(marker);
+        }
+      },
       error: error => console.error("The marker failed to save. Error details: ", error)
     });
   }
@@ -129,7 +137,8 @@ export class MapComponent implements OnInit {
 
     const params = new HttpParams()
       .set('id', markerData.id.toString())
-      .set('action', MarkerAction.DELETE.toString());
+      .set('action', MarkerMode.DELETE.toString())
+      .set('userToken', this.user?.idToken);
     this.httpClient.post('/markers', params).subscribe({
       error: error => console.error("The marker failed to delete. Error details: ", error)
     });
@@ -158,7 +167,7 @@ export class MapComponent implements OnInit {
   // Build infoWindowComponent and return its HTML element that shows editable textboxes and a submit button.
   buildCreateInfoWindowHtmlElement(lat, lng) {
     const infoWindowComponent = this.factory.create(this.injector);
-    infoWindowComponent.instance.type = MarkerAction.CREATE;
+    infoWindowComponent.instance.type = MarkerMode.CREATE;
     infoWindowComponent.changeDetectorRef.detectChanges();
 
     infoWindowComponent.instance.submitEvent.subscribe(event => {
@@ -170,7 +179,7 @@ export class MapComponent implements OnInit {
         lng: lng,
         blobKey: event.blobKey
       };
-      this.postMarker(newMarker, MarkerAction.CREATE);
+      this.postMarker(newMarker, MarkerMode.CREATE);
 
       // Get the image URL from the blob key so we can add the new marker for display
       if (newMarker.blobKey) {
@@ -182,7 +191,6 @@ export class MapComponent implements OnInit {
           });
       }
       else {
-        this.addMarkerForDisplay(newMarker);
         this.editableMarker.setMap(null);
       }
     });
@@ -213,6 +221,8 @@ export class MapComponent implements OnInit {
       markersInfoWindow.setContent(infoWindowComponent.location.nativeElement);
       markersInfoWindow.open(this.gMap, markerForDisplay);
     });
+
+    this.markers.push(markerForDisplay)
   };
 
   // Creates the info window component for display of marker
@@ -222,7 +232,10 @@ export class MapComponent implements OnInit {
     infoWindowComponent.instance.description = marker.description;
     infoWindowComponent.instance.reporter = marker.reporter;
     infoWindowComponent.instance.imageUrl = imageUrl;
-    infoWindowComponent.instance.type = MarkerAction.DISPLAY;
+    infoWindowComponent.instance.type = MarkerMode.VIEW;
+    if (this.user && marker.userId.value == this.user.id) {
+      infoWindowComponent.instance.type = MarkerMode.USER_VIEW;
+    }
     infoWindowComponent.changeDetectorRef.detectChanges();
     return infoWindowComponent;
   }
@@ -230,13 +243,13 @@ export class MapComponent implements OnInit {
   // Edits the InfoWindowComponent instance letting the user update the fields of an existing marker.
   buildUpdateInfoWindowHtmlElment(markerData, infoWindowComponent) {
 
-    infoWindowComponent.instance.type = MarkerAction.UPDATE;
+    infoWindowComponent.instance.type = MarkerMode.UPDATE;
     infoWindowComponent.instance.originalBlobKey = markerData.blobKey;
     infoWindowComponent.changeDetectorRef.detectChanges();
 
     // Once the user clicks "Cancel", we want to return the regular display with the original marker and image
     infoWindowComponent.instance.cancelEvent.subscribe(() => {
-      infoWindowComponent.instance.type = MarkerAction.DISPLAY;
+      infoWindowComponent.instance.type = MarkerMode.USER_VIEW;
       if (markerData.blobKey) {
         this.getBlobFromKey(markerData.blobKey)
           .then((blob) => {
@@ -259,10 +272,10 @@ export class MapComponent implements OnInit {
         lng: markerData.lng,
         blobKey: event.blobKey
       };
-      this.postMarker(newMarker, MarkerAction.UPDATE);
+      this.postMarker(newMarker, MarkerMode.UPDATE);
 
       // Once the user clicks "Update", we want to return the regular display with the updated image
-      infoWindowComponent.instance.type = MarkerAction.DISPLAY;
+      infoWindowComponent.instance.type = MarkerMode.USER_VIEW;
       if (newMarker.blobKey) {
         this.getBlobFromKey(newMarker.blobKey)
           .then((blob) => {
