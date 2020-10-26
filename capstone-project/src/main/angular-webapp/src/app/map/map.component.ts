@@ -1,4 +1,4 @@
-import { Component, OnInit, ComponentFactory, ComponentFactoryResolver, Injector, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ComponentFactory, ComponentFactoryResolver, Injector } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { } from 'googlemaps';
 import { InfoWindowComponent } from '../info-window/info-window.component';
@@ -11,17 +11,15 @@ import { ToastService } from '../toast.service';
 @Component({
   selector: 'app-map',
   templateUrl: './map.component.html',
-  styleUrls: ['./map.component.css'],
+  styleUrls: ['./map.component.css']
 })
 export class MapComponent implements OnInit {
 
   constructor(private httpClient: HttpClient,
     private componentFactoryResolver: ComponentFactoryResolver,
     private injector: Injector,
-
     private userService: UserService,
-    private toastService : ToastService
-  ) { }
+    private toastService : ToastService) { }
 
   // Editable marker that displays when a user clicks on the map.
   private editableMarker: google.maps.Marker;

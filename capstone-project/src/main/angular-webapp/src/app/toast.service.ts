@@ -2,21 +2,23 @@ import { Injectable } from '@angular/core';
 import { Toast, ToastModel } from '@syncfusion/ej2-notifications';
 
 @Injectable()
+
+// Displays Toast notifications
 export class ToastService {
   public toastInstance: Toast;
-  public toastObj: Toast;
 
-  constructor() {}
+  constructor() { }
 
+  // Create a new Toast component
   createToast(element: HTMLElement, model: ToastModel) {
-    if (!element.classList.contains('e-toast')) {
-      this.toastObj = new Toast(model, element);
-    }
-    return this.toastObj
+    this.toastInstance = new Toast(model, element);
   };
 
-  showToast(elemnet: HTMLElement, model: ToastModel) {
-    this.toastInstance = this.createToast(elemnet, model);
+  // Display the Toast notification
+  showToast(element: HTMLElement, model: ToastModel) {
+    if (!element.classList.contains('e-toast')) {
+      this.createToast(element, model);
+    }
     this.toastInstance.show();
   }
 }
