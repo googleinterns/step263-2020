@@ -42,7 +42,6 @@ export class MapComponent implements OnInit {
     });
 
     // When a user is updated, remove all marker and display them with correct buttons
-    this.userService.getUserObservable().subscribe(user => {
       this.markers.forEach(marker => marker.setMap(null));
       this.markers = [];
       // Fetches markers from the backend and adds them to the map.
@@ -54,8 +53,8 @@ export class MapComponent implements OnInit {
           if (response[key].blobKey) {
             this.getBlobFromKey(response[key].blobKey)
               .then((blob) => {
-                const imageUrl = MapComponent.getUrlFromBlob(blob)
-                this.addMarkerForDisplay(response[key], imageUrl)
+                const imageUrl = MapComponent.getUrlFromBlob(blob);
+                this.addMarkerForDisplay(response[key], imageUrl);
               });
           }
           else {
@@ -63,7 +62,6 @@ export class MapComponent implements OnInit {
           }
         }
       });
-    });
   }
 
   // Returns the URL of a blob related to a marker.
@@ -207,23 +205,23 @@ export class MapComponent implements OnInit {
     });
 
     const markersInfoWindow = new google.maps.InfoWindow();
-    const infoWindowComponent = this.buildDisplayInfoWindowComponent(marker, imageUrl);
 
-    infoWindowComponent.instance.deleteEvent.subscribe(event =>
-      this.deleteMarker(marker, markerForDisplay));
-
-    infoWindowComponent.instance.updateEvent.subscribe(event => {
-      markersInfoWindow.setContent(this.buildUpdateInfoWindowHtmlElment(marker, infoWindowComponent));
-      markersInfoWindow.open(this.gMap, markerForDisplay);
-    });
-
-    google.maps.event.addListener(markerForDisplay, 'click', function () {
+    google.maps.event.addListener(markerForDisplay, 'click', () => {
+      const infoWindowComponent = this.buildDisplayInfoWindowComponent(marker, imageUrl);
       markersInfoWindow.setContent(infoWindowComponent.location.nativeElement);
       markersInfoWindow.open(this.gMap, markerForDisplay);
+
+      infoWindowComponent.instance.deleteEvent.subscribe(event =>
+        this.deleteMarker(marker, markerForDisplay));
+  
+      infoWindowComponent.instance.updateEvent.subscribe(event => {
+        markersInfoWindow.setContent(this.buildUpdateInfoWindowHtmlElment(marker, infoWindowComponent));
+        markersInfoWindow.open(this.gMap, markerForDisplay);
+      });
     });
 
     this.markers.push(markerForDisplay)
-  };
+  }
 
   // Creates the info window component for display of marker
   buildDisplayInfoWindowComponent(marker, imageUrl) {
