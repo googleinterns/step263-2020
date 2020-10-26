@@ -5,7 +5,7 @@ import { Toast, ToastModel } from '@syncfusion/ej2-notifications';
 
 // Displays Toast notifications
 export class ToastService {
-  public toastInstance: Toast;
+  private toastInstance: Toast;
 
   constructor() { }
 
