@@ -23,7 +23,6 @@ export class MapComponent implements OnInit {
   private editableMarker: google.maps.Marker;
   private factory: ComponentFactory<InfoWindowComponent> = this.componentFactoryResolver.resolveComponentFactory(InfoWindowComponent);
   private gMap: google.maps.Map;
-  private markers: google.maps.Marker[] = [];
 
   ngOnInit(): void {
     // Define the map.
@@ -41,9 +40,6 @@ export class MapComponent implements OnInit {
       this.addMarkerForEdit(event.latLng.lat(), event.latLng.lng());
     });
 
-    // When a user is updated, remove all marker and display them with correct buttons
-      this.markers.forEach(marker => marker.setMap(null));
-      this.markers = [];
       // Fetches markers from the backend and adds them to the map.
       this.httpClient.get('/markers')
       .toPromise()
@@ -219,8 +215,6 @@ export class MapComponent implements OnInit {
         markersInfoWindow.open(this.gMap, markerForDisplay);
       });
     });
-
-    this.markers.push(markerForDisplay)
   }
 
   // Creates the info window component for display of marker
