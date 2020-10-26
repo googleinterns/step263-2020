@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import {DomSanitizer, SafeUrl} from '@angular/platform-browser'
-import { MarkerAction } from '../marker-action';
+import { MarkerMode } from '../marker-mode';
 import { BlobAction } from '../blob-action';
 import { HttpClient } from '@angular/common/http';
 import { } from 'googlemaps';
@@ -19,14 +19,15 @@ export class InfoWindowComponent implements OnInit {
   @Input() description: string;
   @Input() reporter: string;
   @Input() imageUrl : string;
-  @Input() type : MarkerAction;
+  @Input() type: MarkerMode;
   @Input() originalBlobKey : string; // Used when updating the image of an existing marker
 
   @Output() submitEvent = new EventEmitter();
   @Output() deleteEvent = new EventEmitter();
   @Output() updateEvent = new EventEmitter();
+  @Output() cancelEvent = new EventEmitter();
 
-  MarkerAction = MarkerAction; // Setting a variable because the HTML template needs it in order to recognize the MarkerAction enum.
+  MarkerMode = MarkerMode; // Setting a variable because the HTML template needs it in order to recognize the MarkerAction enum.
   private blobKeyValue : string;
   isUploading = false; // A flag to avoid submitting a report before the image processing is finished.
 
@@ -50,6 +51,7 @@ export class InfoWindowComponent implements OnInit {
     // If a file was submitted and then removed - clear blobKeyValue
     if(!files.item(0)) {
       this.blobKeyValue = this.originalBlobKey;
+      document.getElementById("file-name").textContent = "";
       return;
     }
 
@@ -70,6 +72,7 @@ export class InfoWindowComponent implements OnInit {
             const jsonKey = Object.keys(data)[0];
             this.blobKeyValue = data[jsonKey];
             this.isUploading = false;
+            document.getElementById("file-name").textContent = imageFile.name;
           },
           error: error => console.error("The image failed to save. Error details: ", error)
         });
@@ -78,12 +81,17 @@ export class InfoWindowComponent implements OnInit {
 
   // Indicates that the user pressed on the Delete button
   delete() {
-    this.deleteEvent.emit()
+    this.deleteEvent.emit();
   }
 
   // Indicates that the user pressed on the Update button
   update() {
-    this.updateEvent.emit()
+    this.updateEvent.emit();
+  }
+
+  // Cancels changes made in the 'update' mode
+  cancel() {
+    this.cancelEvent.emit();
   }
 
   // Return the current user

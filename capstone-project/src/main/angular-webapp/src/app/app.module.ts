@@ -2,7 +2,6 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 import { GoogleMapsModule } from '@angular/google-maps';
-import { MatCardModule } from '@angular/material/card'
 import { AppRoutingModule } from './app-routing.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { SocialLoginModule, SocialAuthServiceConfig } from 'angularx-social-login';
@@ -13,7 +12,7 @@ import { MapComponent } from './map/map.component';
 import { AuthenticationComponent } from './authentication/authentication.component';
 import { environment } from 'src/environments/environment';
 import { ToastService } from './toast.service'
-
+import { MaterialModule } from './material/material.module';
 
 @NgModule({
   declarations: [
@@ -29,14 +28,14 @@ import { ToastService } from './toast.service'
     GoogleMapsModule,
     BrowserAnimationsModule,
     SocialLoginModule,
-    MatCardModule
+    MaterialModule
   ],
   providers: [
     ToastService,
     {
     provide: 'SocialAuthServiceConfig',
     useValue: {
-      autoLogin: false,
+      autoLogin: true,
       providers: [
         {
           id: GoogleLoginProvider.PROVIDER_ID,

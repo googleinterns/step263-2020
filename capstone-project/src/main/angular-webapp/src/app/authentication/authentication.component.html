@@ -1,5 +1,5 @@
 <div *ngIf="!user">
-    <button mat-button (click)="signInWithGoogle()">
+    <button mat-raised-button (click)="signInWithGoogle()">
         Sign-in<br>With Google
     </button>
 </div>
@@ -8,6 +8,6 @@
     <div class="dropdown-content">
         <mat-card-subtitle>{{ user.name }}</mat-card-subtitle>
         {{ user.email }}<br>
-        <button mat-button (click)="signOut()">Sign out</button>
+        <button mat-raised-button (click)="signOut()">Sign out</button>
     </div>
 </div>
