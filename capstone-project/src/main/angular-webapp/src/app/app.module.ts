@@ -11,8 +11,8 @@ import { AppComponent } from './app.component';
 import { MapComponent } from './map/map.component';
 import { AuthenticationComponent } from './authentication/authentication.component';
 import { environment } from 'src/environments/environment';
-import { ToastService } from './toast.service'
 import { MaterialModule } from './material/material.module';
+import { ToastService } from './toast.service'
 
 @NgModule({
   declarations: [

@@ -12,10 +12,8 @@ import { ToastService } from '../toast.service';
   selector: 'app-map',
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.css'],
-  providers: [ToastService]
 })
 export class MapComponent implements OnInit {
-  @ViewChild("toast") toast: ElementRef;
 
   constructor(private httpClient: HttpClient,
     private componentFactoryResolver: ComponentFactoryResolver,
@@ -32,11 +30,6 @@ export class MapComponent implements OnInit {
   private markers: google.maps.Marker[] = [];
 
   ngOnInit(): void {
-
-    this.toastService.showToast({
-      title: "Geolocation service failed",
-      content: "Please grant the browser permission to locate you."
-    });
 
     // Define the map.
     const googleMapOption = {
@@ -117,19 +110,16 @@ export class MapComponent implements OnInit {
   // Alerts the user if the location process failed.
   handleLocationError(broswerHasGeolocation: boolean) {
     if (broswerHasGeolocation) {
-      console.log("failed");
-      this.toastService.showToast({
-        title: "Geolocation service failed",
+      this.toastService.showToast(document.getElementById("ej2Toast"), {
+        title: "Geolocation Service Failed",
         content: "Please grant the browser permission to locate you."
       });
-      //window.alert("Geolocation service failed. Please grant the browser permission to locate you.")
     }
     else {
-      this.toastService.showToast({
-        title: "Geolocation service failed",
+      this.toastService.showToast(document.getElementById("ej2Toast"), {
+        title: "Geolocation Service Failed",
         content: "Browser doesn't support Geolocation."
       });
-      //window.alert("Browser doesn't support Geolocation.")
     }
   }
 
