@@ -209,7 +209,7 @@ export class MapComponent implements OnInit {
   }
 
   // Creates the info window component for display of marker
-  buildDisplayInfoWindowComponent(marker, imageUrl?) {
+  buildDisplayInfoWindowComponent(marker, imageUrl) {
     const infoWindowComponent = this.factory.create(this.injector);
     infoWindowComponent.instance.animal = marker.animal;
     infoWindowComponent.instance.description = marker.description;
