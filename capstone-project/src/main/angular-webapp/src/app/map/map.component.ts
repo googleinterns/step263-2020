@@ -40,22 +40,12 @@ export class MapComponent implements OnInit {
       this.addMarkerForEdit(event.latLng.lat(), event.latLng.lng());
     });
 
-      // Fetches markers from the backend and adds them to the map.
-      this.httpClient.get('/markers')
+    // Fetches markers from the backend and adds them to the map.
+    this.httpClient.get('/markers')
       .toPromise()
       .then((response) => {
         for (let key in response) {
-          // If the marker has a blob key - get its URL 
-          if (response[key].blobKey) {
-            this.getBlobFromKey(response[key].blobKey)
-              .then((blob) => {
-                const imageUrl = MapComponent.getUrlFromBlob(blob);
-                this.addMarkerForDisplay(response[key], imageUrl);
-              });
-          }
-          else {
-            this.addMarkerForDisplay(response[key]);
-          }
+          this.addMarkerForDisplay(response[key]);
         }
       });
   }
@@ -68,7 +58,7 @@ export class MapComponent implements OnInit {
 
   getBlobFromKey(blobKey) {
     return this.httpClient.get('/blob-service?' + 'blobAction=' + BlobAction.KEY_TO_BLOB + '&blob-key=' + blobKey, { responseType: 'blob' })
-    .toPromise();
+      .toPromise();
   }
 
   // Centers the map based on the user location if permission is granted.
@@ -118,7 +108,7 @@ export class MapComponent implements OnInit {
       next: data => {
         if (action == MarkerMode.CREATE) {
           marker.id = data.id;
-          marker.userId = {value: data.userId};
+          marker.userId = { value: data.userId };
           this.addMarkerForDisplay(marker);
         }
       },
@@ -174,51 +164,52 @@ export class MapComponent implements OnInit {
         blobKey: event.blobKey
       };
       this.postMarker(newMarker, MarkerMode.CREATE);
-
-      // Get the image URL from the blob key so we can add the new marker for display
-      if (newMarker.blobKey) {
-        this.getBlobFromKey(newMarker.blobKey)
-          .then((blob) => {
-            const imageUrl = MapComponent.getUrlFromBlob(blob)
-            this.addMarkerForDisplay(newMarker, imageUrl)
-            this.editableMarker.setMap(null);
-          });
-      }
-      else {
-        this.editableMarker.setMap(null);
-      }
+      this.editableMarker.setMap(null);
     });
 
     return infoWindowComponent.location.nativeElement;
   }
 
-  // Builds display info window of a marker
-  addMarkerForDisplay(marker, imageUrl?) {
+  // Displays a marker on the map
+  addMarkerForDisplay(marker) {
 
     const markerForDisplay = new google.maps.Marker({
       map: this.gMap,
       position: new google.maps.LatLng(marker.lat, marker.lng)
     });
 
-    const markersInfoWindow = new google.maps.InfoWindow();
-
     google.maps.event.addListener(markerForDisplay, 'click', () => {
-      const infoWindowComponent = this.buildDisplayInfoWindowComponent(marker, imageUrl);
-      markersInfoWindow.setContent(infoWindowComponent.location.nativeElement);
-      markersInfoWindow.open(this.gMap, markerForDisplay);
+      if (marker.blobKey) {
+        this.getBlobFromKey(marker.blobKey)
+          .then((blob) => {
+            const imageUrl = MapComponent.getUrlFromBlob(blob);
+            this.generateInfoWindow(markerForDisplay, marker, imageUrl);
+          });
+      }
+      else {
+        this.generateInfoWindow(markerForDisplay, marker);
+      }
+    });
+  }
 
-      infoWindowComponent.instance.deleteEvent.subscribe(event =>
-        this.deleteMarker(marker, markerForDisplay));
-  
-      infoWindowComponent.instance.updateEvent.subscribe(event => {
-        markersInfoWindow.setContent(this.buildUpdateInfoWindowHtmlElment(marker, infoWindowComponent));
-        markersInfoWindow.open(this.gMap, markerForDisplay);
-      });
+  // Creates an info window to be displayed after user clicks the marker
+  generateInfoWindow(markerForDisplay, marker, imageUrl?) {
+    const markersInfoWindow = new google.maps.InfoWindow();
+    const infoWindowComponent = this.buildDisplayInfoWindowComponent(marker, imageUrl);
+    markersInfoWindow.setContent(infoWindowComponent.location.nativeElement);
+    markersInfoWindow.open(this.gMap, markerForDisplay);
+
+    infoWindowComponent.instance.deleteEvent.subscribe(event =>
+      this.deleteMarker(marker, markerForDisplay));
+
+    infoWindowComponent.instance.updateEvent.subscribe(event => {
+      markersInfoWindow.setContent(this.buildUpdateInfoWindowHtmlElment(marker, infoWindowComponent));
+      markersInfoWindow.open(this.gMap, markerForDisplay);
     });
   }
 
   // Creates the info window component for display of marker
-  buildDisplayInfoWindowComponent(marker, imageUrl) {
+  buildDisplayInfoWindowComponent(marker, imageUrl?) {
     const infoWindowComponent = this.factory.create(this.injector);
     infoWindowComponent.instance.animal = marker.animal;
     infoWindowComponent.instance.description = marker.description;
