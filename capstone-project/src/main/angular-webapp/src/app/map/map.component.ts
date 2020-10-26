@@ -19,7 +19,7 @@ export class MapComponent implements OnInit {
     private componentFactoryResolver: ComponentFactoryResolver,
     private injector: Injector,
     private userService: UserService,
-    private toastService : ToastService) { }
+    private toastService: ToastService) { }
 
   // Editable marker that displays when a user clicks on the map.
   private editableMarker: google.maps.Marker;
