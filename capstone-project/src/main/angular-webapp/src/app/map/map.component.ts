@@ -6,6 +6,7 @@ import { MarkerMode } from '../marker-mode';
 import { UserService } from '../user.service'
 import { SocialUser } from 'angularx-social-login';
 import { BlobAction } from '../blob-action';
+import { ToastService } from '../toast.service';
 
 @Component({
   selector: 'app-map',
@@ -17,7 +18,8 @@ export class MapComponent implements OnInit {
   constructor(private httpClient: HttpClient,
     private componentFactoryResolver: ComponentFactoryResolver,
     private injector: Injector,
-    private userService: UserService) { }
+    private userService: UserService,
+    private toastService: ToastService) { }
 
   // Editable marker that displays when a user clicks on the map.
   private editableMarker: google.maps.Marker;
@@ -25,6 +27,7 @@ export class MapComponent implements OnInit {
   private gMap: google.maps.Map;
 
   ngOnInit(): void {
+
     // Define the map.
     const googleMapOption = {
       zoom: 4,
@@ -75,24 +78,30 @@ export class MapComponent implements OnInit {
         this.gMap.setZoom(14);
       },
         () => {
-          MapComponent.handleLocationError(true);
+          this.handleLocationError(true);
         }
       );
     }
 
     // Browser doesn't support Geolocation
     else {
-      MapComponent.handleLocationError(false);
+      this.handleLocationError(false);
     }
   }
 
   // Alerts the user if the location process failed.
-  static handleLocationError(broswerHasGeolocation: boolean) {
+  handleLocationError(broswerHasGeolocation: boolean) {
     if (broswerHasGeolocation) {
-      window.alert("Geolocation service failed. Please grant the browser permission to locate you.")
+      this.toastService.showToast(document.getElementById("ej2Toast"), {
+        title: "Geolocation Service Failed",
+        content: "Please grant the browser permission to locate you."
+      });
     }
     else {
-      window.alert("Browser doesn't support Geolocation.")
+      this.toastService.showToast(document.getElementById("ej2Toast"), {
+        title: "Geolocation Service Failed",
+        content: "Browser doesn't support Geolocation."
+      });
     }
   }
 
