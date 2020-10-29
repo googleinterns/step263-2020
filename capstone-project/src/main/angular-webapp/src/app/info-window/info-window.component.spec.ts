@@ -66,5 +66,3 @@ describe('InfoWindowComponent', () => {
     expect(component.cancelEvent.emit).toHaveBeenCalled();
   });
 });
-
-
