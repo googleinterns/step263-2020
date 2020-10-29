@@ -30,7 +30,7 @@ describe('InfoWindowComponent', () => {
 
     fixture.detectChanges();
 
-    expect(component.submitEvent.emit).toHaveBeenCalled();
+    expect(component.submitEvent.emit).toHaveBeenCalledWith({animal: "animal", description: "description", reporter: "reporter", blobKey: component.blobKeyValue });
   });
 
   it('Should emit on delete', () => {
