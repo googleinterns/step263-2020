@@ -1,9 +1,38 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { HttpClient, HttpHandler } from '@angular/common/http';
+import { HttpClient, HttpClientModule, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpResponse, HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import 'jasmine';
 
 import { InfoWindowComponent } from './info-window.component';
+import { Injectable, Injector } from '@angular/core';
+import { Observable } from 'rxjs';
+import { BlobAction } from '../blob-action';
+import { of } from 'rxjs/internal/observable/of';
+
+@Injectable()
+export class MockInterceptor implements HttpInterceptor {
+
+  private responseUrl = {
+    imageUrl: "imageUrl"
+  }
+  private responseKey = {
+    blobKey: "blobKey"
+  }
+
+  constructor(private injector: Injector) { }
+
+  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+  
+    if (req.method === "GET" && req.url === '/blob-service?blobAction=' + BlobAction.GET_URL) {
+      return of(new HttpResponse({ status: 200, body: this.responseUrl }));
+    }
+    else if (req.method === "POST" && req.url === this.responseUrl.imageUrl) {
+      return of(new HttpResponse({ status: 200, body: this.responseKey }));
+    }
+
+    next.handle(req);
+  }
+}
 
 describe('InfoWindowComponent', () => {
   let component: InfoWindowComponent;
@@ -12,7 +41,12 @@ describe('InfoWindowComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [InfoWindowComponent],
-      providers: [HttpClient, HttpHandler]
+      imports: [HttpClientModule],
+      providers: [{
+        provide: HTTP_INTERCEPTORS,
+        useClass: MockInterceptor,
+        multi: true
+      }]
     });
     fixture = TestBed.createComponent(InfoWindowComponent);
     component = fixture.componentInstance;
@@ -30,7 +64,7 @@ describe('InfoWindowComponent', () => {
 
     fixture.detectChanges();
 
-    expect(component.submitEvent.emit).toHaveBeenCalledWith({animal: "animal", description: "description", reporter: "reporter", blobKey: component.blobKeyValue });
+    expect(component.submitEvent.emit).toHaveBeenCalledWith({ animal: "animal", description: "description", reporter: "reporter", blobKey: component.blobKeyValue });
   });
 
   it('Should emit on delete', () => {
@@ -65,4 +99,18 @@ describe('InfoWindowComponent', () => {
 
     expect(component.cancelEvent.emit).toHaveBeenCalled();
   });
+
+  it('Should post the file to the backend', () => {
+    const fileList: FileList = {
+      length: 1,
+      item(index: number): File {
+        return fileList[index];
+      }
+    };
+    fileList[0] = new File(["file data"], "file.txt");
+    component.postFile(fileList)
+    expect(component.blobKeyValue).toBe("blobKey");
+  })
+
+
 });
