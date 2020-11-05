@@ -28,13 +28,18 @@ export class InfoWindowComponent implements OnInit {
   @Output() cancelEvent = new EventEmitter();
 
   MarkerMode = MarkerMode; // Setting a variable because the HTML template needs it in order to recognize the MarkerAction enum.
-  public blobKeyValue : string;
+  private blobKeyValue : string;
   isUploading = false; // A flag to avoid submitting a report before the image processing is finished.
 
   constructor(private httpClient: HttpClient, public domSanitizer: DomSanitizer, private userService: UserService) { }
 
   ngOnInit(): void { 
     this.blobKeyValue = this.originalBlobKey;
+  }
+
+  // Getter for blobKeyValue
+  getBlobKeyValue() {
+    return this.blobKeyValue;
   }
 
   // Update the fields according to user input and emit the submitEvent to receive the data in mapComponenet

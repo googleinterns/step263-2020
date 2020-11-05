@@ -67,7 +67,7 @@ describe('InfoWindowComponent', () => {
 
     fixture.detectChanges();
 
-    expect(component.submitEvent.emit).toHaveBeenCalledWith({ animal: "animal", description: "description", reporter: "reporter", blobKey: component.blobKeyValue });
+    expect(component.submitEvent.emit).toHaveBeenCalledWith({animal: "animal", description: "description", reporter: "reporter", blobKey: component.getBlobKeyValue() });
   });
 
   it('Should emit on delete', () => {
@@ -126,6 +126,6 @@ describe('InfoWindowComponent', () => {
 
     await component.postFile(fileList)
   
-    expect(component.blobKeyValue).toBe("blobKey");
+    expect(component.getBlobKeyValue()).toBe("blobKey");
   })
 });
