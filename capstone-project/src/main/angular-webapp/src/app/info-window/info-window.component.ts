@@ -37,6 +37,11 @@ export class InfoWindowComponent implements OnInit {
     this.blobKeyValue = this.originalBlobKey;
   }
 
+  // Getter for blobKeyValue
+  getBlobKeyValue() {
+    return this.blobKeyValue;
+  }
+
   // Update the fields according to user input and emit the submitEvent to receive the data in mapComponenet
   submit(animalValue, descriptionValue, reporterValue) {
     this.animal = animalValue;
