@@ -152,7 +152,6 @@ describe('InfoWindowComponent', () => {
     const dummyElement = fixture.debugElement.nativeElement.querySelector('#file-name');
     spyOn(document, "getElementById").and.returnValue(dummyElement);
 
-
     component.originalBlobKey = "originalKey";
     component.postFile(fileList);
 
