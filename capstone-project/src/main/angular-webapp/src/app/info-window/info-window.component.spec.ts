@@ -4,15 +4,17 @@ import { HttpClientModule, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest,
 import 'jasmine';
 
 import { InfoWindowComponent } from './info-window.component';
-import { Injectable, Injector } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { BlobAction } from '../blob-action';
 import { of } from 'rxjs/internal/observable/of';
 import { MarkerMode } from '../marker-mode';
+import { UserService } from "../user.service";
+import { SocialUser } from 'angularx-social-login';
 
 // Mock the HttpClient's interceptor so that HTTP requests are handled locally and not in the real back end.
 @Injectable()
-export class MockInterceptor implements HttpInterceptor {
+class MockInterceptor implements HttpInterceptor {
 
   private responseUrl = {
     imageUrl: "imageUrl"
@@ -40,6 +42,7 @@ export class MockInterceptor implements HttpInterceptor {
 describe('InfoWindowComponent', () => {
   let component: InfoWindowComponent;
   let fixture: ComponentFixture<InfoWindowComponent>;
+  let userService: UserService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -53,6 +56,7 @@ describe('InfoWindowComponent', () => {
     });
     fixture = TestBed.createComponent(InfoWindowComponent);
     component = fixture.componentInstance;
+    userService = new UserService();
   });
 
   it('Should create an infoWindowComponent instance', () => {
@@ -172,5 +176,13 @@ describe('InfoWindowComponent', () => {
     expect(component.originalBlobKey).toBe("");
     expect(component.imageUrl).toBe("");
     expect(dummyEvent.target.disabled).toBe(true);
+  });
+
+  it('Should return the logged in user', () => {
+
+    const user = new SocialUser();
+    user.firstName = "user";
+    spyOn(userService, 'getUser').and.returnValue(user);
+    expect(component.user.firstName).toBe("user");
   });
 });
