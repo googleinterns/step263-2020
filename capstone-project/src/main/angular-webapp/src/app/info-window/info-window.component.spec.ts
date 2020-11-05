@@ -59,6 +59,13 @@ describe('InfoWindowComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('Should initialize blobKeyValue with the original blob key', () => {
+
+    component.originalBlobKey = "originalKey";
+    component.ngOnInit();
+    expect(component.getBlobKeyValue()).toBe("originalKey");
+  });
+
   it('Should emit on submit', () => {
 
     spyOn(component.submitEvent, 'emit');
@@ -67,7 +74,7 @@ describe('InfoWindowComponent', () => {
 
     fixture.detectChanges();
 
-    expect(component.submitEvent.emit).toHaveBeenCalledWith({animal: "animal", description: "description", reporter: "reporter", blobKey: component.getBlobKeyValue() });
+    expect(component.submitEvent.emit).toHaveBeenCalledWith({ animal: "animal", description: "description", reporter: "reporter", blobKey: component.getBlobKeyValue() });
   });
 
   it('Should emit on delete', () => {
@@ -119,13 +126,52 @@ describe('InfoWindowComponent', () => {
     fileList[0] = new File(["file data"], "file.txt");
 
     // Mock the document.getElementById function to avoid accessing the tests page's document instead of the component's document
-    var dummyElement = fixture.debugElement.nativeElement.querySelector('#file-name');
-    spyOn(document, "getElementById").and.callFake(function () {
-      return dummyElement;
-    });
+    const dummyElement = fixture.debugElement.nativeElement.querySelector('#file-name');
+    spyOn(document, "getElementById").and.returnValue(dummyElement);
 
     await component.postFile(fileList)
-  
+
     expect(component.getBlobKeyValue()).toBe("blobKey");
-  })
+  });
+
+  it('Should remove the file selected and set blobKeyValue to the original blob key', () => {
+
+    // Create an instance of type 'create' so that it has the 'file-name' element
+    component.type = MarkerMode.CREATE;
+    fixture.detectChanges();
+
+    // Create an empty files list
+    const fileList: FileList = {
+      length: 1,
+      item(index: number): File {
+        return fileList[index];
+      }
+    };
+
+    // Mock the document.getElementById function to avoid accessing the tests page's document instead of the component's document
+    const dummyElement = fixture.debugElement.nativeElement.querySelector('#file-name');
+    spyOn(document, "getElementById").and.returnValue(dummyElement);
+
+
+    component.originalBlobKey = "originalKey";
+    component.postFile(fileList);
+
+    expect(component.getBlobKeyValue()).toBe("originalKey");
+  });
+
+  it('Should remove the image of the report', () => {
+
+    const dummyEvent = {
+      target: {
+        disabled: false
+      }
+    };
+
+    component.removeImage(dummyEvent);
+
+    expect(component.getBlobKeyValue()).toBe("");
+    expect(component.originalBlobKey).toBe("");
+    expect(component.imageUrl).toBe("");
+    expect(dummyEvent.target.disabled).toBe(true);
+  });
 });
