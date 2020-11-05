@@ -72,7 +72,7 @@ describe('AuthenticationComponent', () => {
   });
 
   it('should set user to googleUser on sign in button click', async () => {
-    // Setting user to undefiend so sign out button will be displayed
+    // Setting user to null so sign out button will be displayed
     component.getUserService().setUser(null);
     fixture.detectChanges();
 
