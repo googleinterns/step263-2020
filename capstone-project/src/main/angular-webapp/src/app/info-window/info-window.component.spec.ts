@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { HttpClient, HttpClientModule, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpResponse, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HttpClientModule, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpResponse, HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import 'jasmine';
 
@@ -8,7 +8,9 @@ import { Injectable, Injector } from '@angular/core';
 import { Observable } from 'rxjs';
 import { BlobAction } from '../blob-action';
 import { of } from 'rxjs/internal/observable/of';
+import { MarkerMode } from '../marker-mode';
 
+// Mock the HttpClient's interceptor so that HTTP requests are handled locally and not in the real back end.
 @Injectable()
 export class MockInterceptor implements HttpInterceptor {
 
@@ -19,10 +21,11 @@ export class MockInterceptor implements HttpInterceptor {
     blobKey: "blobKey"
   }
 
-  constructor(private injector: Injector) { }
+  constructor() { }
 
+  // Handles get / post requests
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-  
+
     if (req.method === "GET" && req.url === '/blob-service?blobAction=' + BlobAction.GET_URL) {
       return of(new HttpResponse({ status: 200, body: this.responseUrl }));
     }
@@ -81,7 +84,7 @@ describe('InfoWindowComponent', () => {
   it('Should emit on update', () => {
 
     spyOn(component.updateEvent, 'emit');
-    // trigger the update event
+    // Trigger the update event
     component.update();
 
     fixture.detectChanges();
@@ -92,7 +95,7 @@ describe('InfoWindowComponent', () => {
   it('Should emit on cancel', () => {
 
     spyOn(component.cancelEvent, 'emit');
-    // trigger the cancel event
+    // Trigger the cancel event
     component.cancel();
 
     fixture.detectChanges();
@@ -100,7 +103,13 @@ describe('InfoWindowComponent', () => {
     expect(component.cancelEvent.emit).toHaveBeenCalled();
   });
 
-  it('Should post the file to the backend', () => {
+  it('Should post the file that was uploaded', async () => {
+
+    // Create an instance of type 'create' so that it has the 'file-name' element
+    component.type = MarkerMode.CREATE;
+    fixture.detectChanges();
+
+    // Create a file to post
     const fileList: FileList = {
       length: 1,
       item(index: number): File {
@@ -108,9 +117,15 @@ describe('InfoWindowComponent', () => {
       }
     };
     fileList[0] = new File(["file data"], "file.txt");
-    component.postFile(fileList)
+
+    // Mock the document.getElementById function to avoid accessing the tests page's document instead of the component's document
+    var dummyElement = fixture.debugElement.nativeElement.querySelector('#file-name');
+    spyOn(document, "getElementById").and.callFake(function () {
+      return dummyElement;
+    });
+
+    await component.postFile(fileList)
+  
     expect(component.blobKeyValue).toBe("blobKey");
   })
-
-
 });
