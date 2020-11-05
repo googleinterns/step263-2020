@@ -12,7 +12,7 @@ import { MarkerMode } from '../marker-mode';
 
 // Mock the HttpClient's interceptor so that HTTP requests are handled locally and not in the real back end.
 @Injectable()
-export class MockInterceptor implements HttpInterceptor {
+class MockInterceptor implements HttpInterceptor {
 
   private responseUrl = {
     imageUrl: "imageUrl"
@@ -159,7 +159,6 @@ describe('InfoWindowComponent', () => {
   });
 
   it('Should remove the image of the report', () => {
-
     const dummyEvent = {
       target: {
         disabled: false
