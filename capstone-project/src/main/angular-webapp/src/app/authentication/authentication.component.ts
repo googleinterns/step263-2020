@@ -26,6 +26,11 @@ export class AuthenticationComponent implements OnInit {
   // Sign out user and reload page
   signOut(): void {
     this.authService.signOut();
+    AuthenticationComponent.reloadWindow();
+  }
+
+  // Reloads the window
+  static reloadWindow(): void {
     window.location.reload();
   }
 
@@ -34,4 +39,8 @@ export class AuthenticationComponent implements OnInit {
     return this.userService.getUser();
   }
 
+  // Return the userService
+  getUserService() {
+    return this.userService;
+  }
 }
