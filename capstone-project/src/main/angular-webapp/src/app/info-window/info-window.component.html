@@ -15,10 +15,10 @@
             <br>
         </div>
         <div *ngIf="type==MarkerMode.USER_VIEW">
-            <button mat-stroked-button (click)="delete()" style="float: left;">
+            <button id="deleteButton" mat-stroked-button (click)="delete()" style="float: left;">
                 <mat-icon>delete</mat-icon>
             </button>
-            <button mat-stroked-button (click)="update()" style="float: right;">
+            <button id="updateButton" mat-stroked-button (click)="update()" style="float: right;">
                 <mat-icon>edit</mat-icon>
             </button>
         </div>
@@ -46,7 +46,7 @@
                 <p id="file-name">
             </form>
             <br>
-            <button mat-stroked-button style="float: right;" [disabled]="isUploading" (click)="submit(inputAnimal.value, inputDescription.value, inputReporter.value)">
+            <button id="submitButton" mat-stroked-button style="float: right;" [disabled]="isUploading" (click)="submit(inputAnimal.value, inputDescription.value, inputReporter.value)">
                 <mat-icon>done</mat-icon>
             </button>
             <br>
@@ -64,7 +64,7 @@
                 <p id="file-name">
             </form>
             <br>
-            <button mat-stroked-button style="float: right;" [disabled]="isUploading" (click)="submit(inputAnimal.value, inputDescription.value, inputReporterUser.value)">
+            <button id="submitButton" mat-stroked-button style="float: right;" [disabled]="isUploading" (click)="submit(inputAnimal.value, inputDescription.value, inputReporterUser.value)">
                 <mat-icon>done</mat-icon>
             </button>
             <br>
@@ -94,7 +94,7 @@
                 <p id="file-name">
             </form>
             <br>
-            <button mat-stroked-button (click)="removeImage($event)">Remove Image</button><br>
+            <button id="removeButton" mat-stroked-button (click)="removeImage($event)">Remove Image</button><br>
             <br>
         </div>
         <div *ngIf="!imageUrl">
@@ -107,10 +107,10 @@
                 <p id="file-name">
             </form>
         </div>
-        <button mat-stroked-button style="float: left;" (click)="cancel()">
+        <button id="cancelButton" mat-stroked-button style="float: left;" (click)="cancel()">
             <mat-icon>close</mat-icon>
         </button>
-        <button mat-stroked-button style="float: right;" (click)="submit(inputAnimal.value, inputDescription.value, inputReporter.value)">
+        <button od="submitButton" mat-stroked-button style="float: right;" (click)="submit(inputAnimal.value, inputDescription.value, inputReporter.value)">
             <mat-icon>done</mat-icon>
         </button>
         <br>

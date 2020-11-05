@@ -4,7 +4,7 @@ import { HttpClientModule, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest,
 import 'jasmine';
 
 import { InfoWindowComponent } from './info-window.component';
-import { Injectable, Injector } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { BlobAction } from '../blob-action';
 import { of } from 'rxjs/internal/observable/of';
@@ -68,44 +68,48 @@ describe('InfoWindowComponent', () => {
 
   it('Should emit on submit', () => {
 
-    spyOn(component.submitEvent, 'emit');
-    // Trigger the submit event
-    component.submit("animal", "description", "reporter");
-
+    component.type = MarkerMode.CREATE;
     fixture.detectChanges();
+    spyOn(component.submitEvent, 'emit');
+    
+    // Trigger the submit event
+    fixture.debugElement.nativeElement.querySelector('#submitButton').click();
 
-    expect(component.submitEvent.emit).toHaveBeenCalledWith({ animal: "animal", description: "description", reporter: "reporter", blobKey: component.getBlobKeyValue() });
+    expect(component.submitEvent.emit).toHaveBeenCalled();
   });
 
   it('Should emit on delete', () => {
 
-    spyOn(component.deleteEvent, 'emit');
-    // Trigger the delete event
-    component.delete();
-
+    component.type = MarkerMode.USER_VIEW;
     fixture.detectChanges();
+    spyOn(component.deleteEvent, 'emit');
+
+    // Trigger the delete event
+    fixture.debugElement.nativeElement.querySelector('#deleteButton').click();
 
     expect(component.deleteEvent.emit).toHaveBeenCalled();
   });
 
   it('Should emit on update', () => {
 
-    spyOn(component.updateEvent, 'emit');
-    // Trigger the update event
-    component.update();
-
+    component.type = MarkerMode.USER_VIEW;
     fixture.detectChanges();
+    spyOn(component.updateEvent, 'emit');
+
+    // Trigger the update event
+    fixture.debugElement.nativeElement.querySelector('#updateButton').click();
 
     expect(component.updateEvent.emit).toHaveBeenCalled();
   });
 
   it('Should emit on cancel', () => {
 
-    spyOn(component.cancelEvent, 'emit');
-    // Trigger the cancel event
-    component.cancel();
-
+    component.type = MarkerMode.UPDATE;
     fixture.detectChanges();
+    spyOn(component.cancelEvent, 'emit');
+
+    // Trigger the cancel event
+    fixture.debugElement.nativeElement.querySelector('#cancelButton').click();
 
     expect(component.cancelEvent.emit).toHaveBeenCalled();
   });
