@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import {DomSanitizer, SafeUrl} from '@angular/platform-browser'
+import { DomSanitizer } from '@angular/platform-browser'
 import { MarkerMode } from '../marker-mode';
 import { BlobAction } from '../blob-action';
 import { HttpClient } from '@angular/common/http';
@@ -40,6 +40,11 @@ export class InfoWindowComponent implements OnInit {
   // Getter for blobKeyValue
   getBlobKeyValue() {
     return this.blobKeyValue;
+  }
+
+  // Getter for userService
+  getUserService() {
+    return this.userService;
   }
 
   // Update the fields according to user input and emit the submitEvent to receive the data in mapComponenet
