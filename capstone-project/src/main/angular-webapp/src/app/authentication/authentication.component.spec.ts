@@ -71,21 +71,21 @@ describe('AuthenticationComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should set user to googleUser on sign in button click', async () => {
+  it('should set user to googleUser on sign in button click', () => {
     // Setting user to null so sign out button will be displayed
     component.getUserService().setUser(null);
     fixture.detectChanges();
 
-    await fixture.debugElement.nativeElement.querySelector('#signin-button').click();
+    fixture.debugElement.nativeElement.querySelector('#signin-button').click();
     expect(component.user).toEqual(MockSocialAuthService.googleUser);
   });
 
-  it('should set user to null on sign out button click', async () => {
+  it('should set user to null on sign out button click', () => {
     // Setting user to googleUser so sign out button will be displayed
     component.getUserService().setUser(MockSocialAuthService.googleUser);
     fixture.detectChanges();
 
-    await fixture.debugElement.nativeElement.querySelector('#signout-button').click();
+    fixture.debugElement.nativeElement.querySelector('#signout-button').click();
     expect(component.user).toEqual(null);
   });
 
