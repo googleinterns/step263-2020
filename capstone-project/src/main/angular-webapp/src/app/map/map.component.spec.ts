@@ -14,22 +14,9 @@ class MockToastService {
   }
 }
 
-// class MockGeolocation {
-
-//   getCurrentPosition() {
-//     return new google.maps.LatLng(25, 80);
-//   }
-
-//   clearWatch() {}
-  
-//   watchPosition(number) { return 1 }
-
-// }
-
 describe('MapComponent', () => {
   let component: MapComponent;
   let fixture: ComponentFixture<MapComponent>;
-  // let mockGeolocation: MockGeolocation
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -46,7 +33,6 @@ describe('MapComponent', () => {
     });
     fixture = TestBed.createComponent(MapComponent);
     component = fixture.componentInstance;
-    // global.navigator = { geolocation: mockGeolocation }
     fixture.detectChanges();
   });
 
