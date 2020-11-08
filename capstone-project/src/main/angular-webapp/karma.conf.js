@@ -28,6 +28,10 @@ module.exports = function(config) {
         browsers: ['Chrome'],
         singleRun: false,
         restartOnFileChange: true,
-        webpack: { node: { fs: 'empty', } }
+        webpack: { node: { fs: 'empty', } },
+        files:[
+          "maps.googleapis.com/maps/api/js?key=API-KEY",
+          "src/app/tests/maps.google.mock.js"
+          ]
     });
 };
