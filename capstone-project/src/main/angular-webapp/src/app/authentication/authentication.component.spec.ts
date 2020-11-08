@@ -72,8 +72,8 @@ describe('AuthenticationComponent', () => {
   });
 
   it('should set user to googleUser on sign in button click', () => {
-    // Setting user to null so sign out button will be displayed
-    component.getUserService().setUser(null);
+    // Signing out the user sign out button will be displayed
+    component.signOut();
     fixture.detectChanges();
 
     fixture.debugElement.nativeElement.querySelector('#signin-button').click();
@@ -81,8 +81,8 @@ describe('AuthenticationComponent', () => {
   });
 
   it('should set user to null on sign out button click', () => {
-    // Setting user to googleUser so sign out button will be displayed
-    component.getUserService().setUser(MockSocialAuthService.googleUser);
+    // Signing in the user so sign out button will be displayed
+    component.signInWithGoogle();
     fixture.detectChanges();
 
     fixture.debugElement.nativeElement.querySelector('#signout-button').click();
