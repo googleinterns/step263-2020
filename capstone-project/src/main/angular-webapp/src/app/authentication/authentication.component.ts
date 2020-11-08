@@ -38,9 +38,4 @@ export class AuthenticationComponent implements OnInit {
   get user(): SocialUser {
     return this.userService.getUser();
   }
-
-  // Return the userService
-  getUserService() {
-    return this.userService;
-  }
 }
