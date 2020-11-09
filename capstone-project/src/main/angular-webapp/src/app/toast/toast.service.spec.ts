@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { Toast } from '@syncfusion/ej2-angular-notifications';
 
 import { ToastService } from './toast.service';
 
@@ -20,27 +21,34 @@ describe('ToastService', () => {
 
     service.createToast(htmlElement, model);
 
-    expect(service.getToastInstance().content).toBe("content");
+    expect(service['toastInstance'].content).toBe("content");
   });
 
   it('Should show toast when toastInstance is defined', () => {
     const htmlElement = document.createElement("div");
     const model = {title: "title", content: "content"};
     service.createToast(htmlElement, model);
-    spyOn(service.getToastInstance(), 'show');
+    spyOn(service['toastInstance'], 'show');
 
     service.showToast(htmlElement, model);
 
-    expect(service.getToastInstance().show).toHaveBeenCalled();
+    expect(service['toastInstance'].show).toHaveBeenCalled();
   });
 
   it('Should show toast when toastInstance is not defined', () => {
+
+    // Create a Toast instance so we can spy on its show method
+    const toast = new Toast();
+    // Use the instance we created to initialize the service's toastInstance
+    spyOn(service, 'createToast').and.callFake(() => {
+      service["toastInstance"] = toast;
+    });
+    spyOn(toast, 'show');
     const htmlElement = document.createElement("div");
     const model = {title: "title", content: "content"};
 
     service.showToast(htmlElement, model);
 
-    expect(service.getToastInstance().content).toBe("content");
-
+    expect(toast.show).toHaveBeenCalled();
   });
 });

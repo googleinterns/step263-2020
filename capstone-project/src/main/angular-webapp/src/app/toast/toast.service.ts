@@ -6,11 +6,6 @@ export class ToastService {
 
   constructor() { }
 
-  // Getter for toastInstance
-  getToastInstance() {
-    return this.toastInstance;
-  }
-
   // Create a new Toast component
   createToast(element: HTMLElement, model: ToastModel) {
     this.toastInstance = new Toast(model, element);
