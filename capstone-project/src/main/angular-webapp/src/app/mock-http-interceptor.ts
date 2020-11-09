@@ -7,10 +7,10 @@ import { BlobAction } from "./blob-action";
 @Injectable()
 export class MockHttpInterceptor implements HttpInterceptor {
 
-  private responseUrl = {
+  private static responseUrl = {
     imageUrl: "imageUrl"
   }
-  private responseKey = {
+  private static responseKey = {
     blobKey: "blobKey"
   }
 
@@ -20,10 +20,10 @@ export class MockHttpInterceptor implements HttpInterceptor {
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
 
     if (req.method === "GET" && req.url === '/blob-service?blobAction=' + BlobAction.GET_URL) {
-      return of(new HttpResponse({ status: 200, body: this.responseUrl }));
+      return of(new HttpResponse({ status: 200, body: MockHttpInterceptor.responseUrl }));
     }
-    else if (req.method === "POST" && req.url === this.responseUrl.imageUrl) {
-      return of(new HttpResponse({ status: 200, body: this.responseKey }));
+    else if (req.method === "POST" && req.url === MockHttpInterceptor.responseUrl.imageUrl) {
+      return of(new HttpResponse({ status: 200, body: MockHttpInterceptor.responseKey }));
     }
 
     next.handle(req);
