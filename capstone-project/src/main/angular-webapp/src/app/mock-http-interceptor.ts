@@ -5,25 +5,35 @@ import { BlobAction } from "./blob-action";
 
 // Mock the HttpClient's interceptor so that HTTP requests are handled locally and not in the real back end.
 @Injectable()
-export class MockInterceptor implements HttpInterceptor {
+export class MockHttpInterceptor implements HttpInterceptor {
 
-  private responseUrl = {
+  private static responseUrl = {
     imageUrl: "imageUrl"
   }
-  private responseKey = {
+  private static responseKey = {
     blobKey: "blobKey"
   }
 
   constructor() { }
 
+  // Getter for responseUrl
+  static getResponseUrl() {
+    return MockHttpInterceptor.responseUrl.imageUrl;
+  }
+
+  // Getter for responseKey
+  static getResponseKey() {
+    return MockHttpInterceptor.responseKey.blobKey;
+  }
+
   // Handles get / post requests
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
 
     if (req.method === "GET" && req.url === '/blob-service?blobAction=' + BlobAction.GET_URL) {
-      return of(new HttpResponse({ status: 200, body: this.responseUrl }));
+      return of(new HttpResponse({ status: 200, body: MockHttpInterceptor.responseUrl }));
     }
-    else if (req.method === "POST" && req.url === this.responseUrl.imageUrl) {
-      return of(new HttpResponse({ status: 200, body: this.responseKey }));
+    else if (req.method === "POST" && req.url === MockHttpInterceptor.responseUrl.imageUrl) {
+      return of(new HttpResponse({ status: 200, body: MockHttpInterceptor.responseKey }));
     }
 
     next.handle(req);

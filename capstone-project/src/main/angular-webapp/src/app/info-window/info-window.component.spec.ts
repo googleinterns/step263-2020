@@ -5,7 +5,7 @@ import 'jasmine';
 
 import { InfoWindowComponent } from './info-window.component';
 import { MarkerMode } from '../marker-mode';
-import { MockInterceptor } from '../mock-interceptor'
+import { MockHttpInterceptor } from '../mock-http-interceptor'
 import { UserService } from '../user.service';
 import { SocialUser } from 'angularx-social-login';
 
@@ -20,7 +20,7 @@ describe('InfoWindowComponent', () => {
       imports: [HttpClientModule],
       providers: [{
         provide: HTTP_INTERCEPTORS,
-        useClass: MockInterceptor,
+        useClass: MockHttpInterceptor,
         multi: true
       }]
     });
@@ -109,7 +109,7 @@ describe('InfoWindowComponent', () => {
 
     await component.postFile(fileList)
 
-    expect(component.getBlobKeyValue()).toBe("blobKey");
+    expect(component.getBlobKeyValue()).toBe(MockHttpInterceptor.getResponseKey());
   });
 
   it('Should remove the file selected and set blobKeyValue to the original blob key', () => {
