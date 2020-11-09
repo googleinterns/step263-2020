@@ -1,9 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { HttpClient, HttpHandler } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import 'jasmine';
 
 import { InfoWindowComponent } from './info-window.component';
+import { MarkerMode } from '../marker-mode';
+import { MockHttpInterceptor } from '../mock-http-interceptor'
 
 describe('InfoWindowComponent', () => {
   let component: InfoWindowComponent;
@@ -12,7 +14,12 @@ describe('InfoWindowComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [InfoWindowComponent],
-      providers: [HttpClient, HttpHandler]
+      imports: [HttpClientModule],
+      providers: [{
+        provide: HTTP_INTERCEPTORS,
+        useClass: MockHttpInterceptor,
+        multi: true
+      }]
     });
     fixture = TestBed.createComponent(InfoWindowComponent);
     component = fixture.componentInstance;
@@ -22,47 +29,113 @@ describe('InfoWindowComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('Should initialize blobKeyValue with the original blob key', () => {
+
+    component.originalBlobKey = "originalKey";
+    component.ngOnInit();
+    expect(component.getBlobKeyValue()).toBe("originalKey");
+  });
+
   it('Should emit on submit', () => {
 
-    spyOn(component.submitEvent, 'emit');
-    // Trigger the submit event
-    component.submit("animal", "description", "reporter");
-
+    component.type = MarkerMode.CREATE;
     fixture.detectChanges();
+    spyOn(component.submitEvent, 'emit');
+    
+    // Trigger the submit event
+    fixture.debugElement.nativeElement.querySelector('#submitButton').click();
 
-    expect(component.submitEvent.emit).toHaveBeenCalledWith({animal: "animal", description: "description", reporter: "reporter", blobKey: component.getBlobKeyValue() });
+    expect(component.submitEvent.emit).toHaveBeenCalled();
   });
 
   it('Should emit on delete', () => {
 
-    spyOn(component.deleteEvent, 'emit');
-    // Trigger the delete event
-    component.delete();
-
+    component.type = MarkerMode.USER_VIEW;
     fixture.detectChanges();
+    spyOn(component.deleteEvent, 'emit');
+
+    // Trigger the delete event
+    fixture.debugElement.nativeElement.querySelector('#deleteButton').click();
 
     expect(component.deleteEvent.emit).toHaveBeenCalled();
   });
 
   it('Should emit on update', () => {
 
-    spyOn(component.updateEvent, 'emit');
-    // trigger the update event
-    component.update();
-
+    component.type = MarkerMode.USER_VIEW;
     fixture.detectChanges();
+    spyOn(component.updateEvent, 'emit');
+
+    // Trigger the update event
+    fixture.debugElement.nativeElement.querySelector('#updateButton').click();
 
     expect(component.updateEvent.emit).toHaveBeenCalled();
   });
 
   it('Should emit on cancel', () => {
 
-    spyOn(component.cancelEvent, 'emit');
-    // trigger the cancel event
-    component.cancel();
-
+    component.type = MarkerMode.UPDATE;
     fixture.detectChanges();
+    spyOn(component.cancelEvent, 'emit');
+
+    // Trigger the cancel event
+    fixture.debugElement.nativeElement.querySelector('#cancelButton').click();
 
     expect(component.cancelEvent.emit).toHaveBeenCalled();
+  });
+
+  it('Should post the file that was uploaded', async () => {
+
+    // Create an instance of type 'create' so that it has the 'file-name' element
+    component.type = MarkerMode.CREATE;
+    fixture.detectChanges();
+
+    // Create a file to post
+    const fileList: FileList = {
+      length: 1,
+      item(index: number): File {
+        return fileList[index];
+      }
+    };
+    fileList[0] = new File(["file data"], "file.txt");
+
+    await component.postFile(fileList)
+
+    expect(component.getBlobKeyValue()).toBe(MockHttpInterceptor.getResponseKey());
+  });
+
+  it('Should remove the file selected and set blobKeyValue to the original blob key', () => {
+
+    // Create an instance of type 'create' so that it has the 'file-name' element
+    component.type = MarkerMode.CREATE;
+    fixture.detectChanges();
+
+    // Create an empty files list
+    const fileList: FileList = {
+      length: 1,
+      item(index: number): File {
+        return fileList[index];
+      }
+    };
+
+    component.originalBlobKey = "originalKey";
+    component.postFile(fileList);
+
+    expect(component.getBlobKeyValue()).toBe("originalKey");
+  });
+
+  it('Should remove the image of the report', () => {
+    const dummyEvent = {
+      target: {
+        disabled: false
+      }
+    };
+
+    component.removeImage(dummyEvent);
+
+    expect(component.getBlobKeyValue()).toBe("");
+    expect(component.originalBlobKey).toBe("");
+    expect(component.imageUrl).toBe("");
+    expect(dummyEvent.target.disabled).toBe(true);
   });
 });
