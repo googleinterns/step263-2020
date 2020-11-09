@@ -42,11 +42,6 @@ export class InfoWindowComponent implements OnInit {
     return this.blobKeyValue;
   }
 
-  // Getter for userService
-  getUserService() {
-    return this.userService;
-  }
-
   // Update the fields according to user input and emit the submitEvent to receive the data in mapComponenet
   submit(animalValue, descriptionValue, reporterValue) {
     this.animal = animalValue;

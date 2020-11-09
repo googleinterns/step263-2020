@@ -152,16 +152,15 @@ describe('InfoWindowComponent', () => {
   });
 
   it('Should return the logged in user', () => {
-
     const user = new SocialUser();
     user.firstName = "user";
-    spyOn(component.getUserService(), 'getUser').and.returnValue(user);
+    spyOn(component['userService'], 'getUser').and.returnValue(user);
 
     expect(component.user.firstName).toBe("user");
   });
 
   it ('Should return null when no user is logged in', () => {
-    spyOn(component.getUserService(), 'getUser').and.returnValue(null);
+    spyOn(component['userService'], 'getUser').and.returnValue(null);
     expect(component.user).toBe(null);
   });
 });
