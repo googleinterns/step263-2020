@@ -16,6 +16,16 @@ export class MockHttpInterceptor implements HttpInterceptor {
 
   constructor() { }
 
+  // Getter for responseUrl
+  static getResponseUrl() {
+    return MockHttpInterceptor.responseUrl.imageUrl;
+  }
+
+  // Getter for responseKey
+  static getResponseKey() {
+    return MockHttpInterceptor.responseKey.blobKey;
+  }
+
   // Handles get / post requests
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
 

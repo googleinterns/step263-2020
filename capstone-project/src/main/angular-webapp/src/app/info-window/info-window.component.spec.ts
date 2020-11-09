@@ -105,7 +105,7 @@ describe('InfoWindowComponent', () => {
 
     await component.postFile(fileList)
 
-    expect(component.getBlobKeyValue()).toBe("blobKey");
+    expect(component.getBlobKeyValue()).toBe(MockHttpInterceptor.getResponseKey());
   });
 
   it('Should remove the file selected and set blobKeyValue to the original blob key', () => {
