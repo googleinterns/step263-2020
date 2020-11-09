@@ -1,4 +1,3 @@
-import { TestBed } from '@angular/core/testing';
 import { Toast } from '@syncfusion/ej2-angular-notifications';
 
 import { ToastService } from './toast.service';
@@ -7,7 +6,6 @@ describe('ToastService', () => {
   let service: ToastService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
     service = new ToastService();
   });
 
@@ -21,6 +19,7 @@ describe('ToastService', () => {
 
     service.createToast(htmlElement, model);
 
+    expect(service['toastInstance'].title).toBe("title");
     expect(service['toastInstance'].content).toBe("content");
   });
 
