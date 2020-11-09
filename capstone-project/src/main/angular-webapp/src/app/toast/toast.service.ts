@@ -1,13 +1,15 @@
-import { Injectable } from '@angular/core';
 import { Toast, ToastModel } from '@syncfusion/ej2-notifications';
-
-@Injectable()
 
 // Displays Toast notifications
 export class ToastService {
   private toastInstance: Toast;
 
   constructor() { }
+
+  // Getter for toastInstance
+  getToastInstance() {
+    return this.toastInstance;
+  }
 
   // Create a new Toast component
   createToast(element: HTMLElement, model: ToastModel) {
