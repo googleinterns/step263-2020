@@ -5,7 +5,7 @@ import 'jasmine';
 
 import { InfoWindowComponent } from './info-window.component';
 import { MarkerMode } from '../marker-mode';
-import { MockInterceptor } from '../mock-interceptor'
+import { MockHttpInterceptor } from '../mock-http-interceptor'
 
 describe('InfoWindowComponent', () => {
   let component: InfoWindowComponent;
@@ -17,7 +17,7 @@ describe('InfoWindowComponent', () => {
       imports: [HttpClientModule],
       providers: [{
         provide: HTTP_INTERCEPTORS,
-        useClass: MockInterceptor,
+        useClass: MockHttpInterceptor,
         multi: true
       }]
     });

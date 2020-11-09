@@ -5,7 +5,7 @@ import { BlobAction } from "./blob-action";
 
 // Mock the HttpClient's interceptor so that HTTP requests are handled locally and not in the real back end.
 @Injectable()
-export class MockInterceptor implements HttpInterceptor {
+export class MockHttpInterceptor implements HttpInterceptor {
 
   private responseUrl = {
     imageUrl: "imageUrl"
