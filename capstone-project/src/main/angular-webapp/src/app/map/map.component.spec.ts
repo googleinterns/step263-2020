@@ -5,8 +5,6 @@ import { ToastService } from '../toast.service';
 import { } from 'googlemaps';
 
 import { MapComponent } from './map.component';
-import { InjectionToken } from '@angular/core';
-import { map } from 'lodash';
 
 class MockToastService {
   showToast() {
@@ -20,7 +18,7 @@ describe('MapComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [ MapComponent ],
+      declarations: [MapComponent],
       imports: [HttpClientModule],
       providers: [{
         provide: HTTP_INTERCEPTORS,
@@ -41,10 +39,57 @@ describe('MapComponent', () => {
   });
 
   it('should center on user location', () => {
-    spyOn(navigator.geolocation, 'getCurrentPosition').and.callFake(function() {
-      const position = { coords: { latitude: 20, longitude: 85 } };
-      arguments[0](position);
+    spyOn(navigator.geolocation, 'getCurrentPosition').and.callFake(function(success) {
+      const position = {
+        coords: {
+          accuracy: 1,
+          altitude: 1,
+          altitudeAccuracy: 1,
+          heading: 1,
+          speed: 0,
+          latitude: 20,
+          longitude: 85
+        }, timestamp: 1
+      };
+      success(position);
     });
-    expect(component["gMap"].getCenter() == new google.maps.LatLng(20,85));
+
+    // const mockGeolocation = {
+    //   getCurrentPosition(success) {
+    //     const position = {
+    //       coords: {
+    //         accuracy: 1,
+    //         altitude: 1,
+    //         altitudeAccuracy: 1,
+    //         heading: 1,
+    //         speed: 0,
+    //         latitude: 20,
+    //         longitude: 85
+    //       }, timestamp: 1
+    //     };
+    //     success(position);
+    //   }
+    // };
+    // spyOnProperty(navigator, 'geolocation', 'get').and.returnValue(mockGeolocation);
+    component.focusOnUserLocation();
+    const location = new google.maps.LatLng(20, 85)
+
+    expect(component["gMap"].getCenter()).toEqual(location);
   });
+
+  it('should handle location error', () => {
+    spyOn(navigator.geolocation, 'getCurrentPosition').and.callFake(function (success, error) {
+      const err = {
+        code: 0,
+        PERMISSION_DENIED: 1,
+        POSITION_UNAVAILABLE: 2,
+        TIMEOUT: 3,
+        message: ""
+      };
+      error(err);
+    });
+    component.focusOnUserLocation();
+    expect(component["gMap"].getCenter()).toEqual(MapComponent.defaultMapCenter);
+  });
+
 });
