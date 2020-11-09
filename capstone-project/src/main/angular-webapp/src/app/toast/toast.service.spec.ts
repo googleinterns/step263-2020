@@ -4,9 +4,13 @@ import { ToastService } from './toast.service';
 
 describe('ToastService', () => {
   let service: ToastService;
+  let htmlElement;
+  let model;
 
   beforeEach(() => {
     service = new ToastService();
+    htmlElement = document.createElement("div");
+    model = {title: "title", content: "content"};
   });
 
   it('Should create service', () => {
@@ -14,8 +18,6 @@ describe('ToastService', () => {
   });
 
   it('Should create toast', () => {
-    const htmlElement = document.createElement("div");
-    const model = {title: "title", content: "content"};
 
     service.createToast(htmlElement, model);
 
@@ -24,8 +26,7 @@ describe('ToastService', () => {
   });
 
   it('Should show toast when toastInstance is defined', () => {
-    const htmlElement = document.createElement("div");
-    const model = {title: "title", content: "content"};
+  
     service.createToast(htmlElement, model);
     spyOn(service['toastInstance'], 'show');
 
@@ -43,8 +44,6 @@ describe('ToastService', () => {
       service["toastInstance"] = toast;
     });
     spyOn(toast, 'show');
-    const htmlElement = document.createElement("div");
-    const model = {title: "title", content: "content"};
 
     service.showToast(htmlElement, model);
 
