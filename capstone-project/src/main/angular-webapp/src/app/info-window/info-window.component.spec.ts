@@ -99,10 +99,6 @@ describe('InfoWindowComponent', () => {
     };
     fileList[0] = new File(["file data"], "file.txt");
 
-    // Mock the document.getElementById function to avoid accessing the tests page's document instead of the component's document
-    const dummyElement = fixture.debugElement.nativeElement.querySelector('#file-name');
-    spyOn(document, "getElementById").and.returnValue(dummyElement);
-
     await component.postFile(fileList)
 
     expect(component.getBlobKeyValue()).toBe(MockHttpInterceptor.getResponseKey());
@@ -121,10 +117,6 @@ describe('InfoWindowComponent', () => {
         return fileList[index];
       }
     };
-
-    // Mock the document.getElementById function to avoid accessing the tests page's document instead of the component's document
-    const dummyElement = fixture.debugElement.nativeElement.querySelector('#file-name');
-    spyOn(document, "getElementById").and.returnValue(dummyElement);
 
     component.originalBlobKey = "originalKey";
     component.postFile(fileList);
