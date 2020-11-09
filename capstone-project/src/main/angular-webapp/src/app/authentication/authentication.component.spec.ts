@@ -72,7 +72,7 @@ describe('AuthenticationComponent', () => {
   });
 
   it('should set user to googleUser on sign in button click', () => {
-    // Signing out the user sign out button will be displayed
+    // Signing out the user so the sign in button will be displayed
     component.signOut();
     fixture.detectChanges();
 
