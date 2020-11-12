@@ -20,10 +20,10 @@ import static org.mockito.Mockito.when;
 @RunWith(JUnit4.class)
 public final class MarkerTest {
 
-    private Marker marker;
-    private final LocalServiceTestHelper helper =
+    private static Marker marker;
+    private static Entity markerEntity;
+    private static final LocalServiceTestHelper helper =
             new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
-    private Entity markerEntity;
 
     @Before
     public void setUp() {
