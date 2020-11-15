@@ -25,13 +25,14 @@ export class MapComponent implements OnInit {
   private editableMarker: google.maps.Marker;
   private factory: ComponentFactory<InfoWindowComponent> = this.componentFactoryResolver.resolveComponentFactory(InfoWindowComponent);
   private gMap: google.maps.Map;
+  static defaultMapCenter: google.maps.LatLng = new google.maps.LatLng(25, 80);
 
   ngOnInit(): void {
 
     // Define the map.
     const googleMapOption = {
       zoom: 4,
-      center: new google.maps.LatLng(25, 80)
+      center: MapComponent.defaultMapCenter
     };
 
     this.focusOnUserLocation();
