@@ -5,6 +5,9 @@ import { ToastService } from '../toast.service';
 import { } from 'googlemaps';
 
 import { MapComponent } from './map.component';
+import { InfoWindowComponent } from '../info-window/info-window.component';
+import { ComponentFactory } from '@angular/core';
+
 
 class MockToastService {
   showToast() {
@@ -12,13 +15,31 @@ class MockToastService {
   }
 }
 
+class MockComponentFactory {
+  static infoWindowComponentRef;
+
+  create(injector) {
+    return MockComponentFactory.infoWindowComponentRef;
+  }
+}
+
 describe('MapComponent', () => {
   let component: MapComponent;
   let fixture: ComponentFixture<MapComponent>;
+  let fakeMarker;
 
   beforeEach(() => {
+    fakeMarker = {
+      animal: "",
+      description: "",
+      reporter: "",
+      lat: 40,
+      lng: 90,
+      blobKey: "",
+      userId: {value: "0"}
+    };
     TestBed.configureTestingModule({
-      declarations: [MapComponent],
+      declarations: [MapComponent, InfoWindowComponent],
       imports: [HttpClientModule],
       providers: [{
         provide: HTTP_INTERCEPTORS,
@@ -27,7 +48,12 @@ describe('MapComponent', () => {
       }, {
         provide: ToastService,
         useClass: MockToastService
-      }]
+      }
+      , {
+        provide: ComponentFactory,
+        useClass: MockComponentFactory
+      }
+    ]
     });
     fixture = TestBed.createComponent(MapComponent);
     component = fixture.componentInstance;
@@ -35,6 +61,7 @@ describe('MapComponent', () => {
   });
 
   it('should create', () => {
+
     expect(component).toBeTruthy();
   });
 
@@ -54,27 +81,11 @@ describe('MapComponent', () => {
       success(position);
     });
 
-    // const mockGeolocation = {
-    //   getCurrentPosition(success) {
-    //     const position = {
-    //       coords: {
-    //         accuracy: 1,
-    //         altitude: 1,
-    //         altitudeAccuracy: 1,
-    //         heading: 1,
-    //         speed: 0,
-    //         latitude: 20,
-    //         longitude: 85
-    //       }, timestamp: 1
-    //     };
-    //     success(position);
-    //   }
-    // };
-    // spyOnProperty(navigator, 'geolocation', 'get').and.returnValue(mockGeolocation);
     component.focusOnUserLocation();
     const location = new google.maps.LatLng(20, 85)
-
-    expect(component["gMap"].getCenter()).toEqual(location);
+    
+    expect(component["gMap"].getCenter().lat()).toEqual(location.lat());
+    expect(component["gMap"].getCenter().lng()).toEqual(location.lng());
   });
 
   it('should handle location error', () => {
@@ -90,6 +101,29 @@ describe('MapComponent', () => {
     });
     component.focusOnUserLocation();
     expect(component["gMap"].getCenter()).toEqual(MapComponent.defaultMapCenter);
+  });
+
+  it('should create info-window of mode CREATE when a user clicks on the map', () => {
+    spyOn(component, 'buildCreateInfoWindowHtmlElement');
+    const mev = {
+      stop: null,
+      latLng: new google.maps.LatLng(40.0,-90.0)
+    }    
+    google.maps.event.trigger(component["gMap"], 'click', mev);
+    expect(component.buildCreateInfoWindowHtmlElement).toHaveBeenCalled();
+  });
+
+  it('should generate display info-window when a user clicks on a marker', () => {
+    spyOn(component, 'buildDisplayInfoWindowComponent').and.returnValue(TestBed.createComponent(InfoWindowComponent).componentRef);
+    const markerForDisplay = new google.maps.Marker({
+      map: component["gMap"],
+      position: new google.maps.LatLng(fakeMarker.lat, fakeMarker.lng)
+    });
+    google.maps.event.addListener(markerForDisplay, 'click', () => {
+      component.generateInfoWindow(markerForDisplay, fakeMarker);
+    });
+    google.maps.event.trigger(markerForDisplay, 'click');  
+    expect(component.buildDisplayInfoWindowComponent).toHaveBeenCalled();
   });
 
 });
