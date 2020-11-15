@@ -1,6 +1,6 @@
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MockInterceptor } from '../mock-interceptor';
+import { MockHttpInterceptor } from '../mock-http-interceptor';
 import { ToastService } from '../toast.service';
 import { } from 'googlemaps';
 
@@ -43,7 +43,7 @@ describe('MapComponent', () => {
       imports: [HttpClientModule],
       providers: [{
         provide: HTTP_INTERCEPTORS,
-        useClass: MockInterceptor,
+        useClass: MockHttpInterceptor,
         multi: true
       }, {
         provide: ToastService,
@@ -61,7 +61,6 @@ describe('MapComponent', () => {
   });
 
   it('should create', () => {
-
     expect(component).toBeTruthy();
   });
 
