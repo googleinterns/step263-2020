@@ -5,7 +5,7 @@ import 'jasmine';
 
 import { InfoWindowComponent } from './info-window.component';
 import { MarkerMode } from '../marker-mode';
-import { MockInterceptor } from '../mock-interceptor'
+import { MockHttpInterceptor } from '../mock-http-interceptor'
 
 describe('InfoWindowComponent', () => {
   let component: InfoWindowComponent;
@@ -17,7 +17,7 @@ describe('InfoWindowComponent', () => {
       imports: [HttpClientModule],
       providers: [{
         provide: HTTP_INTERCEPTORS,
-        useClass: MockInterceptor,
+        useClass: MockHttpInterceptor,
         multi: true
       }]
     });
@@ -99,13 +99,9 @@ describe('InfoWindowComponent', () => {
     };
     fileList[0] = new File(["file data"], "file.txt");
 
-    // Mock the document.getElementById function to avoid accessing the tests page's document instead of the component's document
-    const dummyElement = fixture.debugElement.nativeElement.querySelector('#file-name');
-    spyOn(document, "getElementById").and.returnValue(dummyElement);
-
     await component.postFile(fileList)
 
-    expect(component.getBlobKeyValue()).toBe("blobKey");
+    expect(component.getBlobKeyValue()).toBe(MockHttpInterceptor.getResponseKey());
   });
 
   it('Should remove the file selected and set blobKeyValue to the original blob key', () => {
@@ -121,10 +117,6 @@ describe('InfoWindowComponent', () => {
         return fileList[index];
       }
     };
-
-    // Mock the document.getElementById function to avoid accessing the tests page's document instead of the component's document
-    const dummyElement = fixture.debugElement.nativeElement.querySelector('#file-name');
-    spyOn(document, "getElementById").and.returnValue(dummyElement);
 
     component.originalBlobKey = "originalKey";
     component.postFile(fileList);
