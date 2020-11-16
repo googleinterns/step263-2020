@@ -6,20 +6,11 @@ import { } from 'googlemaps';
 
 import { MapComponent } from './map.component';
 import { InfoWindowComponent } from '../info-window/info-window.component';
-import { ComponentFactory } from '@angular/core';
 
-
+// Mock toast service for location error
 class MockToastService {
   showToast() {
     document.getElementById("ej2Toast").innerHTML = "Geolocation Service Failed";
-  }
-}
-
-class MockComponentFactory {
-  static infoWindowComponentRef;
-
-  create(injector) {
-    return MockComponentFactory.infoWindowComponentRef;
   }
 }
 
@@ -48,12 +39,7 @@ describe('MapComponent', () => {
       }, {
         provide: ToastService,
         useClass: MockToastService
-      }
-      , {
-        provide: ComponentFactory,
-        useClass: MockComponentFactory
-      }
-    ]
+      }]
     });
     fixture = TestBed.createComponent(MapComponent);
     component = fixture.componentInstance;
@@ -98,7 +84,9 @@ describe('MapComponent', () => {
       };
       error(err);
     });
+
     component.focusOnUserLocation();
+
     expect(component["gMap"].getCenter()).toEqual(MapComponent["defaultMapCenter"]);
   });
 
@@ -107,13 +95,16 @@ describe('MapComponent', () => {
     const clickArgs = {
       stop: null,
       latLng: new google.maps.LatLng(40.0,-90.0)
-    }    
+    };
+
     google.maps.event.trigger(component["gMap"], 'click', clickArgs);
+
     expect(component.buildCreateInfoWindowHtmlElement).toHaveBeenCalled();
   });
 
   it('should generate display info-window when a user clicks on a marker', () => {
-    spyOn(component, 'buildDisplayInfoWindowComponent').and.returnValue(TestBed.createComponent(InfoWindowComponent).componentRef);
+    spyOn(component, 'buildDisplayInfoWindowComponent').and
+      .returnValue(TestBed.createComponent(InfoWindowComponent).componentRef);
     const markerForDisplay = new google.maps.Marker({
       map: component["gMap"],
       position: new google.maps.LatLng(fakeMarker.lat, fakeMarker.lng)
@@ -121,7 +112,9 @@ describe('MapComponent', () => {
     google.maps.event.addListener(markerForDisplay, 'click', () => {
       component.generateInfoWindow(markerForDisplay, fakeMarker);
     });
+
     google.maps.event.trigger(markerForDisplay, 'click');  
+
     expect(component.buildDisplayInfoWindowComponent).toHaveBeenCalled();
   });
 
