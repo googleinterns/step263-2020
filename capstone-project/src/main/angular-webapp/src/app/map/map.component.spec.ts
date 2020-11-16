@@ -1,7 +1,7 @@
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MockHttpInterceptor } from '../mock-http-interceptor';
-import { ToastService } from '../toast.service';
+import { ToastService } from '../toast/toast.service';
 import { } from 'googlemaps';
 
 import { MapComponent } from './map.component';
@@ -99,16 +99,16 @@ describe('MapComponent', () => {
       error(err);
     });
     component.focusOnUserLocation();
-    expect(component["gMap"].getCenter()).toEqual(MapComponent.defaultMapCenter);
+    expect(component["gMap"].getCenter()).toEqual(MapComponent["defaultMapCenter"]);
   });
 
   it('should create info-window of mode CREATE when a user clicks on the map', () => {
     spyOn(component, 'buildCreateInfoWindowHtmlElement');
-    const mev = {
+    const clickArgs = {
       stop: null,
       latLng: new google.maps.LatLng(40.0,-90.0)
     }    
-    google.maps.event.trigger(component["gMap"], 'click', mev);
+    google.maps.event.trigger(component["gMap"], 'click', clickArgs);
     expect(component.buildCreateInfoWindowHtmlElement).toHaveBeenCalled();
   });
 

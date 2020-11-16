@@ -25,7 +25,7 @@ export class MapComponent implements OnInit {
   private editableMarker: google.maps.Marker;
   private factory: ComponentFactory<InfoWindowComponent> = this.componentFactoryResolver.resolveComponentFactory(InfoWindowComponent);
   private gMap: google.maps.Map;
-  static defaultMapCenter: google.maps.LatLng = new google.maps.LatLng(25, 80);
+  private static defaultMapCenter: google.maps.LatLng = new google.maps.LatLng(25, 80);
 
   ngOnInit(): void {
 
