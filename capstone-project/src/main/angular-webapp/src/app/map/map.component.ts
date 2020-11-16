@@ -6,7 +6,7 @@ import { MarkerMode } from '../marker-mode';
 import { UserService } from '../user.service'
 import { SocialUser } from 'angularx-social-login';
 import { BlobAction } from '../blob-action';
-import { ToastService } from '../toast.service';
+import { ToastService } from '../toast/toast.service';
 
 @Component({
   selector: 'app-map',
