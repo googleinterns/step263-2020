@@ -7,12 +7,11 @@ import { } from 'googlemaps';
 import { MapComponent } from './map.component';
 import { InfoWindowComponent } from '../info-window/info-window.component';
 import { ComponentRef } from '@angular/core';
+import { MarkerMode } from '../marker-mode';
 
 // Mock toast service for location error
 class MockToastService {
-  showToast() {
-    document.getElementById("ej2Toast").innerHTML = "Geolocation Service Failed";
-  }
+  showToast() { }
 }
 
 describe('MapComponent', () => {
@@ -21,18 +20,9 @@ describe('MapComponent', () => {
   let fakeMarker;
   let fakeMarkerForDisplay: google.maps.Marker;
   let infoWindowComponent: ComponentRef<InfoWindowComponent>;
+  let clickArgs;
 
   beforeEach(() => {
-    fakeMarker = {
-      animal: "",
-      description: "",
-      reporter: "",
-      lat: 40,
-      lng: 90,
-      blobKey: "",
-      userId: {value: "0"}
-    };
-
     TestBed.configureTestingModule({
       declarations: [MapComponent, InfoWindowComponent],
       imports: [HttpClientModule],
@@ -45,20 +35,47 @@ describe('MapComponent', () => {
         useClass: MockToastService
       }]
     });
+    infoWindowComponent = TestBed.createComponent(InfoWindowComponent).componentRef;
+
     fixture = TestBed.createComponent(MapComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
 
+    clickArgs = {
+      stop: null,
+      latLng: new google.maps.LatLng(40.0,-90.0)
+    };
+    fakeMarker = {
+      animal: "",
+      description: "",
+      reporter: "",
+      lat: 40,
+      lng: 90,
+      blobKey: "",
+      userId: {value: "0"}
+    };
     fakeMarkerForDisplay = new google.maps.Marker({
       map: component["gMap"],
       position: new google.maps.LatLng(fakeMarker.lat, fakeMarker.lng)
     });
+    
+    spyOn(component["factory"], 'create').and.returnValue(infoWindowComponent);
     google.maps.event.addListener(fakeMarkerForDisplay, 'click', () => {
       component.generateInfoWindow(fakeMarkerForDisplay, fakeMarker);
     });
-    infoWindowComponent = TestBed.createComponent(InfoWindowComponent).componentRef;
-    spyOn(component, 'buildDisplayInfoWindowComponent').and
-      .returnValue(infoWindowComponent);
+  });
+
+  // afterEach(() => {
+  //   component = null;
+  //   fixture = null;
+  //   fakeMarker = null;
+  //   fakeMarkerForDisplay = null;
+  //   infoWindowComponent = null;
+  //   clickArgs = null;
+  // });
+
+  afterAll(() => {
+    TestBed.resetTestEnvironment();
   });
 
   it('should create', () => {
@@ -101,25 +118,27 @@ describe('MapComponent', () => {
     });
 
     component.focusOnUserLocation();
-
     expect(component["gMap"].getCenter()).toEqual(MapComponent["defaultMapCenter"]);
+  });
+
+  it('should create marker when a user clicks on the map', () => {
+    spyOn(component, 'addMarkerForEdit');
+
+    google.maps.event.trigger(component["gMap"], 'click', clickArgs);
+    expect(component.addMarkerForEdit).toHaveBeenCalled();
   });
 
   it('should create info-window of mode CREATE when a user clicks on the map', () => {
     spyOn(component, 'buildCreateInfoWindowHtmlElement');
-    const clickArgs = {
-      stop: null,
-      latLng: new google.maps.LatLng(40.0,-90.0)
-    };
 
     google.maps.event.trigger(component["gMap"], 'click', clickArgs);
-
     expect(component.buildCreateInfoWindowHtmlElement).toHaveBeenCalled();
   });
 
   it('should generate display info-window when a user clicks on a marker', () => {
+    spyOn(component, 'buildDisplayInfoWindowComponent').and
+      .returnValue(infoWindowComponent);
     google.maps.event.trigger(fakeMarkerForDisplay, 'click');  
-
     expect(component.buildDisplayInfoWindowComponent).toHaveBeenCalled();
   });
 
@@ -131,6 +150,38 @@ describe('MapComponent', () => {
     infoWindowComponent.instance.update();
 
     expect(component.buildUpdateInfoWindowHtmlElment).toHaveBeenCalled();
+  });
+
+  it('should delete marker when a delete event of info window emits', () => {
+    spyOn(component, 'deleteMarker');
+    
+    // Only after user clicks the info window is created
+    google.maps.event.trigger(fakeMarkerForDisplay, 'click');
+    infoWindowComponent.instance.delete();
+
+    expect(component.deleteMarker).toHaveBeenCalled();
+  });
+
+  it('should post new marker after user creates marker', () => {
+    spyOn(component, 'postMarker');
+
+    google.maps.event.trigger(component["gMap"], 'click', clickArgs);
+    infoWindowComponent.instance.submit("", "", "");
+
+    expect(component.postMarker)
+      .toHaveBeenCalledWith(jasmine.any(Object), MarkerMode.CREATE);
+  });
+
+  it('should post update marker when after user clicks on edit and submits', () => {
+    spyOn(component, 'postMarker');
+    
+    // Only after user clicks the info window is created
+    google.maps.event.trigger(fakeMarkerForDisplay, 'click');
+    infoWindowComponent.instance.update();
+    infoWindowComponent.instance.submit("", "", "");
+
+    expect(component.postMarker)
+      .toHaveBeenCalledWith(jasmine.any(Object), MarkerMode.UPDATE);
   });
 
 });
