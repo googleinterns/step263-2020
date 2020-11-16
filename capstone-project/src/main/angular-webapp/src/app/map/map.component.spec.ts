@@ -9,9 +9,7 @@ import { InfoWindowComponent } from '../info-window/info-window.component';
 
 // Mock toast service for location error
 class MockToastService {
-  showToast() {
-    document.getElementById("ej2Toast").innerHTML = "Geolocation Service Failed";
-  }
+  showToast() { }
 }
 
 describe('MapComponent', () => {
