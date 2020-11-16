@@ -6,6 +6,7 @@ import { } from 'googlemaps';
 
 import { MapComponent } from './map.component';
 import { InfoWindowComponent } from '../info-window/info-window.component';
+import { ComponentRef } from '@angular/core';
 
 // Mock toast service for location error
 class MockToastService {
@@ -18,6 +19,8 @@ describe('MapComponent', () => {
   let component: MapComponent;
   let fixture: ComponentFixture<MapComponent>;
   let fakeMarker;
+  let fakeMarkerForDisplay: google.maps.Marker;
+  let infoWindowComponent: ComponentRef<InfoWindowComponent>;
 
   beforeEach(() => {
     fakeMarker = {
@@ -29,6 +32,7 @@ describe('MapComponent', () => {
       blobKey: "",
       userId: {value: "0"}
     };
+
     TestBed.configureTestingModule({
       declarations: [MapComponent, InfoWindowComponent],
       imports: [HttpClientModule],
@@ -44,6 +48,17 @@ describe('MapComponent', () => {
     fixture = TestBed.createComponent(MapComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
+
+    fakeMarkerForDisplay = new google.maps.Marker({
+      map: component["gMap"],
+      position: new google.maps.LatLng(fakeMarker.lat, fakeMarker.lng)
+    });
+    google.maps.event.addListener(fakeMarkerForDisplay, 'click', () => {
+      component.generateInfoWindow(fakeMarkerForDisplay, fakeMarker);
+    });
+    infoWindowComponent = TestBed.createComponent(InfoWindowComponent).componentRef;
+    spyOn(component, 'buildDisplayInfoWindowComponent').and
+      .returnValue(infoWindowComponent);
   });
 
   it('should create', () => {
@@ -103,19 +118,19 @@ describe('MapComponent', () => {
   });
 
   it('should generate display info-window when a user clicks on a marker', () => {
-    spyOn(component, 'buildDisplayInfoWindowComponent').and
-      .returnValue(TestBed.createComponent(InfoWindowComponent).componentRef);
-    const markerForDisplay = new google.maps.Marker({
-      map: component["gMap"],
-      position: new google.maps.LatLng(fakeMarker.lat, fakeMarker.lng)
-    });
-    google.maps.event.addListener(markerForDisplay, 'click', () => {
-      component.generateInfoWindow(markerForDisplay, fakeMarker);
-    });
-
-    google.maps.event.trigger(markerForDisplay, 'click');  
+    google.maps.event.trigger(fakeMarkerForDisplay, 'click');  
 
     expect(component.buildDisplayInfoWindowComponent).toHaveBeenCalled();
+  });
+
+  it('should build update info-window when a update event of info window emits', () => {
+    spyOn(component, 'buildUpdateInfoWindowHtmlElment');
+    
+    // Only after user clicks the info window is created
+    google.maps.event.trigger(fakeMarkerForDisplay, 'click');
+    infoWindowComponent.instance.update();
+
+    expect(component.buildUpdateInfoWindowHtmlElment).toHaveBeenCalled();
   });
 
 });
