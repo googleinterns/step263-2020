@@ -143,8 +143,8 @@ public class Marker {
         if (o == null || getClass() != o.getClass()) return false;
         Marker other = (Marker) o;
         return id == other.id &&
-                Double.compare(other.lat, lat) == 0 &&
-                Double.compare(other.lng, lng) == 0 &&
+                other.lat == lat &&
+                other.lng == lng &&
                 Objects.equals(animal, other.animal) &&
                 Objects.equals(reporter, other.reporter) &&
                 Objects.equals(description, other.description) &&
