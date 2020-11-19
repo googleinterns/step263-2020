@@ -92,7 +92,7 @@ public class BlobServlet extends HttpServlet {
 
     /** Imitates the real doPost method for testing purposes */
     public void doGet(HttpServletRequest request, HttpServletResponse response, BlobstoreService blobstoreService) throws IOException {
-        
+
         int actionNum = Integer.parseInt(request.getParameter("blobAction"));
         BlobAction action = BlobAction.values()[actionNum];
         switch (action) {
