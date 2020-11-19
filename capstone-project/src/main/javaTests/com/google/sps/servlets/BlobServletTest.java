@@ -33,6 +33,7 @@ public final class BlobServletTest {
                     new LocalDatastoreServiceTestConfig(),
                     new LocalBlobstoreServiceTestConfig());
     private static final String KEY_STRING = "keyString";
+    private static final String EMPTY_RESPONSE = "{\"blobKey\":\"\"}\n";
 
     @Before
     public void setUp() {
@@ -74,15 +75,57 @@ public final class BlobServletTest {
 
 
         BlobKey blobKey = new BlobKey(KEY_STRING);
-        Map<String, List<BlobKey>> fakeKeys = new HashMap<>();
-        fakeKeys.put("image", Arrays.asList(blobKey));
+        Map<String, List<BlobKey>> fakeKeyMap = new HashMap<>();
+        fakeKeyMap.put("image", Arrays.asList(blobKey));
 
-        BlobstoreService spiedBlobService = mock(BlobstoreService.class);
+        BlobstoreService spiedBlobService = spy(BlobstoreService.class);
 
-        when(spiedBlobService.getUploads(Mockito.any(HttpServletRequest.class))).thenReturn(fakeKeys);
+        when(spiedBlobService.getUploads(Mockito.any(HttpServletRequest.class))).thenReturn(fakeKeyMap);
 
         new BlobServlet().doPost(request, response, spiedBlobService);
 
         assertTrue(stringWriter.toString().contains(KEY_STRING));
+    }
+
+    @Test
+    // Post a request containing a blob that wasn't defined as 'image'
+    public void doPostNullBlob() throws IOException {
+
+        final HttpServletRequest request = mock(HttpServletRequest.class);
+        final HttpServletResponse response = mock(HttpServletResponse.class);
+
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter writer = new PrintWriter(stringWriter);
+        when(response.getWriter()).thenReturn(writer);
+
+        BlobstoreService spiedBlobService = spy(BlobstoreService.class);
+        Map<String, List<BlobKey>> fakeKeyMap = new HashMap<>();
+        BlobKey blobKey = new BlobKey(KEY_STRING);
+        fakeKeyMap.put("file", Arrays.asList(blobKey));
+        when(spiedBlobService.getUploads(Mockito.any(HttpServletRequest.class))).thenReturn(fakeKeyMap);
+
+        new BlobServlet().doPost(request, response, spiedBlobService);
+
+        assertTrue(stringWriter.toString().equals(EMPTY_RESPONSE));
+    }
+
+    @Test
+    // Post a request not containing any blobs
+    public void doPostNoBlob() throws IOException {
+
+        final HttpServletRequest request = mock(HttpServletRequest.class);
+        final HttpServletResponse response = mock(HttpServletResponse.class);
+
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter writer = new PrintWriter(stringWriter);
+        when(response.getWriter()).thenReturn(writer);
+
+        BlobstoreService spiedBlobService = spy(BlobstoreService.class);
+        Map<String, List<BlobKey>> emptyKeyMap = new HashMap<>();
+        when(spiedBlobService.getUploads(Mockito.any(HttpServletRequest.class))).thenReturn(emptyKeyMap);
+
+        new BlobServlet().doPost(request, response, spiedBlobService);
+
+        assertTrue(stringWriter.toString().equals(EMPTY_RESPONSE));
     }
 }
