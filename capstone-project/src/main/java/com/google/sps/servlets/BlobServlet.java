@@ -91,8 +91,29 @@ public class BlobServlet extends HttpServlet {
     }
 
     /** Imitates the real doPost method for testing purposes */
-    public void doPost(HttpServletRequest request, HttpServletResponse response, BlobstoreService blobstoreService) throws IOException {
+    public void doGet(HttpServletRequest request, HttpServletResponse response, BlobstoreService blobstoreService) throws IOException {
         
+        int actionNum = Integer.parseInt(request.getParameter("blobAction"));
+        BlobAction action = BlobAction.values()[actionNum];
+        switch (action) {
+            // For action code KEY_TO_BLOB return the blob of the given blob key
+            case KEY_TO_BLOB:
+                BlobKey blobKey = new BlobKey(request.getParameter("blob-key"));
+                blobstoreService.serve(blobKey, response);
+                break;
+            // For action code GET_URL return the URL which first sends the file to BlobStore and then redirects it for further processing.
+            case GET_URL:
+                String uploadUrl = blobstoreService.createUploadUrl("/blob-service");
+                JsonObject jsonResponse = new JsonObject();
+                jsonResponse.addProperty("imageUrl", uploadUrl);
+                response.setContentType("application/json");
+                response.getWriter().println(jsonResponse);
+                break;
+        }
+    }
+    /** Imitates the real doPost method for testing purposes */
+    public void doPost(HttpServletRequest request, HttpServletResponse response, BlobstoreService blobstoreService) throws IOException {
+
         String blobKeyAsString = getBlobKey(request, blobstoreService);
         JsonObject jsonResponse = new JsonObject();
         jsonResponse.addProperty("blobKey", blobKeyAsString);
