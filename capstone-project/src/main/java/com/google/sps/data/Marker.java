@@ -141,15 +141,15 @@ public class Marker {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Marker marker = (Marker) o;
-        return id == marker.id &&
-                Double.compare(marker.lat, lat) == 0 &&
-                Double.compare(marker.lng, lng) == 0 &&
-                Objects.equals(animal, marker.animal) &&
-                Objects.equals(reporter, marker.reporter) &&
-                Objects.equals(description, marker.description) &&
-                Objects.equals(userId, marker.userId) &&
-                Objects.equals(blobKey, marker.blobKey);
+        Marker other = (Marker) o;
+        return id == other.id &&
+                Double.compare(other.lat, lat) == 0 &&
+                Double.compare(other.lng, lng) == 0 &&
+                Objects.equals(animal, other.animal) &&
+                Objects.equals(reporter, other.reporter) &&
+                Objects.equals(description, other.description) &&
+                Objects.equals(userId, other.userId) &&
+                Objects.equals(blobKey, other.blobKey);
     }
 
     /** Creates a Marker from a marker entity */
