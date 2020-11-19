@@ -17,7 +17,6 @@ package com.google.sps.servlets;
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.blobstore.BlobstoreService;
 import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import javax.servlet.annotation.WebServlet;
@@ -88,5 +87,9 @@ public class BlobServlet extends HttpServlet {
         }
 
         return blobKey;
+    }
+
+    public void doPost(HttpServletRequest request, HttpServletResponse response, BlobstoreService blobstoreService){
+
     }
 }
