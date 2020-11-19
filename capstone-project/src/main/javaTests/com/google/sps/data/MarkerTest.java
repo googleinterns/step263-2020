@@ -22,6 +22,7 @@ public final class MarkerTest {
 
     private static Marker marker;
     private static Entity markerEntity;
+    // This local service is needed in order to use Datastore entities in the tests.
     private static final LocalServiceTestHelper helper =
             new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
 
