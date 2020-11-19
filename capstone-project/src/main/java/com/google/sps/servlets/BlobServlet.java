@@ -66,7 +66,8 @@ public class BlobServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        String blobKeyAsString = getBlobKey(request);
+        BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
+        String blobKeyAsString = getBlobKey(request, blobstoreService);
         JsonObject jsonResponse = new JsonObject();
         jsonResponse.addProperty("blobKey", blobKeyAsString);
         response.setContentType("application/json");
@@ -74,8 +75,8 @@ public class BlobServlet extends HttpServlet {
     }
 
     /** Returns the BlobKey of an uploaded image so we can serve the blob. */
-    private static String getBlobKey(HttpServletRequest request) {
-        BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
+    private static String getBlobKey(HttpServletRequest request, BlobstoreService blobstoreService) {
+
         // Get all files uploaded to Blobstore from this request
         Map<String, List<BlobKey>> blobs = blobstoreService.getUploads(request);
         // Get the blob key associated with the image uploaded
@@ -89,7 +90,13 @@ public class BlobServlet extends HttpServlet {
         return blobKey;
     }
 
-    public void doPost(HttpServletRequest request, HttpServletResponse response, BlobstoreService blobstoreService){
-
+    /** Imitates the real doPost method for testing purposes */
+    public void doPost(HttpServletRequest request, HttpServletResponse response, BlobstoreService blobstoreService) throws IOException {
+        
+        String blobKeyAsString = getBlobKey(request, blobstoreService);
+        JsonObject jsonResponse = new JsonObject();
+        jsonResponse.addProperty("blobKey", blobKeyAsString);
+        response.setContentType("application/json");
+        response.getWriter().println(jsonResponse);
     }
 }

@@ -62,6 +62,7 @@ public final class BlobServletTest {
 
 
     @Test
+    // Post a request containing blobs
     public void doPostWithBlob() throws IOException {
 
         final HttpServletRequest request = mock(HttpServletRequest.class);
@@ -83,6 +84,5 @@ public final class BlobServletTest {
         new BlobServlet().doPost(request, response, spiedBlobService);
 
         assertTrue(stringWriter.toString().contains(KEY_STRING));
-
     }
 }
