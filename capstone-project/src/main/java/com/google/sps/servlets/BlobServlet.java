@@ -111,6 +111,7 @@ public class BlobServlet extends HttpServlet {
                 break;
         }
     }
+    
     /** Imitates the real doPost method for testing purposes */
     public void doPost(HttpServletRequest request, HttpServletResponse response, BlobstoreService blobstoreService) throws IOException {
 
