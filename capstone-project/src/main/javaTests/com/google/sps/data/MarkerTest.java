@@ -1,7 +1,6 @@
 package com.google.sps.data;
 
 import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.Key;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import org.junit.After;
@@ -14,14 +13,13 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
 
 @RunWith(JUnit4.class)
 public final class MarkerTest {
 
     private static Marker marker;
     private static Entity markerEntity;
+    // This local service is needed in order to use Datastore entities in the tests.
     private static final LocalServiceTestHelper helper =
             new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
 
@@ -38,7 +36,7 @@ public final class MarkerTest {
                 .setBlobKey("blobKey")
                 .build();
         helper.setUp();
-        markerEntity = new Entity("Marker");
+        markerEntity = new Entity("Marker", 1111);
         markerEntity.setProperty("lat", 1.0);
         markerEntity.setProperty("lng", 1.0);
         markerEntity.setProperty("animal", "animal");
@@ -72,12 +70,7 @@ public final class MarkerTest {
 
     @Test
     public void entityToMarker() {
-        Entity spiedEntity = spy(markerEntity);
-        Key spiedKey = spy(Key.class);
-        when(spiedEntity.getKey()).thenReturn(spiedKey);
-        when(spiedKey.getId()).thenReturn((long) 1111);
-
-        Marker conversionResult = Marker.fromEntity(spiedEntity);
+        Marker conversionResult = Marker.fromEntity(markerEntity);
 
         assertEquals(conversionResult, marker);
     }
