@@ -3,7 +3,6 @@ package com.google.sps.servlets;
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.blobstore.BlobstoreService;
 import com.google.appengine.tools.development.testing.LocalBlobstoreServiceTestConfig;
-import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import org.junit.After;
 import org.junit.Before;
@@ -33,7 +32,6 @@ public final class BlobServletTest {
 
     private static final LocalServiceTestHelper helper =
             new LocalServiceTestHelper(
-                    new LocalDatastoreServiceTestConfig(),
                     new LocalBlobstoreServiceTestConfig());
 
     private static HttpServletRequest request;
@@ -122,8 +120,7 @@ public final class BlobServletTest {
     public void doPostNoImage() throws IOException {
 
         Map<String, List<BlobKey>> fakeKeyMap = new HashMap<>();
-        BlobKey blobKey = new BlobKey(BLOB_KEY_STRING);
-        fakeKeyMap.put("file", Arrays.asList(blobKey));
+        fakeKeyMap.put("file", Arrays.asList(BLOB_KEY));
         when(spiedBlobService.getUploads(Mockito.any(HttpServletRequest.class))).thenReturn(fakeKeyMap);
 
         new BlobServlet().doPost(request, response, spiedBlobService);
