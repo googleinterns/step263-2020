@@ -38,6 +38,9 @@ public final class MarkerServletTest {
     private static PrintWriter writer;
     private static Gson gson;
     private static String markerJson;
+    private static DatastoreService datastoreService;
+    private static MockServletContext mockServletContext;
+    private static MarkerServlet spiedServlet;
     private static final int CREATE_CODE = Action.CREATE.ordinal();
     private static final int UPDATE_CODE = Action.UPDATE.ordinal();
     private static final int DELETE_CODE = Action.DELETE.ordinal();
@@ -69,6 +72,11 @@ public final class MarkerServletTest {
         when(response.getWriter()).thenReturn(writer);
         gson = new Gson();
         markerJson = gson.toJson(marker);
+        datastoreService = DatastoreServiceFactory.getDatastoreService();
+        // Mock ServletContext or else we get an error
+        mockServletContext = new MockServletContext();
+        spiedServlet = Mockito.spy(MarkerServlet.class);
+        Mockito.doReturn(mockServletContext).when(spiedServlet).getServletContext();
     }
 
     @After
@@ -101,13 +109,7 @@ public final class MarkerServletTest {
         when(request.getParameter("marker")).thenReturn(markerJson);
         when(request.getParameter("action")).thenReturn(Integer.toString(UPDATE_CODE));
         when(request.getParameter("userToken")).thenReturn("undefined");
-        MockServletContext mockServletContext = new MockServletContext();
-
-        MarkerServlet servlet = new MarkerServlet();
-        MarkerServlet spiedServlet = Mockito.spy(servlet);
-        Mockito.doReturn(mockServletContext).when(spiedServlet).getServletContext();
         spiedServlet.doPost(request, response);
-
 
         assertTrue(mockServletContext.throwable.toString().contains(new EntityNotFoundException(markerEntity.getKey()).toString()));
     }
@@ -126,7 +128,6 @@ public final class MarkerServletTest {
         Mockito.doReturn(mockServletContext).when(spiedServlet).getServletContext();
         spiedServlet.doPost(request, response);
 
-
         assertTrue(mockServletContext.throwable.toString().contains(new EntityNotFoundException(markerEntity.getKey()).toString()));
     }
 
@@ -136,12 +137,6 @@ public final class MarkerServletTest {
         when(request.getParameter("marker")).thenReturn(markerJson);
         when(request.getParameter("action")).thenReturn(Integer.toString(CREATE_CODE));
         when(request.getParameter("userToken")).thenReturn("undefined");
-        DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
-        MockServletContext mockServletContext = new MockServletContext();
-        // Mock ServletContext or else we get an error
-        MarkerServlet servlet = new MarkerServlet();
-        MarkerServlet spiedServlet = Mockito.spy(servlet);
-        Mockito.doReturn(mockServletContext).when(spiedServlet).getServletContext();
 
         // Preform the doPost and get the marker Id back so we can search for it
         spiedServlet.doPost(request, response);
@@ -157,6 +152,7 @@ public final class MarkerServletTest {
         markerEntity.setProperty("description", "description");
         markerEntity.setProperty("blobKey", "blobKey");
 
-        assertEquals(ds.get(markerEntityKey), markerEntity);
+        assertEquals(datastoreService.get(markerEntityKey), markerEntity);
     }
+
 }
