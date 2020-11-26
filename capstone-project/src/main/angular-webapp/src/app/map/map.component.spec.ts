@@ -172,4 +172,22 @@ describe('MapComponent', () => {
       .toHaveBeenCalledWith(jasmine.any(Object), MarkerMode.UPDATE);
   });
 
+  it('should get markers from backend and display them', async () => {
+    spyOn(component, 'addMarkerForDisplay');
+    
+    // Markers fetched from backend in ngOnInit
+    await component.ngOnInit();
+
+    expect(component.addMarkerForDisplay)
+      .toHaveBeenCalledWith(MockHttpInterceptor.getResponseMarker());
+  });
+
+  it('should send http post when postMarker method is called', async () => {
+    spyOn(component["httpClient"], "post").and.callThrough();
+
+    await component.postMarker(MockHttpInterceptor.getResponseMarker(), MarkerMode.CREATE);
+
+    expect(component["httpClient"].post).toHaveBeenCalled();
+  });
+
 });
