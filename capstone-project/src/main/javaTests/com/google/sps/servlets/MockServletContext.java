@@ -10,8 +10,9 @@ import java.util.EventListener;
 import java.util.Map;
 import java.util.Set;
 
+// A mock ServletContext used in MarkerServletTest
 class MockServletContext implements ServletContext {
-    protected String s;
+    protected String string;
     protected Throwable throwable;
 
     @Override
@@ -99,8 +100,9 @@ class MockServletContext implements ServletContext {
 
     }
 
-    public void log(String s, Throwable throwable){
-        this.s = s;
+    // Set the string and throwable field
+    public void log(String string, Throwable throwable){
+        this.string = string;
         this.throwable = throwable;
     }
 

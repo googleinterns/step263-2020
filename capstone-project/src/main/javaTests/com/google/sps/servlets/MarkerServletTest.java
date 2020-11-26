@@ -121,11 +121,7 @@ public final class MarkerServletTest {
         when(request.getParameter("action")).thenReturn(Integer.toString(DELETE_CODE));
         when(request.getParameter("userToken")).thenReturn("undefined");
         when(request.getParameter("id")).thenReturn(Long.toString(marker.getId()));
-        MockServletContext mockServletContext = new MockServletContext();
 
-        MarkerServlet servlet = new MarkerServlet();
-        MarkerServlet spiedServlet = Mockito.spy(servlet);
-        Mockito.doReturn(mockServletContext).when(spiedServlet).getServletContext();
         spiedServlet.doPost(request, response);
 
         assertTrue(mockServletContext.throwable.toString().contains(new EntityNotFoundException(markerEntity.getKey()).toString()));
@@ -141,9 +137,11 @@ public final class MarkerServletTest {
         // Preform the doPost and get the marker Id back so we can search for it
         spiedServlet.doPost(request, response);
         Map<String,String> responseParameter = gson.fromJson(String.valueOf(stringWriter), Map.class);
+        // Save entity key with the marker id to fetch it from datastore
         Key markerEntityKey = KeyFactory.createKey("Marker", Long.parseLong(responseParameter.get("id")));
 
         // Create the entity identical to the one put in the datastore
+        // We cannot edit the current markerEntity because the id is set in the Entity constructor
         markerEntity = new Entity("Marker", Long.parseLong(responseParameter.get("id")));
         markerEntity.setProperty("lat", 1.0);
         markerEntity.setProperty("lng", 1.0);
