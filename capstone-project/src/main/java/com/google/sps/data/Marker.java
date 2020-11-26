@@ -14,9 +14,10 @@
 
 package com.google.sps.data;
 
-import java.util.Optional;
-
 import com.google.appengine.api.datastore.Entity;
+
+import java.util.Objects;
+import java.util.Optional;
 
 /** Represents an animal report marker on the map. */
 public class Marker {
@@ -136,8 +137,19 @@ public class Marker {
         return blobKey;
     }
 
-    public void setBlobKey(String blobKey) {
-        this.blobKey = blobKey;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Marker other = (Marker) o;
+        return id == other.id &&
+                other.lat == lat &&
+                other.lng == lng &&
+                Objects.equals(animal, other.animal) &&
+                Objects.equals(reporter, other.reporter) &&
+                Objects.equals(description, other.description) &&
+                Objects.equals(userId, other.userId) &&
+                Objects.equals(blobKey, other.blobKey);
     }
 
     /** Creates a Marker from a marker entity */

@@ -99,10 +99,10 @@ describe('MapComponent', () => {
     });
 
     component.focusOnUserLocation();
-    const location = new google.maps.LatLng(20, 85)
+    const expectedLocation = new google.maps.LatLng(20, 85)
     
-    expect(component["gMap"].getCenter().lat()).toEqual(location.lat());
-    expect(component["gMap"].getCenter().lng()).toEqual(location.lng());
+    expect(component["gMap"].getCenter().lat()).toEqual(expectedLocation.lat());
+    expect(component["gMap"].getCenter().lng()).toEqual(expectedLocation.lng());
   });
 
   it('should handle location error', () => {
@@ -118,7 +118,8 @@ describe('MapComponent', () => {
     });
 
     component.focusOnUserLocation();
-    expect(component["gMap"].getCenter()).toEqual(MapComponent["defaultMapCenter"]);
+
+    expect(component["gMap"].getCenter()).toEqual(MapComponent.defaultMapCenter);
   });
 
   it('should create marker when a user clicks on the map', () => {
