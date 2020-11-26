@@ -65,19 +65,6 @@ describe('MapComponent', () => {
     });
   });
 
-  // afterEach(() => {
-  //   component = null;
-  //   fixture = null;
-  //   fakeMarker = null;
-  //   fakeMarkerForDisplay = null;
-  //   infoWindowComponent = null;
-  //   clickArgs = null;
-  // });
-
-  afterAll(() => {
-    TestBed.resetTestEnvironment();
-  });
-
   it('should create', () => {
     expect(component).toBeTruthy();
   });
