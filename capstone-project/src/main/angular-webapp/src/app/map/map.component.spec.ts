@@ -85,7 +85,7 @@ describe('MapComponent', () => {
 
     component.focusOnUserLocation();
 
-    expect(component["gMap"].getCenter()).toEqual(MapComponent["defaultMapCenter"]);
+    expect(component["gMap"].getCenter()).toEqual(MapComponent.defaultMapCenter);
   });
 
   it('should create info-window of mode CREATE when a user clicks on the map', () => {
