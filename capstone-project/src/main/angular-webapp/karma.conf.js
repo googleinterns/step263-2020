@@ -25,9 +25,18 @@ module.exports = function(config) {
         colors: true,
         logLevel: config.LOG_INFO,
         autoWatch: true,
-        browsers: ['Chrome'],
+        browsers: ['Chrome_without_security'],
+        customLaunchers:{
+            Chrome_without_security:{
+                base: 'Chrome',
+                flags: ['--disable-web-security']
+            }
+        },
         singleRun: false,
         restartOnFileChange: true,
-        webpack: { node: { fs: 'empty', } }
+        webpack: { node: { fs: 'empty', } },
+        files: [
+            'https://maps.google.com/maps/api/js?key=API-KEY'
+          ]
     });
 };
