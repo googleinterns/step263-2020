@@ -46,7 +46,6 @@ describe('InfoWindowComponent', () => {
   });
 
   it('Should call "submit" function on submit click', () => {
-
     component.type = MarkerMode.CREATE;
     fixture.detectChanges();
     spyOn(component, 'submit');

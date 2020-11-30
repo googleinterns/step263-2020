@@ -2,7 +2,6 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 import { GoogleMapsModule } from '@angular/google-maps';
-import { FormsModule } from '@angular/forms'
 import { AppRoutingModule } from './app-routing.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { SocialLoginModule, SocialAuthServiceConfig } from 'angularx-social-login';
@@ -27,7 +26,6 @@ import { ToastService } from './toast/toast.service'
     AppRoutingModule,
     HttpClientModule,
     GoogleMapsModule,
-    FormsModule,
     BrowserAnimationsModule,
     SocialLoginModule,
     MaterialModule
