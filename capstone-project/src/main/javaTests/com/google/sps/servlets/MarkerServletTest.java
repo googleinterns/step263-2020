@@ -138,15 +138,13 @@ public final class MarkerServletTest {
         // Preform the doPost and get the marker Id back so we can search for it
         spiedServlet.doPost(request, response);
         Map<String,String> responseParameter = gson.fromJson(String.valueOf(stringWriter), Map.class);
-        // Save entity key with the marker id to fetch it from datastore
-        Key markerEntityKey = KeyFactory.createKey("Marker", Long.parseLong(responseParameter.get("id")));
 
         // Create the entity identical to the one put in the datastore
         // We cannot edit the current markerEntity because the id is set in the Entity constructor
         markerEntity = new Entity("Marker", Long.parseLong(responseParameter.get("id")));
         markerEntity = Marker.toEntity(marker, markerEntity);
 
-        assertEquals(datastoreService.get(markerEntityKey), markerEntity);
+        assertEquals(datastoreService.get(markerEntity.getKey()), markerEntity);
     }
 
     @Test
@@ -172,13 +170,12 @@ public final class MarkerServletTest {
         // Preform the doPost and get the marker Id back so we can search for it
         spiedServlet.doPost(request, response);
         Map<String,String> responseParameter = gson.fromJson(String.valueOf(stringWriter), Map.class);
-        Key markerEntityKey = KeyFactory.createKey("Marker", Long.parseLong(responseParameter.get("id")));
 
         // Create the entity identical to the one put in the datastore
         markerEntity = new Entity("Marker", Long.parseLong(responseParameter.get("id")));
         markerEntity = Marker.toEntity(marker, markerEntity);
 
-        assertEquals(datastoreService.get(markerEntityKey), markerEntity);
+        assertEquals(datastoreService.get(markerEntity.getKey()), markerEntity);
     }
 
     @Test
@@ -218,12 +215,38 @@ public final class MarkerServletTest {
 
         // Preform the doPost
         spiedServlet.doPost(request, response);
-        Key markerEntityKey = KeyFactory.createKey("Marker", marker.getId());
 
         // Update the markerEntity to be of new marker
         markerEntity = Marker.toEntity(marker, markerEntity);
 
-        assertEquals(datastoreService.get(markerEntityKey), markerEntity);
+        assertEquals(datastoreService.get(markerEntity.getKey()), markerEntity);
+    }
+
+    // Test the UPDATE case with user
+    public void doPostCaseDeleteWithUser() throws IOException, EntityNotFoundException, GeneralSecurityException {
+        // Put marker in datastore
+        marker.setUserId(Optional.of(fakeId));
+        markerEntity = Marker.toEntity(marker, markerEntity);
+        datastoreService.put(markerEntity);
+
+        // Set request parameters
+        when(request.getParameter("marker")).thenReturn(markerJson);
+        when(request.getParameter("action")).thenReturn(Integer.toString(DELETE_CODE));
+        when(request.getParameter("userToken")).thenReturn(fakeToken);
+
+        // Mock the verifier
+        GoogleIdTokenVerifier mockVerifier = mock(GoogleIdTokenVerifier.class);
+        GoogleIdToken googleIdToken = mock(GoogleIdToken.class);
+        GoogleIdToken.Payload payload = mock(GoogleIdToken.Payload.class);
+        Mockito.doReturn(mockVerifier).when(spiedServlet).createGoogleIdTokenVerifier();
+        when(mockVerifier.verify(fakeToken)).thenReturn(googleIdToken);
+        when(googleIdToken.getPayload()).thenReturn(payload);
+        when(payload.getSubject()).thenReturn(fakeId);
+
+        // Preform the doPost
+        spiedServlet.doPost(request, response);
+
+        assertTrue(mockServletContext.throwable.toString().contains(new EntityNotFoundException(markerEntity.getKey()).toString()));
     }
 
 
