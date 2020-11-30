@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import {DomSanitizer, SafeUrl} from '@angular/platform-browser'
+import { DomSanitizer } from '@angular/platform-browser'
 import { MarkerMode } from '../marker-mode';
 import { BlobAction } from '../blob-action';
 import { HttpClient } from '@angular/common/http';

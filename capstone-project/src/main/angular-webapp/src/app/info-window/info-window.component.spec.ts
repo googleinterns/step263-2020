@@ -6,6 +6,8 @@ import 'jasmine';
 import { InfoWindowComponent } from './info-window.component';
 import { MarkerMode } from '../marker-mode';
 import { MockHttpInterceptor } from '../mock-http-interceptor'
+import { UserService } from '../user.service';
+import { SocialUser } from 'angularx-social-login';
 import { ToastService } from '../toast/toast.service';
 
 // Mock toast service for empty marker error
@@ -16,6 +18,7 @@ class MockToastService {
 describe('InfoWindowComponent', () => {
   let component: InfoWindowComponent;
   let fixture: ComponentFixture<InfoWindowComponent>;
+  let userService: UserService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -32,6 +35,7 @@ describe('InfoWindowComponent', () => {
     });
     fixture = TestBed.createComponent(InfoWindowComponent);
     component = fixture.componentInstance;
+    userService = new UserService();
   });
 
   it('Should create an infoWindowComponent instance', () => {
@@ -161,5 +165,18 @@ describe('InfoWindowComponent', () => {
     expect(component.originalBlobKey).toBe("");
     expect(component.imageUrl).toBe("");
     expect(dummyEvent.target.disabled).toBe(true);
+  });
+
+  it('Should return the logged in user', () => {
+    const user = new SocialUser();
+    user.firstName = "user";
+    spyOn(component['userService'], 'getUser').and.returnValue(user);
+
+    expect(component.user.firstName).toBe("user");
+  });
+
+  it ('Should return null when no user is logged in', () => {
+    spyOn(component['userService'], 'getUser').and.returnValue(null);
+    expect(component.user).toBe(null);
   });
 });
