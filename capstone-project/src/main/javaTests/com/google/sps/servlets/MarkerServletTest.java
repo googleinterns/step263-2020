@@ -87,6 +87,16 @@ public final class MarkerServletTest {
         helper.tearDown();
     }
 
+    private void setVerifierMock() throws IOException, GeneralSecurityException {
+        GoogleIdTokenVerifier mockVerifier = mock(GoogleIdTokenVerifier.class);
+        GoogleIdToken googleIdToken = mock(GoogleIdToken.class);
+        GoogleIdToken.Payload payload = mock(GoogleIdToken.Payload.class);
+        Mockito.doReturn(mockVerifier).when(spiedServlet).createGoogleIdTokenVerifier();
+        when(mockVerifier.verify(fakeToken)).thenReturn(googleIdToken);
+        when(googleIdToken.getPayload()).thenReturn(payload);
+        when(payload.getSubject()).thenReturn(fakeId);
+    }
+
     @Test
     // Test the doGet method when datastore is empty
     public void doGetDatastoreEmpty() throws IOException {
@@ -136,7 +146,7 @@ public final class MarkerServletTest {
         when(request.getParameter("action")).thenReturn(Integer.toString(CREATE_CODE));
         when(request.getParameter("userToken")).thenReturn("undefined");
 
-        // Preform the doPost and get the marker Id back so we can search for it
+        // Perform the doPost and get the marker Id back so we can search for it
         spiedServlet.doPost(request, response);
         Map<String,String> responseParameter = gson.fromJson(String.valueOf(stringWriter), Map.class);
 
@@ -160,15 +170,9 @@ public final class MarkerServletTest {
         when(request.getParameter("userToken")).thenReturn(fakeToken);
 
         // Mock the verifier
-        GoogleIdTokenVerifier mockVerifier = mock(GoogleIdTokenVerifier.class);
-        GoogleIdToken googleIdToken = mock(GoogleIdToken.class);
-        GoogleIdToken.Payload payload = mock(GoogleIdToken.Payload.class);
-        Mockito.doReturn(mockVerifier).when(spiedServlet).createGoogleIdTokenVerifier();
-        when(mockVerifier.verify(fakeToken)).thenReturn(googleIdToken);
-        when(googleIdToken.getPayload()).thenReturn(payload);
-        when(payload.getSubject()).thenReturn(fakeId);
+        setVerifierMock();
 
-        // Preform the doPost and get the marker Id back so we can search for it
+        // Perform the doPost and get the marker Id back so we can search for it
         spiedServlet.doPost(request, response);
         Map<String,String> responseParameter = gson.fromJson(String.valueOf(stringWriter), Map.class);
 
@@ -206,15 +210,9 @@ public final class MarkerServletTest {
         when(request.getParameter("userToken")).thenReturn(fakeToken);
 
         // Mock the verifier
-        GoogleIdTokenVerifier mockVerifier = mock(GoogleIdTokenVerifier.class);
-        GoogleIdToken googleIdToken = mock(GoogleIdToken.class);
-        GoogleIdToken.Payload payload = mock(GoogleIdToken.Payload.class);
-        Mockito.doReturn(mockVerifier).when(spiedServlet).createGoogleIdTokenVerifier();
-        when(mockVerifier.verify(fakeToken)).thenReturn(googleIdToken);
-        when(googleIdToken.getPayload()).thenReturn(payload);
-        when(payload.getSubject()).thenReturn(fakeId);
+        setVerifierMock();
 
-        // Preform the doPost
+        // Perform the doPost
         spiedServlet.doPost(request, response);
 
         // Update the markerEntity to be of new marker
@@ -238,15 +236,9 @@ public final class MarkerServletTest {
         when(request.getParameter("id")).thenReturn(Long.toString(marker.getId()));
 
         // Mock the verifier
-        GoogleIdTokenVerifier mockVerifier = mock(GoogleIdTokenVerifier.class);
-        GoogleIdToken googleIdToken = mock(GoogleIdToken.class);
-        GoogleIdToken.Payload payload = mock(GoogleIdToken.Payload.class);
-        Mockito.doReturn(mockVerifier).when(spiedServlet).createGoogleIdTokenVerifier();
-        when(mockVerifier.verify(fakeToken)).thenReturn(googleIdToken);
-        when(googleIdToken.getPayload()).thenReturn(payload);
-        when(payload.getSubject()).thenReturn(fakeId);
+        setVerifierMock();
 
-        // Preform the doPost
+        // Perform the doPost
         spiedServlet.doPost(request, response);
 
         // Check that the entity is no longer in datastore
@@ -254,27 +246,45 @@ public final class MarkerServletTest {
             datastoreService.get(markerEntity.getKey());
         });
     }
+
     @Test
     // Test the UPDATE case with unauthorized user
-    public void doPostCaseUpdateWithUnauthorizedUser() throws IOException, EntityNotFoundException, GeneralSecurityException {
+    public void doPostCaseUpdateWithUnauthorizedUser() throws IOException, GeneralSecurityException {
         // Put marker in datastore with second fake Id
         marker.setUserId(Optional.of(secondFakeId));
         markerEntity = Marker.toEntity(marker, markerEntity);
         datastoreService.put(markerEntity);
 
-        // Set request parameters, with token that return the first fake Id
+        // Set request parameters, with token that returns the first fake Id
         when(request.getParameter("marker")).thenReturn(markerJson);
         when(request.getParameter("action")).thenReturn(Integer.toString(UPDATE_CODE));
         when(request.getParameter("userToken")).thenReturn(fakeToken);
 
         // Mock the verifier
-        GoogleIdTokenVerifier mockVerifier = mock(GoogleIdTokenVerifier.class);
-        GoogleIdToken googleIdToken = mock(GoogleIdToken.class);
-        GoogleIdToken.Payload payload = mock(GoogleIdToken.Payload.class);
-        Mockito.doReturn(mockVerifier).when(spiedServlet).createGoogleIdTokenVerifier();
-        when(mockVerifier.verify(fakeToken)).thenReturn(googleIdToken);
-        when(googleIdToken.getPayload()).thenReturn(payload);
-        when(payload.getSubject()).thenReturn(fakeId);
+        setVerifierMock();
+
+        // Perform the doPost
+        spiedServlet.doPost(request, response);
+
+        assertTrue(mockServletContext.throwable.toString().contains(new GeneralSecurityException().toString()));
+    }
+
+    @Test
+    // Test the DELETE case with unauthorized user
+    public void doPostCaseDeleteWithUnauthorizedUser() throws IOException, GeneralSecurityException {
+        // Put marker in datastore with second fake Id
+        marker.setUserId(Optional.of(secondFakeId));
+        markerEntity = Marker.toEntity(marker, markerEntity);
+        datastoreService.put(markerEntity);
+
+        // Set request parameters, with token that returns the first fake Id
+        when(request.getParameter("marker")).thenReturn(markerJson);
+        when(request.getParameter("action")).thenReturn(Integer.toString(DELETE_CODE));
+        when(request.getParameter("userToken")).thenReturn(fakeToken);
+        when(request.getParameter("id")).thenReturn(Long.toString(marker.getId()));
+
+        // Mock the verifier
+        setVerifierMock();
 
         // Perform the doPost
         spiedServlet.doPost(request, response);
