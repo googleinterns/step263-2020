@@ -128,7 +128,7 @@ public final class MarkerServletTest {
         when(request.getParameter("action")).thenReturn(Integer.toString(CREATE_CODE));
         when(request.getParameter("userToken")).thenReturn("undefined");
 
-        // Preform the doPost and get the marker Id back so we can search for it
+        // Perform the doPost and get the marker Id back so we can search for it
         spiedServlet.doPost(request, response);
         Map<String,String> responseParameter = gson.fromJson(String.valueOf(stringWriter), Map.class);
 
