@@ -59,12 +59,7 @@ public final class MarkerServletTest {
                 .setBlobKey("blobKey")
                 .build();
         markerEntity = new Entity("Marker", 1111);
-        markerEntity.setProperty("lat", 1.0);
-        markerEntity.setProperty("lng", 1.0);
-        markerEntity.setProperty("animal", "animal");
-        markerEntity.setProperty("reporter", "reporter");
-        markerEntity.setProperty("description", "description");
-        markerEntity.setProperty("blobKey", "blobKey");
+        markerEntity = Marker.toEntity(marker, markerEntity);
         request = mock(HttpServletRequest.class);
         response = mock(HttpServletResponse.class);
         stringWriter = new StringWriter();
@@ -143,12 +138,7 @@ public final class MarkerServletTest {
         // Create the entity identical to the one put in the datastore
         // We cannot edit the current markerEntity because the id is set in the Entity constructor
         markerEntity = new Entity("Marker", Long.parseLong(responseParameter.get("id")));
-        markerEntity.setProperty("lat", 1.0);
-        markerEntity.setProperty("lng", 1.0);
-        markerEntity.setProperty("animal", "animal");
-        markerEntity.setProperty("reporter", "reporter");
-        markerEntity.setProperty("description", "description");
-        markerEntity.setProperty("blobKey", "blobKey");
+        markerEntity = Marker.toEntity(marker, markerEntity);
 
         assertEquals(datastoreService.get(markerEntityKey), markerEntity);
     }
