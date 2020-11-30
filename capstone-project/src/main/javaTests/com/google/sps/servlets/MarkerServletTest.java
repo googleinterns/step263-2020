@@ -1,5 +1,7 @@
 package com.google.sps.servlets;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.appengine.api.datastore.*;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
@@ -17,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.security.GeneralSecurityException;
 import java.util.Map;
 import java.util.Optional;
 
@@ -149,6 +152,42 @@ public final class MarkerServletTest {
         markerEntity.setProperty("reporter", "reporter");
         markerEntity.setProperty("description", "description");
         markerEntity.setProperty("blobKey", "blobKey");
+
+        assertEquals(datastoreService.get(markerEntityKey), markerEntity);
+    }
+
+    @Test
+    // Test the CREATE case with user
+    public void doPostCaseCreateWithUser() throws IOException, EntityNotFoundException, GeneralSecurityException {
+        String fakeToken = "";
+        String fakeId = "123";
+        when(request.getParameter("marker")).thenReturn(markerJson);
+        when(request.getParameter("action")).thenReturn(Integer.toString(CREATE_CODE));
+        when(request.getParameter("userToken")).thenReturn(fakeToken);
+
+        GoogleIdTokenVerifier mockVerifier = mock(GoogleIdTokenVerifier.class);
+        GoogleIdToken googleIdToken = mock(GoogleIdToken.class);
+        GoogleIdToken.Payload payload = mock(GoogleIdToken.Payload.class);
+
+        Mockito.doReturn(mockVerifier).when(spiedServlet).createGoogleIdTokenVerifier();
+        when(mockVerifier.verify(fakeToken)).thenReturn(googleIdToken);
+        when(googleIdToken.getPayload()).thenReturn(payload);
+        when(payload.getSubject()).thenReturn(fakeId);
+
+        // Preform the doPost and get the marker Id back so we can search for it
+        spiedServlet.doPost(request, response);
+        Map<String,String> responseParameter = gson.fromJson(String.valueOf(stringWriter), Map.class);
+        Key markerEntityKey = KeyFactory.createKey("Marker", Long.parseLong(responseParameter.get("id")));
+
+        // Create the entity identical to the one put in the datastore
+        markerEntity = new Entity("Marker", Long.parseLong(responseParameter.get("id")));
+        markerEntity.setProperty("lat", 1.0);
+        markerEntity.setProperty("lng", 1.0);
+        markerEntity.setProperty("animal", "animal");
+        markerEntity.setProperty("reporter", "reporter");
+        markerEntity.setProperty("description", "description");
+        markerEntity.setProperty("blobKey", "blobKey");
+        markerEntity.setProperty("userId", fakeId);
 
         assertEquals(datastoreService.get(markerEntityKey), markerEntity);
     }
