@@ -23,8 +23,7 @@ import java.security.GeneralSecurityException;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -179,8 +178,8 @@ public final class MarkerServletTest {
     }
 
     @Test
-    // Test the UPDATE case with user
-    public void doPostCaseUpdateWithUser() throws IOException, EntityNotFoundException, GeneralSecurityException {
+    // Test the UPDATE case with correct user
+    public void doPostCaseUpdateWithCorrectUser() throws IOException, EntityNotFoundException, GeneralSecurityException {
         // Put old marker in datastore
         marker.setUserId(Optional.of(fakeId));
         markerEntity = Marker.toEntity(marker, markerEntity);
@@ -222,8 +221,9 @@ public final class MarkerServletTest {
         assertEquals(datastoreService.get(markerEntity.getKey()), markerEntity);
     }
 
-    // Test the UPDATE case with user
-    public void doPostCaseDeleteWithUser() throws IOException, EntityNotFoundException, GeneralSecurityException {
+    @Test
+    // Test the DELETE case with correct user
+    public void doPostCaseDeleteWithCorrectUser() throws IOException, EntityNotFoundException, GeneralSecurityException {
         // Put marker in datastore
         marker.setUserId(Optional.of(fakeId));
         markerEntity = Marker.toEntity(marker, markerEntity);
@@ -233,6 +233,7 @@ public final class MarkerServletTest {
         when(request.getParameter("marker")).thenReturn(markerJson);
         when(request.getParameter("action")).thenReturn(Integer.toString(DELETE_CODE));
         when(request.getParameter("userToken")).thenReturn(fakeToken);
+        when(request.getParameter("id")).thenReturn(Long.toString(marker.getId()));
 
         // Mock the verifier
         GoogleIdTokenVerifier mockVerifier = mock(GoogleIdTokenVerifier.class);
@@ -246,7 +247,10 @@ public final class MarkerServletTest {
         // Preform the doPost
         spiedServlet.doPost(request, response);
 
-        assertTrue(mockServletContext.throwable.toString().contains(new EntityNotFoundException(markerEntity.getKey()).toString()));
+        // Check that the entity is no longer in datastore
+        assertThrows(EntityNotFoundException.class, () -> {
+            datastoreService.get(markerEntity.getKey());
+        });
     }
 
 
