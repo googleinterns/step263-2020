@@ -131,15 +131,13 @@ public final class MarkerServletTest {
         // Preform the doPost and get the marker Id back so we can search for it
         spiedServlet.doPost(request, response);
         Map<String,String> responseParameter = gson.fromJson(String.valueOf(stringWriter), Map.class);
-        // Save entity key with the marker id to fetch it from datastore
-        Key markerEntityKey = KeyFactory.createKey("Marker", Long.parseLong(responseParameter.get("id")));
 
         // Create the entity identical to the one put in the datastore
         // We cannot edit the current markerEntity because the id is set in the Entity constructor
         markerEntity = new Entity("Marker", Long.parseLong(responseParameter.get("id")));
         markerEntity = Marker.toEntity(marker, markerEntity);
 
-        assertEquals(datastoreService.get(markerEntityKey), markerEntity);
+        assertEquals(datastoreService.get(markerEntity.getKey()), markerEntity);
     }
 
 }
