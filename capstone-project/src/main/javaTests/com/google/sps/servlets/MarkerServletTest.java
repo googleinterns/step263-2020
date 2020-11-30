@@ -90,8 +90,7 @@ public final class MarkerServletTest {
     @Test
     // Test the doGet method when datastore has marker
     public void doGetDatastoreNotEmpty() throws IOException {
-        DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
-        ds.put(markerEntity);
+        datastoreService.put(markerEntity);
 
         new MarkerServlet().doGet(request, response);
 
