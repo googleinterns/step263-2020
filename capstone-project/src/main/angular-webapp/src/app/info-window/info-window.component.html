@@ -26,7 +26,7 @@
     <div *ngIf="type==MarkerMode.CREATE">
         <mat-form-field floatLabel="always" appearance="outline">
             <mat-label>Animal</mat-label>
-            <input matInput #inputAnimal [(ngModel)]="animalName"><br>
+            <input matInput #inputAnimal><br>
         </mat-form-field>
         <br>
         <mat-form-field floatLabel="always" appearance="outline">
@@ -46,7 +46,7 @@
                 <p id="file-name">
             </form>
             <br>
-            <button id="submitButton" mat-stroked-button style="float: right;" [disabled]="isUploading || !animalName" (click)="submit(inputAnimal.value, inputDescription.value, inputReporter.value)">
+            <button id="submitButton" mat-stroked-button style="float: right;" [disabled]="isUploading" (click)="submit(inputAnimal.value, inputDescription.value, inputReporter.value)">
                 <mat-icon>done</mat-icon>
             </button>
             <br>
@@ -115,4 +115,5 @@
         </button>
         <br>
     </div>
+    <div id="ej2Toast" #toast></div>
 </body>
