@@ -45,6 +45,7 @@ public final class MarkerServletTest {
     private static MarkerServlet spiedServlet;
     private static String fakeToken;
     private static String fakeId;
+    private static String secondFakeId;
     private static final int CREATE_CODE = Action.CREATE.ordinal();
     private static final int UPDATE_CODE = Action.UPDATE.ordinal();
     private static final int DELETE_CODE = Action.DELETE.ordinal();
@@ -77,6 +78,7 @@ public final class MarkerServletTest {
         spiedServlet = Mockito.spy(MarkerServlet.class);
         Mockito.doReturn(mockServletContext).when(spiedServlet).getServletContext();
         fakeId = "123";
+        secondFakeId = "234";
         fakeToken = "";
     }
 
@@ -252,6 +254,32 @@ public final class MarkerServletTest {
             datastoreService.get(markerEntity.getKey());
         });
     }
+    @Test
+    // Test the UPDATE case with unauthorized user
+    public void doPostCaseUpdateWithUnauthorizedUser() throws IOException, EntityNotFoundException, GeneralSecurityException {
+        // Put marker in datastore with second fake Id
+        marker.setUserId(Optional.of(secondFakeId));
+        markerEntity = Marker.toEntity(marker, markerEntity);
+        datastoreService.put(markerEntity);
 
+        // Set request parameters, with token that return the first fake Id
+        when(request.getParameter("marker")).thenReturn(markerJson);
+        when(request.getParameter("action")).thenReturn(Integer.toString(UPDATE_CODE));
+        when(request.getParameter("userToken")).thenReturn(fakeToken);
+
+        // Mock the verifier
+        GoogleIdTokenVerifier mockVerifier = mock(GoogleIdTokenVerifier.class);
+        GoogleIdToken googleIdToken = mock(GoogleIdToken.class);
+        GoogleIdToken.Payload payload = mock(GoogleIdToken.Payload.class);
+        Mockito.doReturn(mockVerifier).when(spiedServlet).createGoogleIdTokenVerifier();
+        when(mockVerifier.verify(fakeToken)).thenReturn(googleIdToken);
+        when(googleIdToken.getPayload()).thenReturn(payload);
+        when(payload.getSubject()).thenReturn(fakeId);
+
+        // Perform the doPost
+        spiedServlet.doPost(request, response);
+
+        assertTrue(mockServletContext.throwable.toString().contains(new GeneralSecurityException().toString()));
+    }
 
 }
