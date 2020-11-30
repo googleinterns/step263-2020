@@ -26,6 +26,7 @@ export class MapComponent implements OnInit {
   private factory: ComponentFactory<InfoWindowComponent> = this.componentFactoryResolver.resolveComponentFactory(InfoWindowComponent);
   private gMap: google.maps.Map;
   public static readonly defaultMapCenter: google.maps.LatLng = new google.maps.LatLng(25, 80);
+  private markers: google.maps.Marker[];
 
   ngOnInit(): void {
 
@@ -44,7 +45,11 @@ export class MapComponent implements OnInit {
       this.addMarkerForEdit(event.latLng.lat(), event.latLng.lng());
     });
 
-    // Fetches markers from the backend and adds them to the map.
+    this.fetchMarkers();
+  }
+  
+  // Fetches markers from the backend and adds them to the map.
+  fetchMarkers(){ 
     this.httpClient.get('/markers')
       .toPromise()
       .then((response) => {
@@ -139,6 +144,9 @@ export class MapComponent implements OnInit {
 
     // Remove marker from the map.
     markerForDisplay.setMap(null);
+    this.markers.filter((element) => {
+      return element != markerForDisplay;
+    });
   }
 
   // Add a marker the user can edit.
@@ -200,6 +208,8 @@ export class MapComponent implements OnInit {
         this.generateInfoWindow(markerForDisplay, marker);
       }
     });
+
+    this.markers.push(markerForDisplay);
   }
 
   // Creates an info window to be displayed after user clicks the marker
@@ -287,4 +297,5 @@ export class MapComponent implements OnInit {
   get user(): SocialUser {
     return this.userService.getUser();
   }
+
 }
