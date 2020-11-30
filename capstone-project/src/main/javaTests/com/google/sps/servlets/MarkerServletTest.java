@@ -44,6 +44,8 @@ public final class MarkerServletTest {
     private static DatastoreService datastoreService;
     private static MockServletContext mockServletContext;
     private static MarkerServlet spiedServlet;
+    private static String fakeToken;
+    private static String fakeId;
     private static final int CREATE_CODE = Action.CREATE.ordinal();
     private static final int UPDATE_CODE = Action.UPDATE.ordinal();
     private static final int DELETE_CODE = Action.DELETE.ordinal();
@@ -75,6 +77,8 @@ public final class MarkerServletTest {
         mockServletContext = new MockServletContext();
         spiedServlet = Mockito.spy(MarkerServlet.class);
         Mockito.doReturn(mockServletContext).when(spiedServlet).getServletContext();
+        fakeId = "123";
+        fakeToken = "";
     }
 
     @After
@@ -93,8 +97,7 @@ public final class MarkerServletTest {
     @Test
     // Test the doGet method when datastore has marker
     public void doGetDatastoreNotEmpty() throws IOException {
-        DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
-        ds.put(markerEntity);
+        datastoreService.put(markerEntity);
 
         new MarkerServlet().doGet(request, response);
 
@@ -149,16 +152,18 @@ public final class MarkerServletTest {
     @Test
     // Test the CREATE case with user
     public void doPostCaseCreateWithUser() throws IOException, EntityNotFoundException, GeneralSecurityException {
-        String fakeToken = "";
-        String fakeId = "123";
+        // Set the marker userId to the fakeId
+        marker.setUserId(Optional.of(fakeId));
+
+        // Set request parameters
         when(request.getParameter("marker")).thenReturn(markerJson);
         when(request.getParameter("action")).thenReturn(Integer.toString(CREATE_CODE));
         when(request.getParameter("userToken")).thenReturn(fakeToken);
 
+        // Mock the verifier
         GoogleIdTokenVerifier mockVerifier = mock(GoogleIdTokenVerifier.class);
         GoogleIdToken googleIdToken = mock(GoogleIdToken.class);
         GoogleIdToken.Payload payload = mock(GoogleIdToken.Payload.class);
-
         Mockito.doReturn(mockVerifier).when(spiedServlet).createGoogleIdTokenVerifier();
         when(mockVerifier.verify(fakeToken)).thenReturn(googleIdToken);
         when(googleIdToken.getPayload()).thenReturn(payload);
@@ -171,15 +176,55 @@ public final class MarkerServletTest {
 
         // Create the entity identical to the one put in the datastore
         markerEntity = new Entity("Marker", Long.parseLong(responseParameter.get("id")));
-        markerEntity.setProperty("lat", 1.0);
-        markerEntity.setProperty("lng", 1.0);
-        markerEntity.setProperty("animal", "animal");
-        markerEntity.setProperty("reporter", "reporter");
-        markerEntity.setProperty("description", "description");
-        markerEntity.setProperty("blobKey", "blobKey");
-        markerEntity.setProperty("userId", fakeId);
+        markerEntity = Marker.toEntity(marker, markerEntity);
 
         assertEquals(datastoreService.get(markerEntityKey), markerEntity);
     }
+
+    @Test
+    // Test the UPDATE case with user
+    public void doPostCaseUpdateWithUser() throws IOException, EntityNotFoundException, GeneralSecurityException {
+        // Put old marker in datastore
+        marker.setUserId(Optional.of(fakeId));
+        markerEntity = Marker.toEntity(marker, markerEntity);
+        datastoreService.put(markerEntity);
+
+        // Change the marker
+        marker = new Marker.Builder()
+                .setId(1111)
+                .setLat(1)
+                .setLng(1)
+                .setAnimal("animal2")
+                .setReporter("reporter2")
+                .setDescription("description2")
+                .setUserId(Optional.of(fakeId))
+                .setBlobKey("blobKey")
+                .build();
+        markerJson = gson.toJson(marker);
+
+        // Set request parameters
+        when(request.getParameter("marker")).thenReturn(markerJson);
+        when(request.getParameter("action")).thenReturn(Integer.toString(UPDATE_CODE));
+        when(request.getParameter("userToken")).thenReturn(fakeToken);
+
+        // Mock the verifier
+        GoogleIdTokenVerifier mockVerifier = mock(GoogleIdTokenVerifier.class);
+        GoogleIdToken googleIdToken = mock(GoogleIdToken.class);
+        GoogleIdToken.Payload payload = mock(GoogleIdToken.Payload.class);
+        Mockito.doReturn(mockVerifier).when(spiedServlet).createGoogleIdTokenVerifier();
+        when(mockVerifier.verify(fakeToken)).thenReturn(googleIdToken);
+        when(googleIdToken.getPayload()).thenReturn(payload);
+        when(payload.getSubject()).thenReturn(fakeId);
+
+        // Preform the doPost
+        spiedServlet.doPost(request, response);
+        Key markerEntityKey = KeyFactory.createKey("Marker", marker.getId());
+
+        // Update the markerEntity to be of new marker
+        markerEntity = Marker.toEntity(marker, markerEntity);
+
+        assertEquals(datastoreService.get(markerEntityKey), markerEntity);
+    }
+
 
 }
