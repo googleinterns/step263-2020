@@ -45,7 +45,7 @@ export class InfoWindowComponent implements OnInit {
 
   // Update the fields according to user input and emit the submitEvent to receive the data in mapComponenet
   submit(animalValue, descriptionValue, reporterValue) {
-    
+
     // Avoid submitting an empty marker
     if(!animalValue) {
       this.toastService.showToast(document.getElementById("ej2Toast"), {
