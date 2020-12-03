@@ -13,11 +13,11 @@ export class ChartsComponent implements OnInit {
   public topReportersData;
 
   ngOnInit(): void {
-    this.getChartsData();
+    this.setChartsData();
   }
 
   // Right now this function sets static data for the charts. In the future, the data will be retrieved from a server.
-  getChartsData() {
+  setChartsData() {
     this.animalNamesData = [
       ['Cats', 30],
       ['Dogs', 10],
