@@ -68,7 +68,6 @@ public final class BlobServletTest {
     @Test
     // Test the KEY_TO_BLOB case when the given key string is empty
     public void doGetNoBlob() throws IOException {
-
         when(request.getParameter("blobAction")).thenReturn(Integer.toString(KEY_TO_BLOB_CODE));
         when(request.getParameter("blob-key")).thenReturn("");
 
@@ -80,7 +79,6 @@ public final class BlobServletTest {
     @Test
     // Test the KEY_TO_BLOB case when the given key string is not empty
     public void doGetBlob() throws IOException {
-
         when(request.getParameter("blobAction")).thenReturn(Integer.toString(KEY_TO_BLOB_CODE));
         when(request.getParameter("blob-key")).thenReturn(BLOB_KEY_STRING);
 
@@ -92,7 +90,6 @@ public final class BlobServletTest {
     @Test
     // Test the GET_URL case
     public void doGetUrl() throws IOException {
-
         when(request.getParameter("blobAction")).thenReturn(Integer.toString(GET_URL_CODE));
 
         new BlobServlet().doGet(request, response, spiedBlobService);
@@ -104,7 +101,6 @@ public final class BlobServletTest {
     @Test
     // Post a request containing blobs
     public void doPostWithBlob() throws IOException {
-
         Map<String, List<BlobKey>> fakeKeyMap = new HashMap<>();
         fakeKeyMap.put("image", Arrays.asList(BLOB_KEY));
 
@@ -118,7 +114,6 @@ public final class BlobServletTest {
     @Test
     // Post a request containing a blob that wasn't defined as 'image'
     public void doPostNoImage() throws IOException {
-
         Map<String, List<BlobKey>> fakeKeyMap = new HashMap<>();
         fakeKeyMap.put("file", Arrays.asList(BLOB_KEY));
         when(spiedBlobService.getUploads(Mockito.any(HttpServletRequest.class))).thenReturn(fakeKeyMap);
@@ -131,7 +126,6 @@ public final class BlobServletTest {
     @Test
     // Post a request not containing any blobs
     public void doPostNoBlob() throws IOException {
-
         Map<String, List<BlobKey>> emptyKeyMap = new HashMap<>();
         when(spiedBlobService.getUploads(Mockito.any(HttpServletRequest.class))).thenReturn(emptyKeyMap);
 
