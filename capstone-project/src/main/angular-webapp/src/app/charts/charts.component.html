@@ -11,7 +11,7 @@
             <google-chart title="Users" type="PieChart" [data]="usersStateData" height="700" width="700"></google-chart>
         </div>
         <div style="display: inline-block;">
-            <google-chart title="Top 5 Reporters" type="ColumnChart" [data]="topReportersData" vAxis="{format: '0'}" height="700" width="700"></google-chart>
+            <google-chart title="Top 5 Reporters" type="ColumnChart" [columns]=columnNames [data]="topReportersData" height="700" width="700"></google-chart>
         </div>
     </div>
 </body>

@@ -11,6 +11,7 @@ export class ChartsComponent implements OnInit {
   public animalNamesData;
   public usersStateData;
   public topReportersData;
+  public columnNames = ['Name', 'Num. of Reports'];
 
   ngOnInit(): void {
     this.setChartsData();
