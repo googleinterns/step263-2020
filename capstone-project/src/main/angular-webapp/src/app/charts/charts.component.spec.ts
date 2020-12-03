@@ -6,11 +6,11 @@ describe('ChartsComponent', () => {
   let component: ChartsComponent;
   let fixture: ComponentFixture<ChartsComponent>;
 
-  beforeEach(async () => {
+  beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [ChartsComponent],
-
+      declarations: [ChartsComponent]
     });
+    
     fixture = TestBed.createComponent(ChartsComponent);
     component = fixture.componentInstance;
   });

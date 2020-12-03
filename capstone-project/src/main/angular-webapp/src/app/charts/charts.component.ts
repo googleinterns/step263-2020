@@ -7,11 +7,12 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ChartsComponent implements OnInit {
 
-  constructor() { }
   public animalNamesData;
   public usersStateData;
   public topReportersData;
   public columnNames = ['Name', 'Num. of Reports'];
+  
+  constructor() { }
 
   ngOnInit(): void {
     this.setChartsData();

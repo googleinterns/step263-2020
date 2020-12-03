@@ -16,7 +16,6 @@ import { environment } from 'src/environments/environment';
 import { MaterialModule } from './material/material.module';
 import { ToastService } from './toast/toast.service';
 
-
 @NgModule({
   declarations: [
     AppComponent,
