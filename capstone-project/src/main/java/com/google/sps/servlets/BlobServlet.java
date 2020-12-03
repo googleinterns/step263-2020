@@ -17,7 +17,6 @@ package com.google.sps.servlets;
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.blobstore.BlobstoreService;
 import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import javax.servlet.annotation.WebServlet;
@@ -67,7 +66,8 @@ public class BlobServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        String blobKeyAsString = getBlobKey(request);
+        BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
+        String blobKeyAsString = getBlobKey(request, blobstoreService);
         JsonObject jsonResponse = new JsonObject();
         jsonResponse.addProperty("blobKey", blobKeyAsString);
         response.setContentType("application/json");
@@ -75,8 +75,8 @@ public class BlobServlet extends HttpServlet {
     }
 
     /** Returns the BlobKey of an uploaded image so we can serve the blob. */
-    private static String getBlobKey(HttpServletRequest request) {
-        BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
+    private static String getBlobKey(HttpServletRequest request, BlobstoreService blobstoreService) {
+
         // Get all files uploaded to Blobstore from this request
         Map<String, List<BlobKey>> blobs = blobstoreService.getUploads(request);
         // Get the blob key associated with the image uploaded
@@ -88,5 +88,37 @@ public class BlobServlet extends HttpServlet {
         }
 
         return blobKey;
+    }
+
+    /** Imitates the real doPost method for testing purposes */
+    static void doGet(HttpServletRequest request, HttpServletResponse response, BlobstoreService blobstoreService) throws IOException {
+
+        int actionNum = Integer.parseInt(request.getParameter("blobAction"));
+        BlobAction action = BlobAction.values()[actionNum];
+        switch (action) {
+            // For action code KEY_TO_BLOB return the blob of the given blob key
+            case KEY_TO_BLOB:
+                BlobKey blobKey = new BlobKey(request.getParameter("blob-key"));
+                blobstoreService.serve(blobKey, response);
+                break;
+            // For action code GET_URL return the URL which first sends the file to BlobStore and then redirects it for further processing.
+            case GET_URL:
+                String uploadUrl = blobstoreService.createUploadUrl("/blob-service");
+                JsonObject jsonResponse = new JsonObject();
+                jsonResponse.addProperty("imageUrl", uploadUrl);
+                response.setContentType("application/json");
+                response.getWriter().println(jsonResponse);
+                break;
+        }
+    }
+    
+    /** Imitates the real doPost method for testing purposes */
+    static void doPost(HttpServletRequest request, HttpServletResponse response, BlobstoreService blobstoreService) throws IOException {
+
+        String blobKeyAsString = getBlobKey(request, blobstoreService);
+        JsonObject jsonResponse = new JsonObject();
+        jsonResponse.addProperty("blobKey", blobKeyAsString);
+        response.setContentType("application/json");
+        response.getWriter().println(jsonResponse);
     }
 }
