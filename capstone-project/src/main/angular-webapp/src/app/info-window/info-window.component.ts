@@ -6,6 +6,7 @@ import { HttpClient } from '@angular/common/http';
 import { } from 'googlemaps';
 import { SocialUser } from "angularx-social-login";
 import { UserService } from "../user.service";
+import { ToastService } from '../toast/toast.service';
 
 @Component({
   selector: 'app-info-window',
@@ -31,7 +32,7 @@ export class InfoWindowComponent implements OnInit {
   private blobKeyValue : string;
   isUploading = false; // A flag to avoid submitting a report before the image processing is finished.
 
-  constructor(private httpClient: HttpClient, public domSanitizer: DomSanitizer, private userService: UserService) { }
+  constructor(private httpClient: HttpClient, public domSanitizer: DomSanitizer, private userService: UserService, private toastService: ToastService) { }
 
   ngOnInit(): void { 
     this.blobKeyValue = this.originalBlobKey;
@@ -44,6 +45,16 @@ export class InfoWindowComponent implements OnInit {
 
   // Update the fields according to user input and emit the submitEvent to receive the data in mapComponenet
   submit(animalValue, descriptionValue, reporterValue) {
+
+    // Avoid submitting an empty marker
+    if(!animalValue) {
+      this.toastService.showToast(document.getElementById("ej2Toast"), {
+        title: "Couldn't Submit Report",
+        content: "Please fill in the 'Animal' field."
+      });
+      return;
+    }
+
     this.animal = animalValue;
     this.description = descriptionValue;
     this.reporter = reporterValue;
