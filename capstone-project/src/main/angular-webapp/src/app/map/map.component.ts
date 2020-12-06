@@ -1,4 +1,4 @@
-import { Component, OnInit, ComponentFactory, ComponentFactoryResolver, Injector } from '@angular/core';
+import { Component, OnInit, ComponentFactory, ComponentFactoryResolver, Injector, ViewChild, AfterViewInit } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { } from 'googlemaps';
 import { InfoWindowComponent } from '../info-window/info-window.component';
@@ -7,13 +7,14 @@ import { UserService } from '../user.service'
 import { SocialUser } from 'angularx-social-login';
 import { BlobAction } from '../blob-action';
 import { ToastService } from '../toast/toast.service';
+import { MarkerFilterComponent } from '../marker-filter/marker-filter.component';
 
 @Component({
   selector: 'app-map',
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.css']
 })
-export class MapComponent implements OnInit {
+export class MapComponent implements AfterViewInit {
 
   constructor(private httpClient: HttpClient,
     private componentFactoryResolver: ComponentFactoryResolver,
@@ -26,9 +27,10 @@ export class MapComponent implements OnInit {
   private factory: ComponentFactory<InfoWindowComponent> = this.componentFactoryResolver.resolveComponentFactory(InfoWindowComponent);
   private gMap: google.maps.Map;
   public static readonly defaultMapCenter: google.maps.LatLng = new google.maps.LatLng(25, 80);
-  private markers: google.maps.Marker[];
+  markers: [google.maps.Marker, any][] = [];
+  @ViewChild(MarkerFilterComponent) markerFilter; 
 
-  ngOnInit(): void {
+  ngAfterViewInit(): void {
 
     // Define the map.
     const googleMapOption = {
@@ -46,10 +48,11 @@ export class MapComponent implements OnInit {
     });
 
     this.fetchMarkers();
+    this.markerFilter.setOptionsArray();
   }
-  
+
   // Fetches markers from the backend and adds them to the map.
-  fetchMarkers(){ 
+  fetchMarkers() {
     this.httpClient.get('/markers')
       .toPromise()
       .then((response) => {
@@ -209,7 +212,8 @@ export class MapComponent implements OnInit {
       }
     });
 
-    this.markers.push(markerForDisplay);
+    this.markers.push([markerForDisplay, marker]);
+    this.markerFilter.animals.add(marker.animal);
   }
 
   // Creates an info window to be displayed after user clicks the marker
@@ -296,6 +300,25 @@ export class MapComponent implements OnInit {
   // Return the current user
   get user(): SocialUser {
     return this.userService.getUser();
+  }
+
+  // Show on map only the markers with animal name
+  displayMarkersByAnimalName(animalName) {
+    this.markers.forEach(([markerForDisplay, marker]) => {
+      if ((marker.animal).toLowerCase() == animalName.toLowerCase()) {
+        markerForDisplay.setMap(this.gMap);
+      }
+      else {
+        markerForDisplay.setMap(null);
+      }
+    });
+  }
+
+  // Show on map all markers
+  displayAllMarkers() {
+    this.markers.forEach(([markerForDisplay, marker]) => {
+      markerForDisplay.setMap(this.gMap);
+    });
   }
 
 }

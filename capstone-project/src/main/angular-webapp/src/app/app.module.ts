@@ -12,14 +12,19 @@ import { MapComponent } from './map/map.component';
 import { AuthenticationComponent } from './authentication/authentication.component';
 import { environment } from 'src/environments/environment';
 import { MaterialModule } from './material/material.module';
-import { ToastService } from './toast/toast.service'
+import { ToastService } from './toast/toast.service';
+import { MarkerFilterComponent } from './marker-filter/marker-filter.component'
+import {MatAutocompleteModule} from '@angular/material/autocomplete';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+
 
 @NgModule({
   declarations: [
     AppComponent,
     MapComponent,
     AuthenticationComponent,
-    InfoWindowComponent
+    InfoWindowComponent,
+    MarkerFilterComponent
   ],
   imports: [
     BrowserModule,
@@ -28,7 +33,10 @@ import { ToastService } from './toast/toast.service'
     GoogleMapsModule,
     BrowserAnimationsModule,
     SocialLoginModule,
-    MaterialModule
+    MaterialModule,
+    MatAutocompleteModule,
+    ReactiveFormsModule,
+    FormsModule
   ],
   providers: [
     ToastService,
