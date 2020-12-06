@@ -8,6 +8,7 @@ import { SocialUser } from 'angularx-social-login';
 import { BlobAction } from '../blob-action';
 import { ToastService } from '../toast/toast.service';
 import { MarkerFilterComponent } from '../marker-filter/marker-filter.component';
+import { MarkerService } from '../marker.service';
 
 @Component({
   selector: 'app-map',
@@ -20,7 +21,8 @@ export class MapComponent implements AfterViewInit {
     private componentFactoryResolver: ComponentFactoryResolver,
     private injector: Injector,
     private userService: UserService,
-    private toastService: ToastService) { }
+    private toastService: ToastService,
+    private markerService: MarkerService) { }
 
   // Editable marker that displays when a user clicks on the map.
   private editableMarker: google.maps.Marker;
@@ -28,6 +30,7 @@ export class MapComponent implements AfterViewInit {
   private gMap: google.maps.Map;
   public static readonly defaultMapCenter: google.maps.LatLng = new google.maps.LatLng(25, 80);
   markers: [google.maps.Marker, any][] = [];
+  
   @ViewChild(MarkerFilterComponent) markerFilter; 
 
   ngAfterViewInit(): void {
@@ -48,8 +51,14 @@ export class MapComponent implements AfterViewInit {
     });
 
     this.fetchMarkers();
-    this.markerFilter.setOptionsArray();
-  }
+    this.markerService.nameToFilterBy.subscribe(animal => {
+      if (animal == ""){
+        this.displayAllMarkers();
+      } else {
+        this.displayMarkersByAnimalName(animal);
+      }
+    })
+    }
 
   // Fetches markers from the backend and adds them to the map.
   fetchMarkers() {
@@ -213,7 +222,7 @@ export class MapComponent implements AfterViewInit {
     });
 
     this.markers.push([markerForDisplay, marker]);
-    this.markerFilter.animals.add(marker.animal);
+    this.markerService.markers.push(marker);
   }
 
   // Creates an info window to be displayed after user clicks the marker
@@ -304,6 +313,7 @@ export class MapComponent implements AfterViewInit {
 
   // Show on map only the markers with animal name
   displayMarkersByAnimalName(animalName) {
+    console.log("setNameToFilterBy was called with - " + animalName);
     this.markers.forEach(([markerForDisplay, marker]) => {
       if ((marker.animal).toLowerCase() == animalName.toLowerCase()) {
         markerForDisplay.setMap(this.gMap);

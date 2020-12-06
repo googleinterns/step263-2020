@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
+import { MarkerService } from '../marker.service';
 
 @Component({
   selector: 'app-marker-filter',
@@ -10,31 +11,25 @@ import { map, startWith } from 'rxjs/operators';
   styleUrls: ['./marker-filter.component.css']
 })
 export class MarkerFilterComponent implements OnInit {
+  
+  constructor(public markerService: MarkerService){ }
 
   myControl = new FormControl();
-  animals: Set<string> = new Set();
-  options: string[];
+  // animals: Set<string> = new Set();
+  // options: string[];
   filteredOptions: Observable<string[]>;
 
-  ngOnInit() {  
-    this.options = ["Check"];
-  }
-
-  setOptionsArray() {
-    this.animals.forEach((animal) => {
-      this.options.push(animal);
-    });
-
+  ngOnInit() {
     this.filteredOptions = this.myControl.valueChanges.pipe(
       startWith(''),
-      map(value => this._filter(value))
+      map(value => this.markerService.filter(value))
     );
   }
 
-  private _filter(value: string): string[] {
-    const filterValue = value.toLowerCase();
-
-    return this.options.filter(option => option.toLowerCase().indexOf(filterValue) === 0);
+  displayFn(value){
+    console.log("In DisplayFn, value = " + value);
+    this.markerService.setNameToFilterBy(value);
   }
+
 }
 

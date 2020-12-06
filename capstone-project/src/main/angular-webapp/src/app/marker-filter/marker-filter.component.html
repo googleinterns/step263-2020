@@ -5,10 +5,11 @@
              matInput
              [formControl]="myControl"
              [matAutocomplete]="auto">
-      <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+      <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" [displayWith]="displayFn.bind(this)">
         <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
           {{option}}
         </mat-option>
       </mat-autocomplete>
+      <button>{{markerService.nameToFilterBy}}</button>
     </mat-form-field>
   </form>

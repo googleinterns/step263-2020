@@ -16,6 +16,7 @@ import { ToastService } from './toast/toast.service';
 import { MarkerFilterComponent } from './marker-filter/marker-filter.component'
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {MatButtonModule} from '@angular/material/button';
 
 
 @NgModule({
@@ -36,7 +37,8 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
     MaterialModule,
     MatAutocompleteModule,
     ReactiveFormsModule,
-    FormsModule
+    FormsModule,
+    MatButtonModule
   ],
   providers: [
     ToastService,
