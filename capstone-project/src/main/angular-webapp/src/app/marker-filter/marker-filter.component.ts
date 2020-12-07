@@ -24,7 +24,8 @@ export class MarkerFilterComponent implements OnInit {
     );
   }
 
-  displayFn(value){
+  // When a user selects an animal name, filter markers by that name
+  filterMarkers(value){
     this.markerService.setNameToFilterBy(value);
   }
 
