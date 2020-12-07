@@ -28,7 +28,6 @@ export class MapComponent implements AfterViewInit {
   private factory: ComponentFactory<InfoWindowComponent> = this.componentFactoryResolver.resolveComponentFactory(InfoWindowComponent);
   private gMap: google.maps.Map;
   public static readonly defaultMapCenter: google.maps.LatLng = new google.maps.LatLng(25, 80);
-  markers: [google.maps.Marker, any][] = [];
 
   ngAfterViewInit(): void {
 
@@ -152,14 +151,7 @@ export class MapComponent implements AfterViewInit {
     });
     // Remove marker from the map.
     markerForDisplay.setMap(null);
-    this.RemoveMarkerFromArrays(markerData, markerForDisplay);
-  }
-
-  // Remove marker from markers array and markerService
-  RemoveMarkerFromArrays(marker, markerForDisplay) {
-    const index = this.markers.indexOf([markerForDisplay, marker]);
-    this.markers.splice(index, 1);
-    this.markerService.deleteMarker(marker);
+    this.markerService.deleteMarker([markerForDisplay, markerData]);
   }
 
   // Add a marker the user can edit.
@@ -201,12 +193,6 @@ export class MapComponent implements AfterViewInit {
     return infoWindowComponent.location.nativeElement;
   }
 
-  // Add marker to markers array and markerService
-  addMarkerToArrays(marker, markerForDisplay){
-    this.markers.push([markerForDisplay, marker]);
-    this.markerService.pushMarker(marker);
-  }
-
   // Displays a marker on the map
   addMarkerForDisplay(marker) {
 
@@ -228,7 +214,7 @@ export class MapComponent implements AfterViewInit {
       }
     });
 
-    this.addMarkerToArrays(marker, markerForDisplay)
+    this.markerService.pushMarker([markerForDisplay, marker]);
   }
 
   // Creates an info window to be displayed after user clicks the marker
@@ -310,8 +296,8 @@ export class MapComponent implements AfterViewInit {
       }
 
       // Update the markers array and marker service
-      this.RemoveMarkerFromArrays(markerData, markerForDisplay);
-      this.addMarkerToArrays(newMarker, markerForDisplay);
+      this.markerService.deleteMarker([markerForDisplay, markerData]);
+      this.markerService.pushMarker([markerForDisplay, newMarker]);
     });
 
     return infoWindowComponent.location.nativeElement;
@@ -324,7 +310,7 @@ export class MapComponent implements AfterViewInit {
 
   // Show on map only the markers with animal name
   displayMarkersByAnimalName(animalName) {
-    this.markers.forEach(([markerForDisplay, marker]) => {
+    this.markerService.getMarkersArray().forEach(([markerForDisplay, marker]) => {
       if ((marker.animal).toLowerCase() == animalName.toLowerCase()) {
         markerForDisplay.setMap(this.gMap);
       }
@@ -336,7 +322,7 @@ export class MapComponent implements AfterViewInit {
 
   // Show on map all markers
   displayAllMarkers() {
-    this.markers.forEach(([markerForDisplay, marker]) => {
+    this.markerService.getMarkersArray().forEach(([markerForDisplay, marker]) => {
       markerForDisplay.setMap(this.gMap);
     });
   }

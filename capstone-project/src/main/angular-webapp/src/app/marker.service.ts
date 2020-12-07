@@ -6,7 +6,7 @@ import { Subject } from 'rxjs';
 })
 export class MarkerService {
 
-  private markers: any[] = [];
+  markers: [google.maps.Marker, any][] = [];
   private nameToFilterBy = new Subject();
 
   constructor() { }
@@ -16,7 +16,7 @@ export class MarkerService {
     let names = new Set();
     names.add("");
     this.markers.forEach((marker) => {
-      let str = marker.animal.charAt(0).toUpperCase() + marker.animal.substr(1).toLowerCase();
+      let str = marker[1].animal.charAt(0).toUpperCase() + marker[1].animal.substr(1).toLowerCase();
       names.add(str);
     });
     return names;
@@ -42,13 +42,18 @@ export class MarkerService {
   }
 
   // Push a marker to markers array
-  pushMarker(marker){
-    this.markers.push(marker);
+  pushMarker(markerTuple){
+    this.markers.push(markerTuple);
   }
 
   // Remove marker from markers array
-  deleteMarker(marker){
-    const index = this.markers.indexOf(marker);
+  deleteMarker(markerTuple){
+    const index = this.markers.indexOf(markerTuple);
     this.markers.splice(index,1);
+  }
+
+  // Returns the markers array
+  getMarkersArray(){
+    return this.markers;
   }
 }
