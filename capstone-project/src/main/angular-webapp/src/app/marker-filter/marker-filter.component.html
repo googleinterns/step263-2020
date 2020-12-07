@@ -5,7 +5,7 @@
              matInput
              [formControl]="myControl"
              [matAutocomplete]="auto">
-      <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" [displayWith]="displayFn.bind(this)">
+      <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" [displayWith]="filterMarkers.bind(this)">
         <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
           {{option}}
         </mat-option>

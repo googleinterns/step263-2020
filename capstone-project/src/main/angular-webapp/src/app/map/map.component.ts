@@ -250,7 +250,6 @@ export class MapComponent implements AfterViewInit {
 
   // Edits the InfoWindowComponent instance letting the user update the fields of an existing marker.
   buildUpdateInfoWindowHtmlElment(markerData, infoWindowComponent, markerForDisplay) {
-
     infoWindowComponent.instance.type = MarkerMode.UPDATE;
     infoWindowComponent.instance.originalBlobKey = markerData.blobKey;
     infoWindowComponent.changeDetectorRef.detectChanges();

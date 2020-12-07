@@ -1,32 +1,21 @@
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
+import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MarkerService {
 
-  markers: [google.maps.Marker, any][] = [];
-  private nameToFilterBy = new Subject();
+  private markers: [google.maps.Marker, any][] = [];
+  private animalNames: Set<string> = new Set();
+  private nameToFilterBy = new BehaviorSubject("");
 
   constructor() { }
-
-  // Returns array with distinct animal names
-  getAnimalNames(){
-    let names = new Set();
-    names.add("");
-    this.markers.forEach((marker) => {
-      let str = marker[1].animal.charAt(0).toUpperCase() + marker[1].animal.substr(1).toLowerCase();
-      names.add(str);
-    });
-    return names;
-  }
 
   // Filters on animal names array according to user input, not case sensitive
   filter(value: string): string[] {
     const filterValue = value.toLowerCase();
-    let namesArray = [];
-    this.getAnimalNames().forEach((name) => namesArray.push(name));
+    const namesArray = Array.from(this.animalNames);
 
     return namesArray.filter(option => option.toLowerCase().indexOf(filterValue) === 0);
   }
@@ -41,9 +30,13 @@ export class MarkerService {
     return this.nameToFilterBy;
   }
 
-  // Push a marker to markers array
+  // Push a marker to markers array and add name to name set
   pushMarker(markerTuple){
     this.markers.push(markerTuple);
+    this.animalNames.add(
+      markerTuple[1].animal.charAt(0).toUpperCase() + 
+      markerTuple[1].animal.substr(1).toLowerCase()
+      );
   }
 
   // Remove marker from markers array
