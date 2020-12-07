@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.Set;
 
 // A mock ServletContext used in MarkerServletTest
+// We need this mock in order to have access to data sent to ServletContext,
+// as we cannot retrieve it from ServletContext easily
 class MockServletContext implements ServletContext {
     protected String string;
     protected Throwable throwable;
