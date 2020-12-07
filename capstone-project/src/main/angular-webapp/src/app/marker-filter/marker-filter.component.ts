@@ -15,8 +15,7 @@ export class MarkerFilterComponent implements OnInit {
   constructor(public markerService: MarkerService){ }
 
   myControl = new FormControl();
-  // animals: Set<string> = new Set();
-  // options: string[];
+  name;
   filteredOptions: Observable<string[]>;
 
   ngOnInit() {
@@ -27,8 +26,8 @@ export class MarkerFilterComponent implements OnInit {
   }
 
   displayFn(value){
-    console.log("In DisplayFn, value = " + value);
     this.markerService.setNameToFilterBy(value);
+    this.name = value;
   }
 
 }

@@ -7,7 +7,6 @@ import { UserService } from '../user.service'
 import { SocialUser } from 'angularx-social-login';
 import { BlobAction } from '../blob-action';
 import { ToastService } from '../toast/toast.service';
-import { MarkerFilterComponent } from '../marker-filter/marker-filter.component';
 import { MarkerService } from '../marker.service';
 
 @Component({
@@ -30,8 +29,6 @@ export class MapComponent implements AfterViewInit {
   private gMap: google.maps.Map;
   public static readonly defaultMapCenter: google.maps.LatLng = new google.maps.LatLng(25, 80);
   markers: [google.maps.Marker, any][] = [];
-  
-  @ViewChild(MarkerFilterComponent) markerFilter; 
 
   ngAfterViewInit(): void {
 
@@ -51,14 +48,14 @@ export class MapComponent implements AfterViewInit {
     });
 
     this.fetchMarkers();
-    this.markerService.nameToFilterBy.subscribe(animal => {
-      if (animal == ""){
+    this.markerService.getNameToFilterBy().subscribe(animal => {
+      if (animal == "") {
         this.displayAllMarkers();
       } else {
         this.displayMarkersByAnimalName(animal);
       }
     })
-    }
+  }
 
   // Fetches markers from the backend and adds them to the map.
   fetchMarkers() {
@@ -153,12 +150,16 @@ export class MapComponent implements AfterViewInit {
     this.httpClient.post('/markers', params).subscribe({
       error: error => console.error("The marker failed to delete. Error details: ", error)
     });
-
     // Remove marker from the map.
     markerForDisplay.setMap(null);
-    this.markers.filter((element) => {
-      return element != markerForDisplay;
-    });
+    this.RemoveMarkerFromArrays(markerData, markerForDisplay);
+  }
+
+  // Remove marker from markers array and markerService
+  RemoveMarkerFromArrays(marker, markerForDisplay) {
+    const index = this.markers.indexOf([markerForDisplay, marker]);
+    this.markers.splice(index, 1);
+    this.markerService.deleteMarker(marker);
   }
 
   // Add a marker the user can edit.
@@ -200,6 +201,12 @@ export class MapComponent implements AfterViewInit {
     return infoWindowComponent.location.nativeElement;
   }
 
+  // Add marker to markers array and markerService
+  addMarkerToArrays(marker, markerForDisplay){
+    this.markers.push([markerForDisplay, marker]);
+    this.markerService.pushMarker(marker);
+  }
+
   // Displays a marker on the map
   addMarkerForDisplay(marker) {
 
@@ -221,8 +228,7 @@ export class MapComponent implements AfterViewInit {
       }
     });
 
-    this.markers.push([markerForDisplay, marker]);
-    this.markerService.markers.push(marker);
+    this.addMarkerToArrays(marker, markerForDisplay)
   }
 
   // Creates an info window to be displayed after user clicks the marker
@@ -236,7 +242,7 @@ export class MapComponent implements AfterViewInit {
       this.deleteMarker(marker, markerForDisplay));
 
     infoWindowComponent.instance.updateEvent.subscribe(event => {
-      markersInfoWindow.setContent(this.buildUpdateInfoWindowHtmlElment(marker, infoWindowComponent));
+      markersInfoWindow.setContent(this.buildUpdateInfoWindowHtmlElment(marker, infoWindowComponent, markerForDisplay));
       markersInfoWindow.open(this.gMap, markerForDisplay);
     });
   }
@@ -257,7 +263,7 @@ export class MapComponent implements AfterViewInit {
   }
 
   // Edits the InfoWindowComponent instance letting the user update the fields of an existing marker.
-  buildUpdateInfoWindowHtmlElment(markerData, infoWindowComponent) {
+  buildUpdateInfoWindowHtmlElment(markerData, infoWindowComponent, markerForDisplay) {
 
     infoWindowComponent.instance.type = MarkerMode.UPDATE;
     infoWindowComponent.instance.originalBlobKey = markerData.blobKey;
@@ -302,7 +308,12 @@ export class MapComponent implements AfterViewInit {
       else {
         infoWindowComponent.changeDetectorRef.detectChanges();
       }
+
+      // Update the markers array and marker service
+      this.RemoveMarkerFromArrays(markerData, markerForDisplay);
+      this.addMarkerToArrays(newMarker, markerForDisplay);
     });
+
     return infoWindowComponent.location.nativeElement;
   }
 
@@ -313,7 +324,6 @@ export class MapComponent implements AfterViewInit {
 
   // Show on map only the markers with animal name
   displayMarkersByAnimalName(animalName) {
-    console.log("setNameToFilterBy was called with - " + animalName);
     this.markers.forEach(([markerForDisplay, marker]) => {
       if ((marker.animal).toLowerCase() == animalName.toLowerCase()) {
         markerForDisplay.setMap(this.gMap);
