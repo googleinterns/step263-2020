@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ChartsService } from '../charts.service';
 
 @Component({
   selector: 'app-charts',
@@ -6,38 +7,31 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./charts.component.css']
 })
 export class ChartsComponent implements OnInit {
-
-  public animalNamesData;
-  public usersStateData;
-  public topReportersData;
-  public columnNames = ['Name', 'Num. of Reports'];
   
-  constructor() { }
+  public animalNamesData = [];
+  public usersStateData = [];
+  public topReportersData = [];
+  public displayCharts;
+  public displayTopFive;
+  public columnNames = ['name', 'num. of reports'];
 
-  ngOnInit(): void {
-    this.setChartsData();
+  constructor(public chartsService : ChartsService) {
+    this.chartsService.animalNamesData.subscribe(animalNameData => {
+      this.animalNamesData = animalNameData;
+    });
+    this.chartsService.usersStateData.subscribe(usersStateData => {
+      this.usersStateData = usersStateData;
+    });
+    this.chartsService.topReportersData.subscribe(topReportersData => {
+      this.topReportersData = topReportersData;
+    });
+    this.chartsService.displayCharts.subscribe(displayCharts => {
+      this.displayCharts = displayCharts;
+    });
+    this.chartsService.displayTopFive.subscribe(displayTopFive => {
+      this.displayTopFive = displayTopFive;
+    });
   }
 
-  // Right now this function sets static data for the charts. In the future, the data will be retrieved from a server.
-  setChartsData() {
-    this.animalNamesData = [
-      ['Cats', 30],
-      ['Dogs', 10],
-      ['Cows', 5],
-      ['Sharks', 3]
-    ];
-
-    this.usersStateData = [
-      ["Logged-In Reporters", 120],
-      ["Guest Reporters", 150]
-    ];
-
-    this.topReportersData = [
-      ['Noy', 25],
-      ['Naama', 23],
-      ['Lucy', 17],
-      ['Pisu', 14],
-      ['Google', 10]
-    ];
-  }
+  ngOnInit(): void {}
 }

@@ -15,6 +15,7 @@ import { AuthenticationComponent } from './authentication/authentication.compone
 import { environment } from 'src/environments/environment';
 import { MaterialModule } from './material/material.module';
 import { ToastService } from './toast/toast.service';
+import { ChartsService } from './charts.service';
 
 @NgModule({
   declarations: [
@@ -36,6 +37,7 @@ import { ToastService } from './toast/toast.service';
   ],
   providers: [
     ToastService,
+    ChartsService,
     {
     provide: 'SocialAuthServiceConfig',
     useValue: {

@@ -7,6 +7,7 @@ import { UserService } from '../user.service'
 import { SocialUser } from 'angularx-social-login';
 import { BlobAction } from '../blob-action';
 import { ToastService } from '../toast/toast.service';
+import { ChartsService } from '../charts.service';
 
 @Component({
   selector: 'app-map',
@@ -19,7 +20,8 @@ export class MapComponent implements OnInit {
     private componentFactoryResolver: ComponentFactoryResolver,
     private injector: Injector,
     private userService: UserService,
-    private toastService: ToastService) { }
+    private toastService: ToastService,
+    private chartsService: ChartsService) { }
 
   // Editable marker that displays when a user clicks on the map.
   private editableMarker: google.maps.Marker;
@@ -52,6 +54,7 @@ export class MapComponent implements OnInit {
           this.addMarkerForDisplay(response[key]);
         }
       });
+    this.chartsService.getChartsData();
   }
 
   // Returns the URL of a blob related to a marker.
@@ -121,6 +124,7 @@ export class MapComponent implements OnInit {
           marker.userId = { value: data.userId };
           this.addMarkerForDisplay(marker);
         }
+        this.chartsService.getChartsData();
       },
       error: error => console.error("The marker failed to save. Error details: ", error)
     });
@@ -134,6 +138,7 @@ export class MapComponent implements OnInit {
       .set('action', MarkerMode.DELETE.toString())
       .set('userToken', this.user?.idToken);
     this.httpClient.post('/markers', params).subscribe({
+      next: () => this.chartsService.getChartsData(),
       error: error => console.error("The marker failed to delete. Error details: ", error)
     });
 
