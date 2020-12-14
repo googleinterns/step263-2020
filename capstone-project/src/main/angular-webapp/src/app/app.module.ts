@@ -14,9 +14,7 @@ import { environment } from 'src/environments/environment';
 import { MaterialModule } from './material/material.module';
 import { ToastService } from './toast/toast.service';
 import { MarkerFilterComponent } from './marker-filter/marker-filter.component'
-import {MatAutocompleteModule} from '@angular/material/autocomplete';
-import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {MatButtonModule} from '@angular/material/button';
+
 
 
 @NgModule({
@@ -34,11 +32,7 @@ import {MatButtonModule} from '@angular/material/button';
     GoogleMapsModule,
     BrowserAnimationsModule,
     SocialLoginModule,
-    MaterialModule,
-    MatAutocompleteModule,
-    ReactiveFormsModule,
-    FormsModule,
-    MatButtonModule
+    MaterialModule
   ],
   providers: [
     ToastService,

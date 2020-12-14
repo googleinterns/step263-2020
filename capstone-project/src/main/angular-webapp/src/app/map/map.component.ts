@@ -1,4 +1,4 @@
-import { Component, OnInit, ComponentFactory, ComponentFactoryResolver, Injector, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ComponentFactory, ComponentFactoryResolver, Injector } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { } from 'googlemaps';
 import { InfoWindowComponent } from '../info-window/info-window.component';
@@ -14,7 +14,7 @@ import { MarkerService } from '../marker.service';
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.css']
 })
-export class MapComponent implements AfterViewInit {
+export class MapComponent implements OnInit {
 
   constructor(private httpClient: HttpClient,
     private componentFactoryResolver: ComponentFactoryResolver,
@@ -29,7 +29,7 @@ export class MapComponent implements AfterViewInit {
   private gMap: google.maps.Map;
   public static readonly defaultMapCenter: google.maps.LatLng = new google.maps.LatLng(25, 80);
 
-  ngAfterViewInit(): void {
+  ngOnInit(): void {
 
     // Define the map.
     const googleMapOption = {
