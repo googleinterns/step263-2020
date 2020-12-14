@@ -14,8 +14,7 @@ import { environment } from 'src/environments/environment';
 import { MaterialModule } from './material/material.module';
 import { ToastService } from './toast/toast.service';
 import { MarkerFilterComponent } from './marker-filter/marker-filter.component'
-
-
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -32,7 +31,9 @@ import { MarkerFilterComponent } from './marker-filter/marker-filter.component'
     GoogleMapsModule,
     BrowserAnimationsModule,
     SocialLoginModule,
-    MaterialModule
+    MaterialModule,
+    ReactiveFormsModule,
+    FormsModule
   ],
   providers: [
     ToastService,
