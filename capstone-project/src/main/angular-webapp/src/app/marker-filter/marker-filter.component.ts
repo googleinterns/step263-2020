@@ -1,4 +1,4 @@
-import { Input } from '@angular/core';
+import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
@@ -17,6 +17,7 @@ export class MarkerFilterComponent implements OnInit {
   myControl = new FormControl();
   filteredOptions: Observable<string[]>;
   currentName: string[] = [];
+  separatorKeysCodes: number[] = [ENTER, COMMA];
 
   ngOnInit() {
     this.filteredOptions = this.myControl.valueChanges.pipe(
