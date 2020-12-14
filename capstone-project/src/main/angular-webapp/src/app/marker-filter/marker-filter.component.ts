@@ -16,6 +16,7 @@ export class MarkerFilterComponent implements OnInit {
 
   myControl = new FormControl();
   filteredOptions: Observable<string[]>;
+  currentName: string[] = [];
 
   ngOnInit() {
     this.filteredOptions = this.myControl.valueChanges.pipe(
@@ -26,7 +27,13 @@ export class MarkerFilterComponent implements OnInit {
 
   // When a user selects an animal name, filter markers by that name
   filterMarkers(value){
+    this.currentName = [value];
     this.markerService.setNameToFilterBy(value);
+  }
+
+  removeFilter(){
+    this.currentName = [];
+    this.markerService.setNameToFilterBy("");
   }
 
 }
