@@ -15,7 +15,6 @@
 <mat-chip-list #chipList style="float: left;">
   <mat-chip *ngFor="let name of currentName" [removable]=true (removed)="removeFilter()">
     {{name}}
-    <mat-icon matChipRemove *ngIf=true>cancel</mat-icon>
+    <mat-icon matChipRemove>cancel</mat-icon>
   </mat-chip>
 </mat-chip-list>
-
