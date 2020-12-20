@@ -40,9 +40,12 @@ export class MarkerService {
   }
 
   // Remove marker from markers array
-  deleteMarker(markerTuple){
-    const index = this.markers.indexOf(markerTuple);
-    this.markers.splice(index,1);
+  deleteMarker(markerForDisplay){
+    this.markers.forEach( (markerTuple, index) => {
+      if(markerTuple[0] === markerForDisplay){
+        this.markers.splice(index,1);
+      }
+    });
   }
 
   // Returns the markers array
