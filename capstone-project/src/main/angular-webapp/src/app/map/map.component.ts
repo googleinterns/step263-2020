@@ -48,10 +48,23 @@ export class MapComponent implements OnInit {
 
     this.fetchMarkers();
     this.markerService.getNameToFilterBy().subscribe(animal => {
-      if (animal == "") {
+      if ((animal == "") || (animal == null)) {
         this.displayAllMarkers();
+        google.maps.event.clearListeners(this.gMap, 'click');
+        // When the user clicks on the map, show a marker with a text box the user can edit.
+        this.gMap.addListener('click', (event) => {
+          this.addMarkerForEdit(event.latLng.lat(), event.latLng.lng());
+        });
       } else {
         this.displayMarkersByAnimalName(animal);
+        google.maps.event.clearListeners(this.gMap, 'click');
+        // When the user clicks on the map, show toast.
+        this.gMap.addListener('click', (event) => {
+          this.toastService.showToast(document.getElementById("ej2Toast"), {
+            title: "Unable to upload sighting",
+            content: "Clear filter to upload sighting."
+          });
+        });
       }
     })
   }
@@ -201,6 +214,8 @@ export class MapComponent implements OnInit {
       position: new google.maps.LatLng(marker.lat, marker.lng)
     });
 
+    this.markerService.pushMarker([markerForDisplay, marker]);
+
     google.maps.event.addListener(markerForDisplay, 'click', () => {
       if (marker.blobKey) {
         this.getBlobFromKey(marker.blobKey)
@@ -212,9 +227,7 @@ export class MapComponent implements OnInit {
       else {
         this.generateInfoWindow(markerForDisplay, marker);
       }
-    });
-
-    this.markerService.pushMarker([markerForDisplay, marker]);
+    });    
   }
 
   // Creates an info window to be displayed after user clicks the marker
@@ -309,7 +322,10 @@ export class MapComponent implements OnInit {
 
   // Show on map only the markers with animal name
   displayMarkersByAnimalName(animalName) {
+    console.log("displayMarkersByAnimalName START");
+
     this.markerService.getMarkersArray().forEach(([markerForDisplay, marker]) => {
+      console.log(marker);
       if ((marker.animal).toLowerCase() == animalName.toLowerCase()) {
         markerForDisplay.setMap(this.gMap);
       }
@@ -317,13 +333,18 @@ export class MapComponent implements OnInit {
         markerForDisplay.setMap(null);
       }
     });
+    console.log("displayMarkersByAnimalName END");
+
   }
 
   // Show on map all markers
   displayAllMarkers() {
+    console.log("displayAllMarkers START");
     this.markerService.getMarkersArray().forEach(([markerForDisplay, marker]) => {
       markerForDisplay.setMap(this.gMap);
+      console.log(marker);
     });
+    console.log("displayAllMarkers END");
   }
 
 }
