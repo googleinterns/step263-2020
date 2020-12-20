@@ -217,15 +217,16 @@ export class MapComponent implements OnInit {
     this.markerService.pushMarker([markerForDisplay, marker]);
 
     google.maps.event.addListener(markerForDisplay, 'click', () => {
+      const markerData = this.markerService.getMarker(markerForDisplay);
       if (marker.blobKey) {
         this.getBlobFromKey(marker.blobKey)
           .then((blob) => {
             const imageUrl = MapComponent.getUrlFromBlob(blob);
-            this.generateInfoWindow(markerForDisplay, marker, imageUrl);
+            this.generateInfoWindow(markerForDisplay, markerData, imageUrl);
           });
       }
       else {
-        this.generateInfoWindow(markerForDisplay, marker);
+        this.generateInfoWindow(markerForDisplay, markerData);
       }
     });    
   }
@@ -290,7 +291,8 @@ export class MapComponent implements OnInit {
         reporter: event.reporter,
         lat: markerData.lat,
         lng: markerData.lng,
-        blobKey: event.blobKey
+        blobKey: event.blobKey,
+        userId: markerData.userId
       };
       this.postMarker(newMarker, MarkerMode.UPDATE);
 
@@ -322,10 +324,7 @@ export class MapComponent implements OnInit {
 
   // Show on map only the markers with animal name
   displayMarkersByAnimalName(animalName) {
-    console.log("displayMarkersByAnimalName START");
-
     this.markerService.getMarkersArray().forEach(([markerForDisplay, marker]) => {
-      console.log(marker);
       if ((marker.animal).toLowerCase() == animalName.toLowerCase()) {
         markerForDisplay.setMap(this.gMap);
       }
@@ -333,18 +332,13 @@ export class MapComponent implements OnInit {
         markerForDisplay.setMap(null);
       }
     });
-    console.log("displayMarkersByAnimalName END");
-
   }
 
   // Show on map all markers
   displayAllMarkers() {
-    console.log("displayAllMarkers START");
     this.markerService.getMarkersArray().forEach(([markerForDisplay, marker]) => {
       markerForDisplay.setMap(this.gMap);
-      console.log(marker);
     });
-    console.log("displayAllMarkers END");
   }
-
+ 
 }
