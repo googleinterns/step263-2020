@@ -7,6 +7,7 @@ import { UserService } from '../user.service'
 import { SocialUser } from 'angularx-social-login';
 import { BlobAction } from '../blob-action';
 import { ToastService } from '../toast/toast.service';
+import { MarkerService } from '../marker.service';
 
 @Component({
   selector: 'app-map',
@@ -19,7 +20,8 @@ export class MapComponent implements OnInit {
     private componentFactoryResolver: ComponentFactoryResolver,
     private injector: Injector,
     private userService: UserService,
-    private toastService: ToastService) { }
+    private toastService: ToastService,
+    private markerService: MarkerService) { }
 
   // Editable marker that displays when a user clicks on the map.
   private editableMarker: google.maps.Marker;
@@ -44,7 +46,18 @@ export class MapComponent implements OnInit {
       this.addMarkerForEdit(event.latLng.lat(), event.latLng.lng());
     });
 
-    // Fetches markers from the backend and adds them to the map.
+    this.fetchMarkers();
+    this.markerService.getNameToFilterBy().subscribe(animal => {
+      if (animal == "") {
+        this.displayAllMarkers();
+      } else {
+        this.displayMarkersByAnimalName(animal);
+      }
+    })
+  }
+
+  // Fetches markers from the backend and adds them to the map.
+  fetchMarkers() {
     this.httpClient.get('/markers')
       .toPromise()
       .then((response) => {
@@ -136,9 +149,9 @@ export class MapComponent implements OnInit {
     this.httpClient.post('/markers', params).subscribe({
       error: error => console.error("The marker failed to delete. Error details: ", error)
     });
-
     // Remove marker from the map.
     markerForDisplay.setMap(null);
+    this.markerService.deleteMarker(markerForDisplay);
   }
 
   // Add a marker the user can edit.
@@ -200,6 +213,8 @@ export class MapComponent implements OnInit {
         this.generateInfoWindow(markerForDisplay, marker);
       }
     });
+
+    this.markerService.pushMarker([markerForDisplay, marker]);
   }
 
   // Creates an info window to be displayed after user clicks the marker
@@ -213,7 +228,7 @@ export class MapComponent implements OnInit {
       this.deleteMarker(marker, markerForDisplay));
 
     infoWindowComponent.instance.updateEvent.subscribe(event => {
-      markersInfoWindow.setContent(this.buildUpdateInfoWindowHtmlElment(marker, infoWindowComponent));
+      markersInfoWindow.setContent(this.buildUpdateInfoWindowHtmlElment(marker, infoWindowComponent, markerForDisplay));
       markersInfoWindow.open(this.gMap, markerForDisplay);
     });
   }
@@ -234,8 +249,7 @@ export class MapComponent implements OnInit {
   }
 
   // Edits the InfoWindowComponent instance letting the user update the fields of an existing marker.
-  buildUpdateInfoWindowHtmlElment(markerData, infoWindowComponent) {
-
+  buildUpdateInfoWindowHtmlElment(markerData, infoWindowComponent, markerForDisplay) {
     infoWindowComponent.instance.type = MarkerMode.UPDATE;
     infoWindowComponent.instance.originalBlobKey = markerData.blobKey;
     infoWindowComponent.changeDetectorRef.detectChanges();
@@ -279,7 +293,12 @@ export class MapComponent implements OnInit {
       else {
         infoWindowComponent.changeDetectorRef.detectChanges();
       }
+
+      // Update the markers array and marker service
+      this.markerService.deleteMarker(markerForDisplay);
+      this.markerService.pushMarker([markerForDisplay, newMarker]);
     });
+
     return infoWindowComponent.location.nativeElement;
   }
 
@@ -287,4 +306,24 @@ export class MapComponent implements OnInit {
   get user(): SocialUser {
     return this.userService.getUser();
   }
+
+  // Show on map only the markers with animal name
+  displayMarkersByAnimalName(animalName) {
+    this.markerService.getMarkersArray().forEach(([markerForDisplay, marker]) => {
+      if ((marker.animal).toLowerCase() == animalName.toLowerCase()) {
+        markerForDisplay.setMap(this.gMap);
+      }
+      else {
+        markerForDisplay.setMap(null);
+      }
+    });
+  }
+
+  // Show on map all markers
+  displayAllMarkers() {
+    this.markerService.getMarkersArray().forEach(([markerForDisplay, marker]) => {
+      markerForDisplay.setMap(this.gMap);
+    });
+  }
+
 }
