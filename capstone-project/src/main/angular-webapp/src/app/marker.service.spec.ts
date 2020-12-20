@@ -13,6 +13,4 @@ describe('MarkerService', () => {
   it('should be created', () => {
     expect(service).toBeTruthy();
   });
-
-  
 });

@@ -28,7 +28,6 @@ export class MarkerFilterComponent implements OnInit {
 
   // When a user selects an animal name, filter markers by that name
   filterMarkers(value){
-    // console.log("value = " + value)
     if (value != null){
       this.currentName = [value];
     }
