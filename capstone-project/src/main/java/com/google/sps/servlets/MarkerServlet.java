@@ -119,11 +119,7 @@ public class MarkerServlet extends HttpServlet {
             return Optional.empty();
         }
         try {
-            JsonFactory jsonFactory = new JacksonFactory();
-            HttpTransport transport = new NetHttpTransport();
-            GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(transport, jsonFactory)
-                .setAudience(Collections.singletonList("client-id"))
-                .build();
+            GoogleIdTokenVerifier verifier = createGoogleIdTokenVerifier();
             GoogleIdToken idToken;
             idToken = verifier.verify(idTokenString);
             if (idToken != null) {
@@ -134,6 +130,15 @@ public class MarkerServlet extends HttpServlet {
             context.log("idToken unauthorized", e);
         }
         return Optional.empty();
+    }
+
+    /** Creates GoogleIdTokenVerifier for verifyToken */
+    GoogleIdTokenVerifier createGoogleIdTokenVerifier(){
+        JsonFactory jsonFactory = new JacksonFactory();
+        HttpTransport transport = new NetHttpTransport();
+        return new GoogleIdTokenVerifier.Builder(transport, jsonFactory)
+                .setAudience(Collections.singletonList("client-id"))
+                .build();
     }
 
     /** Fetches markers from Datastore. */
