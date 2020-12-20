@@ -151,7 +151,7 @@ export class MapComponent implements OnInit {
     });
     // Remove marker from the map.
     markerForDisplay.setMap(null);
-    this.markerService.deleteMarker([markerForDisplay, markerData]);
+    this.markerService.deleteMarker(markerForDisplay);
   }
 
   // Add a marker the user can edit.
@@ -295,7 +295,7 @@ export class MapComponent implements OnInit {
       }
 
       // Update the markers array and marker service
-      this.markerService.deleteMarker([markerForDisplay, markerData]);
+      this.markerService.deleteMarker(markerForDisplay);
       this.markerService.pushMarker([markerForDisplay, newMarker]);
     });
 
