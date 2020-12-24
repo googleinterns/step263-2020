@@ -1,14 +1,20 @@
+<div style="float:left;">
 <form>
-    <mat-form-field>
-      <input type="text"
-             placeholder="Filter by animal"
-             matInput
-             [formControl]="myControl"
-             [matAutocomplete]="auto">
-      <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" [displayWith]="filterMarkers.bind(this)">
-        <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
-          {{option}}
-        </mat-option>
-      </mat-autocomplete>
-    </mat-form-field>
-  </form>
+  <mat-form-field>
+    <input type="text" placeholder="Filter by animal" matInput 
+    [formControl]="myControl" 
+    [matAutocomplete]="auto">
+    <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" [displayWith]="filterMarkers.bind(this)">
+      <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
+        {{option}}
+      </mat-option>
+    </mat-autocomplete>    
+  </mat-form-field>
+</form>
+</div>
+<mat-chip-list #chipList style="float: left;">
+  <mat-chip *ngFor="let name of currentName" [removable]=true (removed)="removeFilter()">
+    {{name}}
+    <mat-icon matChipRemove>cancel</mat-icon>
+  </mat-chip>
+</mat-chip-list>

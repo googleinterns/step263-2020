@@ -48,10 +48,23 @@ export class MapComponent implements OnInit {
 
     this.fetchMarkers();
     this.markerService.getNameToFilterBy().subscribe(animal => {
-      if (animal == "") {
+      if ((animal == "") || (animal == null)) {
         this.displayAllMarkers();
+        google.maps.event.clearListeners(this.gMap, 'click');
+        // When the user clicks on the map, show a marker with a text box the user can edit.
+        this.gMap.addListener('click', (event) => {
+          this.addMarkerForEdit(event.latLng.lat(), event.latLng.lng());
+        });
       } else {
         this.displayMarkersByAnimalName(animal);
+        google.maps.event.clearListeners(this.gMap, 'click');
+        // When the user clicks on the map, show toast.
+        this.gMap.addListener('click', (event) => {
+          this.toastService.showToast(document.getElementById("ej2Toast"), {
+            title: "Unable to upload sighting",
+            content: "Clear filter to upload sighting."
+          });
+        });
       }
     })
   }
@@ -201,20 +214,21 @@ export class MapComponent implements OnInit {
       position: new google.maps.LatLng(marker.lat, marker.lng)
     });
 
+    this.markerService.pushMarker([markerForDisplay, marker]);
+
     google.maps.event.addListener(markerForDisplay, 'click', () => {
+      const markerData = this.markerService.getMarker(markerForDisplay);
       if (marker.blobKey) {
         this.getBlobFromKey(marker.blobKey)
           .then((blob) => {
             const imageUrl = MapComponent.getUrlFromBlob(blob);
-            this.generateInfoWindow(markerForDisplay, marker, imageUrl);
+            this.generateInfoWindow(markerForDisplay, markerData, imageUrl);
           });
       }
       else {
-        this.generateInfoWindow(markerForDisplay, marker);
+        this.generateInfoWindow(markerForDisplay, markerData);
       }
-    });
-
-    this.markerService.pushMarker([markerForDisplay, marker]);
+    });    
   }
 
   // Creates an info window to be displayed after user clicks the marker
@@ -277,7 +291,8 @@ export class MapComponent implements OnInit {
         reporter: event.reporter,
         lat: markerData.lat,
         lng: markerData.lng,
-        blobKey: event.blobKey
+        blobKey: event.blobKey,
+        userId: markerData.userId
       };
       this.postMarker(newMarker, MarkerMode.UPDATE);
 
@@ -325,5 +340,5 @@ export class MapComponent implements OnInit {
       markerForDisplay.setMap(this.gMap);
     });
   }
-
+ 
 }

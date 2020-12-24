@@ -52,4 +52,15 @@ export class MarkerService {
   getMarkersArray(){
     return this.markers;
   }
+
+   // Get marker of markerForDisplay
+   getMarker(markerForDisplay){
+    let result;
+    this.markers.forEach( markerTuple => {
+      if(markerTuple[0] === markerForDisplay){
+        result = markerTuple[1];
+      }
+    });
+    return result;
+  }
 }

@@ -24,7 +24,7 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
     MapComponent,
     AuthenticationComponent,
     InfoWindowComponent,
-    MarkerFilterComponent
+    MarkerFilterComponent,
     ChartsComponent
   ],
   imports: [
