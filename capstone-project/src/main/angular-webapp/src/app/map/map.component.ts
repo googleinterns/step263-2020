@@ -23,7 +23,7 @@ export class MapComponent implements OnInit {
     private userService: UserService,
     private toastService: ToastService,
     private chartsService: ChartsService,
-    private markerService: MarkerService ) { }
+    private markerService: MarkerService) { }
 
   // Editable marker that displays when a user clicks on the map.
   private editableMarker: google.maps.Marker;
@@ -49,6 +49,8 @@ export class MapComponent implements OnInit {
     });
 
     this.fetchMarkers();
+    this.chartsService.getChartsData();
+
     this.markerService.getNameToFilterBy().subscribe(animal => {
       if ((animal == "") || (animal == null)) {
         this.displayAllMarkers();
@@ -80,7 +82,6 @@ export class MapComponent implements OnInit {
           this.addMarkerForDisplay(response[key]);
         }
       });
-    this.chartsService.getChartsData();
   }
 
   // Returns the URL of a blob related to a marker.
@@ -233,7 +234,7 @@ export class MapComponent implements OnInit {
       else {
         this.generateInfoWindow(markerForDisplay, markerData);
       }
-    });    
+    });
   }
 
   // Creates an info window to be displayed after user clicks the marker
