@@ -206,7 +206,7 @@ export class MapComponent implements OnInit {
         blobKey: event.blobKey
       };
       this.postMarker(newMarker, MarkerMode.CREATE);
-      this.editableMarker.setMap(null);      
+      this.editableMarker.setMap(null);
     });
 
     return infoWindowComponent.location.nativeElement;
