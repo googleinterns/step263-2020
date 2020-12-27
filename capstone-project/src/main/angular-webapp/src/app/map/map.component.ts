@@ -132,7 +132,7 @@ export class MapComponent implements OnInit {
     }
   }
 
-  // Performs a backend action on a marker - display / update / delete. Returns the marker
+  // Performs a backend action on a marker - display / update / delete.
   postMarker(marker, action) {
 
     const markerJson = JSON.stringify(marker);
