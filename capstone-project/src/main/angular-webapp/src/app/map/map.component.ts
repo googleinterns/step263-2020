@@ -132,7 +132,7 @@ export class MapComponent implements OnInit {
     }
   }
 
-  // Performs a backend action on a marker - display / update / delete.
+  // Performs a backend action on a marker - display / update / delete. Returns the marker
   postMarker(marker, action) {
 
     const markerJson = JSON.stringify(marker);
@@ -145,7 +145,13 @@ export class MapComponent implements OnInit {
         if (action == MarkerMode.CREATE) {
           marker.id = data.id;
           marker.userId = { value: data.userId };
-          this.addMarkerForDisplay(marker);
+          // Immediately Display the info window
+          const markerForDisplay = new google.maps.Marker({
+            map: this.gMap,
+            position: new google.maps.LatLng(marker.lat, marker.lng)
+          });
+          this.generateInfoWindow(markerForDisplay, marker);
+          this.addMarkerForDisplay(marker, markerForDisplay);
         }
       },
       error: error => console.error("The marker failed to save. Error details: ", error)
@@ -200,19 +206,20 @@ export class MapComponent implements OnInit {
         blobKey: event.blobKey
       };
       this.postMarker(newMarker, MarkerMode.CREATE);
-      this.editableMarker.setMap(null);
+      this.editableMarker.setMap(null);      
     });
 
     return infoWindowComponent.location.nativeElement;
   }
 
   // Displays a marker on the map
-  addMarkerForDisplay(marker) {
-
-    const markerForDisplay = new google.maps.Marker({
-      map: this.gMap,
-      position: new google.maps.LatLng(marker.lat, marker.lng)
-    });
+  addMarkerForDisplay(marker, markerForDisplay?) {
+    if (!markerForDisplay){
+      markerForDisplay = new google.maps.Marker({
+        map: this.gMap,
+        position: new google.maps.LatLng(marker.lat, marker.lng)
+      });
+    }
 
     this.markerService.pushMarker([markerForDisplay, marker]);
 
