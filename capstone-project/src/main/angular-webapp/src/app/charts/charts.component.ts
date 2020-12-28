@@ -16,19 +16,19 @@ export class ChartsComponent implements OnInit {
   columnNames = ['name', 'num. of reports'];
 
   constructor(public chartsService : ChartsService) {
-    this.chartsService.animalNamesData.subscribe(animalNameData => {
+    this.chartsService.getAnimalNamesData().subscribe(animalNameData => {
       this.animalNamesData = animalNameData;
     });
-    this.chartsService.usersStateData.subscribe(usersStateData => {
+    this.chartsService.getUsersStateData().subscribe(usersStateData => {
       this.usersStateData = usersStateData;
     });
-    this.chartsService.topReportersData.subscribe(topReportersData => {
+    this.chartsService.getTopReportersData().subscribe(topReportersData => {
       this.topReportersData = topReportersData;
     });
-    this.chartsService.displayCharts.subscribe(displayCharts => {
+    this.chartsService.getDisplayCharts().subscribe(displayCharts => {
       this.displayCharts = displayCharts;
     });
-    this.chartsService.displayTopFive.subscribe(displayTopFive => {
+    this.chartsService.getDisplayTopFive().subscribe(displayTopFive => {
       this.displayTopFive = displayTopFive;
     });
   }

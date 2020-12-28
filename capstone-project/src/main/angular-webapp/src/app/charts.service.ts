@@ -10,21 +10,21 @@ import { Charts } from './charts';
 // This service holds and updates the charts' data.
 export class ChartsService {
 
-  public animalNamesData : BehaviorSubject<any> = new BehaviorSubject<any>([]);
-  public usersStateData : BehaviorSubject<any> = new BehaviorSubject<any>([]);
-  public topReportersData : BehaviorSubject<any> = new BehaviorSubject<any>([]);
-  public displayCharts : BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  public displayTopFive : BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  private animalNamesData: BehaviorSubject<any> = new BehaviorSubject<any>([]);
+  private usersStateData: BehaviorSubject<any> = new BehaviorSubject<any>([]);
+  private topReportersData: BehaviorSubject<any> = new BehaviorSubject<any>([]);
+  private displayCharts: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  private displayTopFive: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
-  constructor(private httpClient : HttpClient) { }
+  constructor(private httpClient: HttpClient) { }
 
-   // Gets the charts' data from the server.
-   getChartsData() {
+  // Gets the charts' data from the server.
+  getChartsData() {
     this.httpClient.get('/charts')
       .toPromise()
       .then((response) => {
         // Don't display the charts if no report has been made yet
-        if((Object.keys(response).length === 0)) {
+        if ((Object.keys(response).length === 0)) {
           this.displayCharts.next(false);
           return;
         }
@@ -32,7 +32,7 @@ export class ChartsService {
         this.buildChart(response[Charts.ANIMALS_REPORTED], this.animalNamesData);
 
         // Don't display the 'top 5 reporters' chart if no report was made by a logged-in user
-        if((Object.keys(response[Charts.TOP_REPORTERS]).length === 0)) {
+        if ((Object.keys(response[Charts.TOP_REPORTERS]).length === 0)) {
           this.displayTopFive.next(false);
         }
         else {
@@ -53,5 +53,30 @@ export class ChartsService {
       i += 1;
     });
     chart.next(updatedChart);
+  }
+
+  // Getter for animalNamesData
+  getAnimalNamesData() {
+    return this.animalNamesData;
+  }
+
+  // Getter for usersStateData
+  getUsersStateData() {
+    return this.usersStateData;
+  }
+
+  // Getter for topReportersData
+  getTopReportersData() {
+    return this.topReportersData;
+  }
+
+  // Getter for displayCharts
+  getDisplayCharts() {
+    return this.displayCharts;
+  }
+  
+  // Getter for displayTopFive
+  getDisplayTopFive() {
+    return this.displayTopFive;
   }
 }
