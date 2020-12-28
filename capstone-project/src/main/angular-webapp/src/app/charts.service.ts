@@ -49,7 +49,9 @@ export class ChartsService {
     let i = 0;
     let updatedChart = []
     Object.keys(data).forEach(key => {
-      updatedChart[i] = [key, data[key]];
+      let count = data[key];
+      key = key.charAt(0).toUpperCase() + key.substr(1).toLowerCase();
+      updatedChart[i] = [key, count];
       i += 1;
     });
     chart.next(updatedChart);
@@ -74,7 +76,7 @@ export class ChartsService {
   getDisplayCharts() {
     return this.displayCharts;
   }
-  
+
   // Getter for displayTopFive
   getDisplayTopFive() {
     return this.displayTopFive;

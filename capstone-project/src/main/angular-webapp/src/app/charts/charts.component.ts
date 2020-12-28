@@ -13,7 +13,7 @@ export class ChartsComponent implements OnInit {
   topReportersData = [];
   displayCharts;
   displayTopFive;
-  columnNames = ['name', 'num. of reports'];
+  columnNames = ['Name', 'Number of reports'];
 
   constructor(public chartsService : ChartsService) {
     this.chartsService.getAnimalNamesData().subscribe(animalNameData => {
