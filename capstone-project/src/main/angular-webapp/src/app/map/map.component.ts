@@ -149,7 +149,13 @@ export class MapComponent implements OnInit {
         if (action == MarkerMode.CREATE) {
           marker.id = data.id;
           marker.userId = { value: data.userId };
-          this.addMarkerForDisplay(marker);
+          // Immediately Display the info window
+          const markerForDisplay = new google.maps.Marker({
+            map: this.gMap,
+            position: new google.maps.LatLng(marker.lat, marker.lng)
+          });
+          this.generateInfoWindow(markerForDisplay, marker);
+          this.addMarkerForDisplay(marker, markerForDisplay);
         }
         this.chartsService.getChartsData();
       },
@@ -213,12 +219,13 @@ export class MapComponent implements OnInit {
   }
 
   // Displays a marker on the map
-  addMarkerForDisplay(marker) {
-
-    const markerForDisplay = new google.maps.Marker({
-      map: this.gMap,
-      position: new google.maps.LatLng(marker.lat, marker.lng)
-    });
+  addMarkerForDisplay(marker, markerForDisplay?) {
+    if (!markerForDisplay){
+      markerForDisplay = new google.maps.Marker({
+        map: this.gMap,
+        position: new google.maps.LatLng(marker.lat, marker.lng)
+      });
+    }
 
     this.markerService.pushMarker([markerForDisplay, marker]);
 
