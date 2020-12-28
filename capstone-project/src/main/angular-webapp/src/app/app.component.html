@@ -12,9 +12,21 @@
         <img width="300px" height="auto" src="./assets/images/spotsLogo.png">
     </div>
     <div>
-        <app-map></app-map>
-        <app-charts></app-charts>
+        <mat-drawer-container [hasBackdrop]="false">
+            <mat-drawer #drawer mode="side" (keydown.escape)="drawer.toggle()" disableClose>
+                <app-charts></app-charts>
+            </mat-drawer>
+
+            <mat-drawer-content style="background-color: white;">
+                
+                <p><button mat-raised-button (click)="drawer.toggle()">Statistics</button></p>
+                <div style="margin-left: 10px;">
+                    <app-marker-filter></app-marker-filter>
+                </div>
+                <br><br><br>
+                <app-map></app-map>
+            </mat-drawer-content>
+        </mat-drawer-container>
     </div>
 </body>
-
 </html>

@@ -85,7 +85,7 @@ public class ChartsServlet extends HttpServlet {
 
     // Counts the occurrences of the items in the list
     private static Map<String, Integer> countOccurrences(List<Entity> queryResultList, String propertyName) {
-        Map<String, Integer> countersMap = new HashMap();
+        Map<String, Integer> countersMap = new HashMap<>();
         for (Entity entity : queryResultList) {
             String instanceKey = (String) entity.getProperty(propertyName);
             Integer instanceCounter = countersMap.get(instanceKey.toLowerCase());
@@ -108,7 +108,7 @@ public class ChartsServlet extends HttpServlet {
     // Receives a map that maps num. of reports to user IDs and returns the same map but with the user's name instead of the ID.
     private static Map<String, Integer>  getUsersFromIds(Map<String, Integer> idsMap, List<Entity> queryResultList) {
         // Create a map to get a user's name from his ID
-        Map<String, String> idToNameMap = new HashMap();
+        Map<String, String> idToNameMap = new HashMap<>();
         for (Entity entity : queryResultList) {
             String userId = (String) entity.getProperty("userId");
             String reporter = idToNameMap.get(userId);
