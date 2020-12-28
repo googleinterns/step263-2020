@@ -15,6 +15,7 @@ import { AuthenticationComponent } from './authentication/authentication.compone
 import { environment } from 'src/environments/environment';
 import { MaterialModule } from './material/material.module';
 import { ToastService } from './toast/toast.service';
+import { ChartsService } from './charts.service';
 import { MarkerFilterComponent } from './marker-filter/marker-filter.component'
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 
@@ -41,6 +42,7 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
   ],
   providers: [
     ToastService,
+    ChartsService,
     {
     provide: 'SocialAuthServiceConfig',
     useValue: {

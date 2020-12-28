@@ -7,6 +7,7 @@ import { UserService } from '../user.service'
 import { SocialUser } from 'angularx-social-login';
 import { BlobAction } from '../blob-action';
 import { ToastService } from '../toast/toast.service';
+import { ChartsService } from '../charts.service';
 import { MarkerService } from '../marker.service';
 
 @Component({
@@ -21,6 +22,7 @@ export class MapComponent implements OnInit {
     private injector: Injector,
     private userService: UserService,
     private toastService: ToastService,
+    private chartsService: ChartsService,
     private markerService: MarkerService) { }
 
   // Editable marker that displays when a user clicks on the map.
@@ -47,6 +49,8 @@ export class MapComponent implements OnInit {
     });
 
     this.fetchMarkers();
+    this.chartsService.getChartsData();
+
     this.markerService.getNameToFilterBy().subscribe(animal => {
       if ((animal == "") || (animal == null)) {
         this.displayAllMarkers();
@@ -147,6 +151,7 @@ export class MapComponent implements OnInit {
           marker.userId = { value: data.userId };
           this.addMarkerForDisplay(marker);
         }
+        this.chartsService.getChartsData();
       },
       error: error => console.error("The marker failed to save. Error details: ", error)
     });
@@ -160,6 +165,7 @@ export class MapComponent implements OnInit {
       .set('action', MarkerMode.DELETE.toString())
       .set('userToken', this.user?.idToken);
     this.httpClient.post('/markers', params).subscribe({
+      next: () => this.chartsService.getChartsData(),
       error: error => console.error("The marker failed to delete. Error details: ", error)
     });
     // Remove marker from the map.
@@ -228,7 +234,7 @@ export class MapComponent implements OnInit {
       else {
         this.generateInfoWindow(markerForDisplay, markerData);
       }
-    });    
+    });
   }
 
   // Creates an info window to be displayed after user clicks the marker
@@ -340,5 +346,4 @@ export class MapComponent implements OnInit {
       markerForDisplay.setMap(this.gMap);
     });
   }
- 
 }
