@@ -52,10 +52,10 @@ public class ChartsServlet extends HttpServlet {
         }
         Map<String, Integer> animalCounters = countOccurrences(animalList, "animal");
         Map<String, Integer> topTenAnimals = getMostFrequent(animalCounters, 10);
-        int sumAllReports = animalCounters.values().stream().reduce(0, Integer::sum);
-        int sumFrequentReports = topTenAnimals.values().stream().reduce(0, Integer::sum);
-        int sumOtherReports = sumAllReports - sumFrequentReports;
-        topTenAnimals.put("other", sumOtherReports);
+        int sumAllAnimals = animalCounters.values().stream().reduce(0, Integer::sum);
+        int sumFrequentAnimals = topTenAnimals.values().stream().reduce(0, Integer::sum);
+        int sumOtherAnimals = sumAllAnimals - sumFrequentAnimals;
+        topTenAnimals.put("other", sumOtherAnimals);
 
         // Data for the 'top 5 reporters' chart
         Projection userIdProjection = new PropertyProjection("userId", String.class);
@@ -69,7 +69,7 @@ public class ChartsServlet extends HttpServlet {
         // Data for the 'users state' chart
         Map<String, Integer> usersState = new HashMap<>();
         int sumReportsByUsers = userCounters.values().stream().reduce(0, Integer::sum);
-        int sumGuestReporters = sumAllReports - sumReportsByUsers;
+        int sumGuestReporters = sumAllAnimals - sumReportsByUsers;
         usersState.put("logged-in reporters", sumReportsByUsers);
         usersState.put("guest reporters", sumGuestReporters );
 

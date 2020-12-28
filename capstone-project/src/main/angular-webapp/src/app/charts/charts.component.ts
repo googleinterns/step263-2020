@@ -8,12 +8,12 @@ import { ChartsService } from '../charts.service';
 })
 export class ChartsComponent implements OnInit {
   
-  public animalNamesData = [];
-  public usersStateData = [];
-  public topReportersData = [];
-  public displayCharts;
-  public displayTopFive;
-  public columnNames = ['name', 'num. of reports'];
+  animalNamesData = [];
+  usersStateData = [];
+  topReportersData = [];
+  displayCharts;
+  displayTopFive;
+  columnNames = ['name', 'num. of reports'];
 
   constructor(public chartsService : ChartsService) {
     this.chartsService.animalNamesData.subscribe(animalNameData => {
