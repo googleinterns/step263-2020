@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ChartsService } from '../charts.service';
+import {MatSidenav} from '@angular/material/sidenav';
 
 @Component({
   selector: 'app-charts',
@@ -14,6 +15,7 @@ export class ChartsComponent implements OnInit {
   displayCharts;
   displayTopFive;
   columnNames = ['Name', 'Number of reports'];
+  @ViewChild('sidenav') sidenav: MatSidenav;
 
   constructor(public chartsService : ChartsService) {
     this.chartsService.getAnimalNamesData().subscribe(animalNameData => {

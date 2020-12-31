@@ -4,13 +4,13 @@
 
 <body>
     <div *ngIf="displayCharts" style="text-align: center;">
-        <div style="display: inline-block;">
+        <div>
             <google-chart title="Animals Reported" type="PieChart" [data]="animalNamesData" height="700" width="700"></google-chart>
         </div>
-        <div style="display: inline-block;">
+        <div>
             <google-chart title="Users" type="PieChart" [data]="usersStateData" height="700" width="700"></google-chart>
         </div>
-        <div *ngIf="displayTopFive" style="display: inline-block;">
+        <div *ngIf="displayTopFive">
             <google-chart title="Top 5 Reporters" type="ColumnChart" [columns]=columnNames [data]="topReportersData" height="700" width="700"></google-chart>
         </div>
     </div>
