@@ -230,22 +230,29 @@ export class MapComponent implements OnInit {
     this.markerService.pushMarker([markerForDisplay, marker]);
 
     google.maps.event.addListener(markerForDisplay, 'click', () => {
-      const markerData = this.markerService.getMarker(markerForDisplay);
-      if (marker.blobKey) {
-        this.getBlobFromKey(marker.blobKey)
-          .then((blob) => {
-            const imageUrl = MapComponent.getUrlFromBlob(blob);
-            this.generateInfoWindow(markerForDisplay, markerData, imageUrl);
-          });
-      }
-      else {
-        this.generateInfoWindow(markerForDisplay, markerData);
-      }
+      this.generateInfoWindow(marker, markerForDisplay)
     });
+      
+}
+
+  // Checks if there is a blob key and calls generates the info window
+  generateInfoWindow(marker, markerForDisplay){
+    const markerData = this.markerService.getMarker(markerForDisplay);
+    if (marker.blobKey) {
+      this.getBlobFromKey(marker.blobKey)
+        .then((blob) => {
+          const imageUrl = MapComponent.getUrlFromBlob(blob);
+          this.displayInfoWindow(markerForDisplay, markerData, imageUrl);
+        });
+    }
+    else {
+      this.displayInfoWindow(markerForDisplay, markerData);
+    }
   }
 
+
   // Creates an info window to be displayed after user clicks the marker
-  generateInfoWindow(markerForDisplay, marker, imageUrl?) {
+  displayInfoWindow(markerForDisplay, marker, imageUrl?) {
     const markersInfoWindow = new google.maps.InfoWindow();
     const infoWindowComponent = this.buildDisplayInfoWindowComponent(marker, imageUrl);
     markersInfoWindow.setContent(infoWindowComponent.location.nativeElement);
