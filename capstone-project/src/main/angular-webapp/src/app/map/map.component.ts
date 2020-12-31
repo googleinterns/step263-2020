@@ -154,7 +154,7 @@ export class MapComponent implements OnInit {
             map: this.gMap,
             position: new google.maps.LatLng(marker.lat, marker.lng)
           });
-          this.generateInfoWindow(markerForDisplay, marker);
+          this.generateInfoWindow(marker, markerForDisplay);
           this.addMarkerForDisplay(marker, markerForDisplay);
         }
         this.chartsService.getChartsData();
@@ -230,23 +230,23 @@ export class MapComponent implements OnInit {
     this.markerService.pushMarker([markerForDisplay, marker]);
 
     google.maps.event.addListener(markerForDisplay, 'click', () => {
-      this.generateInfoWindow(marker, markerForDisplay)
+      const markerData = this.markerService.getMarker(markerForDisplay);
+      this.generateInfoWindow(markerData, markerForDisplay)
     });
       
 }
 
-  // Checks if there is a blob key and calls generates the info window
+  // Checks if there is a blob key and calls generates the info window 
   generateInfoWindow(marker, markerForDisplay){
-    const markerData = this.markerService.getMarker(markerForDisplay);
     if (marker.blobKey) {
       this.getBlobFromKey(marker.blobKey)
         .then((blob) => {
           const imageUrl = MapComponent.getUrlFromBlob(blob);
-          this.displayInfoWindow(markerForDisplay, markerData, imageUrl);
+          this.displayInfoWindow(markerForDisplay, marker, imageUrl);
         });
     }
     else {
-      this.displayInfoWindow(markerForDisplay, markerData);
+      this.displayInfoWindow(markerForDisplay, marker);
     }
   }
 
