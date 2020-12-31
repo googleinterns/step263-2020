@@ -236,7 +236,7 @@ export class MapComponent implements OnInit {
       
 }
 
-  // Checks if there is a blob key and calls generates the info window
+  // Checks if there is a blob key and calls generates the info window 
   generateInfoWindow(marker, markerForDisplay){
     if (marker.blobKey) {
       this.getBlobFromKey(marker.blobKey)
