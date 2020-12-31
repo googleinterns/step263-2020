@@ -42,8 +42,7 @@ public class ChartsServlet extends HttpServlet {
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
         // Data for the 'animals reported' chart
-        Projection animalProjection = new PropertyProjection("animal", String.class);
-        Query queryAnimalNames = new Query("Marker").addProjection(animalProjection);
+        Query queryAnimalNames = new Query("Marker");
         List<Entity> animalList = datastore.prepare(queryAnimalNames).asList(FetchOptions.Builder.withDefaults());
         // If no reports have been made - set the response to be an empty object.
         if(animalList.isEmpty()) {
@@ -58,9 +57,7 @@ public class ChartsServlet extends HttpServlet {
         topTenAnimals.put("other", sumOtherAnimals);
 
         // Data for the 'top 5 reporters' chart
-        Projection userIdProjection = new PropertyProjection("userId", String.class);
-        Projection reporterProjection = new PropertyProjection("reporter", String.class);
-        Query queryUsers = new Query("Marker").addProjection(userIdProjection).addProjection(reporterProjection);
+        Query queryUsers = new Query("Marker");
         List<Entity> usersList = datastore.prepare(queryUsers).asList(FetchOptions.Builder.withDefaults());
         Map<String, Integer> userCounters = countOccurrences(usersList, "userId");
         Map<String, Integer> topFiveIds = getMostFrequent(userCounters, 5);
@@ -87,9 +84,11 @@ public class ChartsServlet extends HttpServlet {
     private static Map<String, Integer> countOccurrences(List<Entity> queryResultList, String propertyName) {
         Map<String, Integer> countersMap = new HashMap<>();
         for (Entity entity : queryResultList) {
-            String instanceKey = (String) entity.getProperty(propertyName);
-            Integer instanceCounter = countersMap.get(instanceKey.toLowerCase());
-            countersMap.put(instanceKey.toLowerCase(), (instanceCounter == null) ? 1 : instanceCounter + 1);
+            if(entity.hasProperty(propertyName)) {
+                String instanceKey = (String) entity.getProperty(propertyName);
+                Integer instanceCounter = countersMap.get(instanceKey.toLowerCase());
+                countersMap.put(instanceKey.toLowerCase(), (instanceCounter == null) ? 1 : instanceCounter + 1);
+            }
         }
         return  countersMap;
     }

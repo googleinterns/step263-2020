@@ -14,12 +14,17 @@
     <div>
         <mat-drawer-container [hasBackdrop]="false">
             <mat-drawer #drawer mode="side" (keydown.escape)="drawer.toggle()" disableClose>
+                <h1 style="font-size:40px; font-weight: bold; font-family: 'Open Sans', 'Helvetica Neue', sans-serif;">Statistics</h1>
                 <app-charts></app-charts>
             </mat-drawer>
 
             <mat-drawer-content style="background-color: white;">
-                
-                <p><button mat-raised-button (click)="drawer.toggle()">Statistics</button></p>
+
+                <p>
+                    <button mat-raised-button (click)="drawer.toggle()">
+                        <mat-icon>menu</mat-icon>
+                    </button>
+                </p>
                 <div style="margin-left: 10px;">
                     <app-marker-filter></app-marker-filter>
                 </div>
@@ -29,4 +34,5 @@
         </mat-drawer-container>
     </div>
 </body>
+
 </html>
